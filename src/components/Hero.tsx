@@ -20,9 +20,14 @@ const Hero = () => {
         <h4 className="text-wine uppercase tracking-[0.3em] text-sm font-light mb-4 opacity-0 animate-fade-in">
           The Private Collection
         </h4>
-        <h1 className="font-serif text-5xl md:text-7xl font-medium mb-6 opacity-0 animate-fade-in animate-delay-100">
-          <span className="block">Vino</span>
-          <span className="block text-gradient">Nero</span>
+        <h1 className="font-serif text-5xl md:text-7xl font-medium mb-6">
+          <span className="block opacity-0 animate-fade-in animate-delay-100">Vino</span>
+          <span className="block text-gradient relative overflow-hidden">
+            <span className="inline-block opacity-0 animate-fade-in animate-delay-200">
+              Nero
+            </span>
+            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-wine to-wine-light transform -translate-x-full animate-[slideInLeft_1.5s_ease-in-out_forwards_0.5s]"></span>
+          </span>
         </h1>
         <p className="max-w-xl mx-auto text-white/80 text-lg mb-10 leading-relaxed opacity-0 animate-fade-in animate-delay-200">
           A curated selection of the finest wines from around the world, stored in perfect conditions and cataloged for your pleasure.
@@ -32,9 +37,6 @@ const Hero = () => {
           <Link to="/collection" className="btn-wine group">
             <span>Explore Collection</span>
             <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
-          <Link to="/about" className="text-white border border-white/20 rounded-md px-6 py-3 transition-colors hover:bg-white/5">
-            About Vino Nero
           </Link>
         </div>
       </div>

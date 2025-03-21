@@ -32,7 +32,6 @@ const Navbar = () => {
   const links = [
     { name: 'Home', path: '/' },
     { name: 'Collection', path: '/collection' },
-    { name: 'About', path: '/about' },
   ];
 
   const isActive = (path: string) => {
