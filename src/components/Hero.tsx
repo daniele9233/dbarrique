@@ -1,5 +1,5 @@
 
-import { ArrowRight, Wine } from 'lucide-react';
+import { ArrowRight, Container } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Hero = () => {
@@ -23,7 +23,7 @@ const Hero = () => {
         <h1 className="font-serif text-5xl md:text-7xl font-medium mb-6">
           <span className="block opacity-0 animate-fade-in animate-delay-100">Vino</span>
           <div className="flex items-center justify-center space-x-3">
-            <Wine className="h-10 w-10 md:h-14 md:w-14 text-wine opacity-0 animate-fade-in animate-delay-200" />
+            <Container className="h-10 w-10 md:h-14 md:w-14 text-wine opacity-0 animate-fade-in animate-delay-200" />
             <span className="block relative overflow-hidden">
               <span className="inline-block text-wine opacity-0 animate-fade-in animate-delay-200">
                 Nero
