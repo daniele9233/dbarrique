@@ -1,5 +1,5 @@
 
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Wine } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Hero = () => {
@@ -22,12 +22,15 @@ const Hero = () => {
         </h4>
         <h1 className="font-serif text-5xl md:text-7xl font-medium mb-6">
           <span className="block opacity-0 animate-fade-in animate-delay-100">Vino</span>
-          <span className="block text-gradient relative overflow-hidden">
-            <span className="inline-block opacity-0 animate-fade-in animate-delay-200">
-              Nero
+          <div className="flex items-center justify-center space-x-3">
+            <Wine className="h-10 w-10 md:h-14 md:w-14 text-wine opacity-0 animate-fade-in animate-delay-200" />
+            <span className="block text-gradient relative overflow-hidden">
+              <span className="inline-block opacity-0 animate-fade-in animate-delay-200">
+                Nero
+              </span>
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-wine to-wine-light transform -translate-x-full animate-[slideInLeft_1.5s_ease-in-out_forwards_0.5s]"></span>
             </span>
-            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-wine to-wine-light transform -translate-x-full animate-[slideInLeft_1.5s_ease-in-out_forwards_0.5s]"></span>
-          </span>
+          </div>
         </h1>
         <p className="max-w-xl mx-auto text-white/80 text-lg mb-10 leading-relaxed opacity-0 animate-fade-in animate-delay-200">
           A curated selection of the finest wines from around the world, stored in perfect conditions and cataloged for your pleasure.
