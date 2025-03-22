@@ -1,26 +1,21 @@
 
 import { ArrowDown, Grape } from 'lucide-react';
-import { Input } from "@/components/ui/input";
-import { Search } from 'lucide-react';
 import WineCollection from './WineCollection';
 
 const Hero = () => {
   const scrollToCollection = () => {
+    // Add smooth scroll with a fade transition
     document.getElementById('collection-section')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
     <div className="flex flex-col">
-      {/* Hero Section */}
+      {/* Hero Section with wine illustration background */}
       <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Background with wine illustration */}
         <div className="absolute inset-0 bg-noir-dark">
+          <div className="absolute inset-0 bg-[url('/lovable-uploads/4574b078-f6e3-4d0d-9355-3a94f72d96a6.png')] bg-contain bg-center opacity-20"></div>
           <div className="absolute inset-0 bg-gradient-radial from-noir-light/10 to-noir-dark opacity-80"></div>
-        </div>
-        
-        {/* Left side illustration */}
-        <div className="absolute left-0 h-full w-1/3 flex items-center justify-center opacity-20">
-          <div className="relative h-[90%] w-full bg-[url('/lovable-uploads/311c609b-df0b-4316-9297-c778f5daff8f.png')] bg-contain bg-no-repeat bg-center"></div>
         </div>
         
         {/* Wine glass decoration - positioned absolutely */}
@@ -32,22 +27,21 @@ const Hero = () => {
           <div className="flex items-center justify-center space-x-3 mb-10">
             <Grape className="h-14 w-14 text-wine opacity-0 animate-fade-in animate-delay-100" />
             <span className="block relative overflow-hidden font-serif text-7xl font-medium opacity-0 animate-fade-in animate-delay-100">
-              <span className="inline-block">DBarrique</span>
+              <span className="inline-block">
+                <span className="text-white">D</span><span className="text-wine">Barrique</span>
+              </span>
               <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-wine to-wine-light transform -translate-x-full animate-[slideInLeft_1.5s_ease-in-out_forwards_0.5s]"></span>
             </span>
           </div>
           
+          {/* Quote instead of search bar */}
           <div className="max-w-md mx-auto mt-12 opacity-0 animate-fade-in animate-delay-300">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-white/40" />
-              </div>
-              <Input 
-                type="text" 
-                placeholder="Search your wine collection..." 
-                className="w-full pl-10 pr-4 py-6 rounded-md bg-noir-light/50 backdrop-blur-sm border border-white/10 focus:border-wine focus:ring-1 focus:ring-wine text-white placeholder:text-white/40"
-              />
-            </div>
+            <p className="text-white/80 italic text-xl">
+              "Bere del vino è bere del genio."
+            </p>
+            <p className="text-white/60 text-sm mt-2">
+              — Charles Baudelaire
+            </p>
           </div>
         </div>
         
@@ -60,8 +54,11 @@ const Hero = () => {
         </div>
       </div>
       
-      {/* Collection Section */}
-      <div id="collection-section" className="min-h-screen bg-noir">
+      {/* Collection Section with transition */}
+      <div id="collection-section" className="min-h-screen bg-noir relative">
+        {/* Transition overlay */}
+        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-noir-dark to-transparent z-10"></div>
+        
         <WineCollection limit={6} />
       </div>
     </div>

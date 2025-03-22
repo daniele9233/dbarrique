@@ -13,7 +13,7 @@ const Footer = () => {
           <div className="space-y-4">
             <Link to="/" className="flex items-center space-x-2 text-white">
               <Grape className="h-8 w-8 text-wine" />
-              <span className="font-serif text-xl">DBarrique</span>
+              <span className="font-serif text-xl"><span className="text-white">D</span><span className="text-wine">Barrique</span></span>
             </Link>
             <p className="text-white/60 text-sm leading-relaxed">
               A personal wine cellar management system for the discerning collector. 
