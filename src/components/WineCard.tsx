@@ -1,7 +1,11 @@
 
 import { useState } from 'react';
-import { Star, Plus } from 'lucide-react';
+import { Star, Plus, Edit, Save } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/hooks/use-toast";
 
 interface WineCardProps {
   name: string;
@@ -15,6 +19,25 @@ interface WineCardProps {
 const WineCard = ({ name, region, year, rating, type, image }: WineCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  
+  const [editedWine, setEditedWine] = useState({
+    name, 
+    region, 
+    year, 
+    rating, 
+    type, 
+    image,
+    description: type === 'red' ? 'This exceptional red wine from ' + region + ' showcases remarkable complexity and character. With notes of dark berries, leather, and oak, it offers an unforgettable tasting experience.' : 
+              type === 'white' ? 'This exceptional white wine from ' + region + ' showcases remarkable complexity and character. With notes of citrus, green apple, and honeysuckle, it offers an unforgettable tasting experience.' : 
+              type === 'rosé' ? 'This exceptional rosé wine from ' + region + ' showcases remarkable complexity and character. With notes of strawberry, watermelon, and rose petal, it offers an unforgettable tasting experience.' : 
+              'This exceptional sparkling wine from ' + region + ' showcases remarkable complexity and character. With notes of pear, brioche, and toasted almonds, it offers an unforgettable tasting experience.',
+    pairing: type === 'red' ? 'Red meat, aged cheeses, and mushroom dishes' : 
+            type === 'white' ? 'Seafood, poultry, and fresh salads' : 
+            type === 'rosé' ? 'Mediterranean cuisine, grilled vegetables, and light pasta' : 
+            'Oysters, light appetizers, and celebrations',
+    storage: 'Best stored at 12-16°C with 70% humidity. Will continue to develop for ' + (type === 'red' ? '5-10' : '2-4') + ' years.'
+  });
   
   const typeColors = {
     red: 'bg-wine',
@@ -28,6 +51,22 @@ const WineCard = ({ name, region, year, rating, type, image }: WineCardProps) =>
     white: 'text-noir',
     rosé: 'text-noir',
     sparkling: 'text-noir',
+  };
+
+  const handleSaveChanges = () => {
+    // In a real app, this would save to a database
+    toast({
+      title: "Changes saved",
+      description: `${editedWine.name} has been updated.`,
+    });
+    setIsEditMode(false);
+  };
+  
+  const handleEditField = (field: string, value: string | number) => {
+    setEditedWine({
+      ...editedWine,
+      [field]: value
+    });
   };
   
   return (
@@ -97,13 +136,63 @@ const WineCard = ({ name, region, year, rating, type, image }: WineCardProps) =>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="bg-noir-light border-white/10 text-white max-w-3xl">
           <DialogHeader>
-            <DialogTitle className="font-serif text-3xl">{name}</DialogTitle>
-            <DialogDescription className="text-white/70">{region}, {year}</DialogDescription>
+            <DialogTitle className="font-serif text-3xl flex justify-between items-center">
+              {isEditMode ? (
+                <Input 
+                  value={editedWine.name} 
+                  onChange={(e) => handleEditField('name', e.target.value)}
+                  className="bg-noir border-white/20 text-white text-3xl font-serif"
+                />
+              ) : (
+                <span>{editedWine.name}</span>
+              )}
+              <Button 
+                onClick={() => isEditMode ? handleSaveChanges() : setIsEditMode(true)}
+                variant="outline"
+                size="icon"
+                className="rounded-full bg-transparent border-wine hover:bg-wine/20"
+              >
+                {isEditMode ? <Save className="h-5 w-5" /> : <Edit className="h-5 w-5" />}
+              </Button>
+            </DialogTitle>
+            <DialogDescription className="text-white/70">
+              {isEditMode ? (
+                <div className="flex gap-4 mt-2">
+                  <Input 
+                    value={editedWine.region} 
+                    onChange={(e) => handleEditField('region', e.target.value)}
+                    className="bg-noir border-white/20 text-white flex-grow"
+                  />
+                  <Input 
+                    value={editedWine.year} 
+                    onChange={(e) => handleEditField('year', parseInt(e.target.value))}
+                    className="bg-noir border-white/20 text-white w-24"
+                    type="number"
+                  />
+                </div>
+              ) : (
+                <span>{editedWine.region}, {editedWine.year}</span>
+              )}
+            </DialogDescription>
           </DialogHeader>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
             <div className="rounded-lg overflow-hidden h-[300px]">
-              <img src={image} alt={name} className="w-full h-full object-cover" />
+              {isEditMode ? (
+                <div className="flex flex-col h-full">
+                  <label className="text-sm text-white/70 mb-1">Image URL</label>
+                  <Input 
+                    value={editedWine.image} 
+                    onChange={(e) => handleEditField('image', e.target.value)}
+                    className="bg-noir border-white/20 text-white mb-2"
+                  />
+                  <div className="bg-noir-dark flex-grow rounded-lg overflow-hidden">
+                    <img src={editedWine.image} alt={editedWine.name} className="w-full h-full object-cover" />
+                  </div>
+                </div>
+              ) : (
+                <img src={editedWine.image} alt={editedWine.name} className="w-full h-full object-cover" />
+              )}
             </div>
             
             <div className="space-y-4">
@@ -112,8 +201,10 @@ const WineCard = ({ name, region, year, rating, type, image }: WineCardProps) =>
                 <div className="flex items-center space-x-1">
                   {[...Array(5)].map((_, i) => (
                     <Star 
-                      key={i} 
-                      className={`h-5 w-5 ${i < rating ? 'text-wine fill-wine' : 'text-gray-400'}`} 
+                      key={i}
+                      onClick={() => isEditMode && handleEditField('rating', i + 1)}
+                      className={`h-5 w-5 ${i < editedWine.rating ? 'text-wine fill-wine' : 'text-gray-400'} 
+                        ${isEditMode ? 'cursor-pointer hover:text-wine-light' : ''}`}
                     />
                   ))}
                 </div>
@@ -121,41 +212,95 @@ const WineCard = ({ name, region, year, rating, type, image }: WineCardProps) =>
               
               <div>
                 <h4 className="text-sm uppercase tracking-wider text-wine/80 mb-1">Type</h4>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium uppercase ${typeColors[type]} ${typeTextColors[type]}`}>
-                  {type}
-                </span>
+                {isEditMode ? (
+                  <select 
+                    value={editedWine.type}
+                    onChange={(e) => handleEditField('type', e.target.value)}
+                    className="bg-noir border border-white/20 rounded-md px-3 py-1 text-white"
+                  >
+                    <option value="red">Red</option>
+                    <option value="white">White</option>
+                    <option value="rosé">Rosé</option>
+                    <option value="sparkling">Sparkling</option>
+                  </select>
+                ) : (
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium uppercase ${typeColors[editedWine.type]} ${typeTextColors[editedWine.type]}`}>
+                    {editedWine.type}
+                  </span>
+                )}
               </div>
               
               <div>
                 <h4 className="text-sm uppercase tracking-wider text-wine/80 mb-1">Description</h4>
-                <p className="text-white/80">
-                  This exceptional {type} wine from {region} showcases remarkable complexity and character.
-                  With notes of {type === 'red' ? 'dark berries, leather, and oak' : 
-                              type === 'white' ? 'citrus, green apple, and honeysuckle' : 
-                              type === 'rosé' ? 'strawberry, watermelon, and rose petal' : 
-                              'pear, brioche, and toasted almonds'}, 
-                  it offers an unforgettable tasting experience.
-                </p>
+                {isEditMode ? (
+                  <Textarea 
+                    value={editedWine.description}
+                    onChange={(e) => handleEditField('description', e.target.value)}
+                    className="bg-noir border-white/20 text-white h-24"
+                  />
+                ) : (
+                  <p className="text-white/80">{editedWine.description}</p>
+                )}
               </div>
               
               <div>
                 <h4 className="text-sm uppercase tracking-wider text-wine/80 mb-1">Perfect Pairing</h4>
-                <p className="text-white/80">
-                  {type === 'red' ? 'Red meat, aged cheeses, and mushroom dishes' : 
-                   type === 'white' ? 'Seafood, poultry, and fresh salads' : 
-                   type === 'rosé' ? 'Mediterranean cuisine, grilled vegetables, and light pasta' : 
-                   'Oysters, light appetizers, and celebrations'}
-                </p>
+                {isEditMode ? (
+                  <Input 
+                    value={editedWine.pairing}
+                    onChange={(e) => handleEditField('pairing', e.target.value)}
+                    className="bg-noir border-white/20 text-white"
+                  />
+                ) : (
+                  <p className="text-white/80">{editedWine.pairing}</p>
+                )}
               </div>
               
               <div>
                 <h4 className="text-sm uppercase tracking-wider text-wine/80 mb-1">Storage</h4>
-                <p className="text-white/80">
-                  Best stored at 12-16°C with 70% humidity. Will continue to develop for {type === 'red' ? '5-10' : '2-4'} years.
-                </p>
+                {isEditMode ? (
+                  <Input 
+                    value={editedWine.storage}
+                    onChange={(e) => handleEditField('storage', e.target.value)}
+                    className="bg-noir border-white/20 text-white"
+                  />
+                ) : (
+                  <p className="text-white/80">{editedWine.storage}</p>
+                )}
               </div>
             </div>
           </div>
+          
+          {isEditMode && (
+            <div className="flex justify-end gap-4 mt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsEditMode(false);
+                  setEditedWine({ name, region, year, rating, type, image, 
+                    description: type === 'red' ? 'This exceptional red wine from ' + region + ' showcases remarkable complexity and character. With notes of dark berries, leather, and oak, it offers an unforgettable tasting experience.' : 
+                                type === 'white' ? 'This exceptional white wine from ' + region + ' showcases remarkable complexity and character. With notes of citrus, green apple, and honeysuckle, it offers an unforgettable tasting experience.' : 
+                                type === 'rosé' ? 'This exceptional rosé wine from ' + region + ' showcases remarkable complexity and character. With notes of strawberry, watermelon, and rose petal, it offers an unforgettable tasting experience.' : 
+                                'This exceptional sparkling wine from ' + region + ' showcases remarkable complexity and character. With notes of pear, brioche, and toasted almonds, it offers an unforgettable tasting experience.',
+                    pairing: type === 'red' ? 'Red meat, aged cheeses, and mushroom dishes' : 
+                            type === 'white' ? 'Seafood, poultry, and fresh salads' : 
+                            type === 'rosé' ? 'Mediterranean cuisine, grilled vegetables, and light pasta' : 
+                            'Oysters, light appetizers, and celebrations',
+                    storage: 'Best stored at 12-16°C with 70% humidity. Will continue to develop for ' + (type === 'red' ? '5-10' : '2-4') + ' years.'
+                  });
+                }}
+                className="border-white/10 hover:bg-noir hover:text-white"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSaveChanges}
+                className="bg-wine hover:bg-wine-light"
+              >
+                Save Changes
+              </Button>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </>

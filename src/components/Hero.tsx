@@ -1,14 +1,16 @@
 
 import { ArrowRight, Grape } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Input } from "@/components/ui/input";
+import { Search } from 'lucide-react';
 
 const Hero = () => {
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background with subtle animation */}
+      {/* Background con vineyard image */}
       <div className="absolute inset-0 bg-noir-dark">
         <div className="absolute inset-0 bg-gradient-radial from-noir-light/10 to-noir-dark opacity-80"></div>
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjIiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptNiA2djZoNnYtNmgtNnptLTEyIDBoNnY2aC02di02em0xMiAwaDZ2NmgtNnYtNnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-20"></div>
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1444491741275-3747c53c99b4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')] bg-cover bg-center opacity-20"></div>
       </div>
       
       {/* Wine glass decoration - positioned absolutely */}
@@ -17,32 +19,33 @@ const Hero = () => {
       
       {/* Main content */}
       <div className="relative z-10 container mx-auto px-4 text-center">
-        <h4 className="text-wine uppercase tracking-[0.3em] text-sm font-light mb-4 opacity-0 animate-fade-in">
-          The Private Collection
-        </h4>
-        <h1 className="font-serif text-5xl md:text-7xl font-medium mb-6">
-          <span className="block opacity-0 animate-fade-in animate-delay-100">D</span>
-          <div className="flex items-center justify-center space-x-3">
-            <Grape className="h-10 w-10 md:h-14 md:w-14 text-wine opacity-0 animate-fade-in animate-delay-200" />
-            <span className="block relative overflow-hidden">
-              <span className="inline-block text-wine opacity-0 animate-fade-in animate-delay-200">
-                Barrique
-              </span>
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-wine to-wine-light transform -translate-x-full animate-[slideInLeft_1.5s_ease-in-out_forwards_0.5s]"></span>
+        <div className="flex items-center justify-center space-x-3 mb-6">
+          <Grape className="h-14 w-14 text-wine opacity-0 animate-fade-in animate-delay-100" />
+          <span className="block relative overflow-hidden font-serif text-7xl font-medium opacity-0 animate-fade-in animate-delay-100">
+            <span className="inline-block">
+              DBarrique
             </span>
-          </div>
-        </h1>
-        <p className="max-w-xl mx-auto text-white/80 text-lg mb-10 leading-relaxed opacity-0 animate-fade-in animate-delay-200 font-gothic">
+            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-wine to-wine-light transform -translate-x-full animate-[slideInLeft_1.5s_ease-in-out_forwards_0.5s]"></span>
+          </span>
+        </div>
+        
+        <p className="max-w-xl mx-auto text-white/80 text-lg mb-10 leading-relaxed opacity-0 animate-fade-in animate-delay-200 font-serif italic">
           "Bere del vino è bere del genio."
           <br />
-          <span className="text-wine/80 text-sm mt-2 italic block">Charles Baudelaire</span>
+          <span className="text-wine/80 text-sm mt-2 block">Charles Baudelaire</span>
         </p>
         
-        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 justify-center opacity-0 animate-fade-in animate-delay-300">
-          <Link to="/collection" className="btn-wine group">
-            <span>Explore Collection</span>
-            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
+        <div className="max-w-md mx-auto opacity-0 animate-fade-in animate-delay-300">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-white/40" />
+            </div>
+            <Input 
+              type="text" 
+              placeholder="Search your wine collection..." 
+              className="w-full pl-10 pr-4 py-6 rounded-md bg-noir-light/50 backdrop-blur-sm border border-white/10 focus:border-wine focus:ring-1 focus:ring-wine text-white placeholder:text-white/40"
+            />
+          </div>
         </div>
       </div>
       
