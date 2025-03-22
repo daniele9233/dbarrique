@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { Star, Plus, Edit, Save } from 'lucide-react';
+import { useState, useRef, ChangeEvent } from 'react';
+import { Star, Plus, Edit, Save, Upload } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ const WineCard = ({ name, region, year, rating, type, image }: WineCardProps) =>
   const [isHovered, setIsHovered] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [editedWine, setEditedWine] = useState({
     name, 
@@ -69,6 +70,39 @@ const WineCard = ({ name, region, year, rating, type, image }: WineCardProps) =>
     });
   };
   
+  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        handleEditField('image', e.target.result as string);
+        toast({
+          title: "Image uploaded",
+          description: "Your image has been successfully uploaded.",
+        });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  const handleUploadButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+  
+  // Convert 1-10 rating to an array of 10 positions for stars
+  const renderRatingStars = (rating: number, editable = false) => {
+    return [...Array(10)].map((_, i) => (
+      <Star 
+        key={i}
+        onClick={() => editable && handleEditField('rating', i + 1)}
+        className={`h-4 w-4 ${i < rating ? 'text-wine fill-wine' : 'text-gray-400'} 
+          ${editable ? 'cursor-pointer hover:text-wine-light' : ''}`}
+      />
+    ));
+  };
+  
   return (
     <>
       <div 
@@ -94,13 +128,8 @@ const WineCard = ({ name, region, year, rating, type, image }: WineCardProps) =>
         {/* Main content */}
         <div className="absolute bottom-0 left-0 w-full p-6 transform transition-transform duration-500 ease-wine-bounce">
           <div className="space-y-3">
-            <div className="flex items-center space-x-1">
-              {[...Array(5)].map((_, i) => (
-                <Star 
-                  key={i} 
-                  className={`h-4 w-4 ${i < rating ? 'text-wine fill-wine' : 'text-gray-400'}`} 
-                />
-              ))}
+            <div className="flex items-center space-x-0.5 flex-wrap">
+              {renderRatingStars(rating)}
             </div>
             
             <h3 className="font-serif text-2xl">{name}</h3>
@@ -180,12 +209,30 @@ const WineCard = ({ name, region, year, rating, type, image }: WineCardProps) =>
             <div className="rounded-lg overflow-hidden h-[300px]">
               {isEditMode ? (
                 <div className="flex flex-col h-full">
-                  <label className="text-sm text-white/70 mb-1">Image URL</label>
-                  <Input 
-                    value={editedWine.image} 
-                    onChange={(e) => handleEditField('image', e.target.value)}
-                    className="bg-noir border-white/20 text-white mb-2"
-                  />
+                  <label className="text-sm text-white/70 mb-1">Wine Image</label>
+                  <div className="relative mb-2">
+                    <Input 
+                      value={editedWine.image} 
+                      onChange={(e) => handleEditField('image', e.target.value)}
+                      className="bg-noir border-white/20 text-white pr-12"
+                      placeholder="Enter image URL or upload"
+                    />
+                    <Button 
+                      onClick={handleUploadButtonClick}
+                      variant="outline" 
+                      size="icon"
+                      className="absolute right-0 top-0 h-full aspect-square rounded-l-none bg-noir border-white/20 hover:bg-wine/20"
+                    >
+                      <Upload className="h-4 w-4" />
+                    </Button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleFileUpload}
+                    />
+                  </div>
                   <div className="bg-noir-dark flex-grow rounded-lg overflow-hidden">
                     <img src={editedWine.image} alt={editedWine.name} className="w-full h-full object-cover" />
                   </div>
@@ -197,16 +244,10 @@ const WineCard = ({ name, region, year, rating, type, image }: WineCardProps) =>
             
             <div className="space-y-4">
               <div>
-                <h4 className="text-sm uppercase tracking-wider text-wine/80 mb-1">Rating</h4>
-                <div className="flex items-center space-x-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star 
-                      key={i}
-                      onClick={() => isEditMode && handleEditField('rating', i + 1)}
-                      className={`h-5 w-5 ${i < editedWine.rating ? 'text-wine fill-wine' : 'text-gray-400'} 
-                        ${isEditMode ? 'cursor-pointer hover:text-wine-light' : ''}`}
-                    />
-                  ))}
+                <h4 className="text-sm uppercase tracking-wider text-wine/80 mb-1">Rating (1-10)</h4>
+                <div className="flex items-center space-x-0.5 flex-wrap">
+                  {renderRatingStars(editedWine.rating, isEditMode)}
+                  <span className="ml-2 text-white/70">{editedWine.rating}/10</span>
                 </div>
               </div>
               

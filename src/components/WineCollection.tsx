@@ -3,14 +3,14 @@ import { useState } from 'react';
 import WineCard from './WineCard';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 
-// Sample wine data
+// Sample wine data with 1-10 rating scale
 const wines = [
   {
     id: 1,
     name: "Château Margaux",
     region: "Bordeaux, France",
     year: 2015,
-    rating: 5,
+    rating: 10,
     type: "red" as const,
     image: "https://images.unsplash.com/photo-1586370434639-0fe27519d3e6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
   },
@@ -19,7 +19,7 @@ const wines = [
     name: "Barolo Riserva",
     region: "Piedmont, Italy",
     year: 2016,
-    rating: 4,
+    rating: 8,
     type: "red" as const,
     image: "https://images.unsplash.com/photo-1609951651556-5334e2706168?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80"
   },
@@ -28,7 +28,7 @@ const wines = [
     name: "Dom Pérignon",
     region: "Champagne, France",
     year: 2010,
-    rating: 5,
+    rating: 9,
     type: "sparkling" as const,
     image: "https://images.unsplash.com/photo-1594372425423-ba65d6e1e226?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80"
   },
@@ -37,7 +37,7 @@ const wines = [
     name: "Opus One",
     region: "Napa Valley, USA",
     year: 2017,
-    rating: 4,
+    rating: 8,
     type: "red" as const,
     image: "https://images.unsplash.com/photo-1566452348683-79f9cf5c3a8e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80"
   },
@@ -46,7 +46,7 @@ const wines = [
     name: "Chablis Grand Cru",
     region: "Burgundy, France",
     year: 2018,
-    rating: 4,
+    rating: 7,
     type: "white" as const,
     image: "https://images.unsplash.com/photo-1556340346-5e30da977c0d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=994&q=80"
   },
@@ -55,7 +55,7 @@ const wines = [
     name: "Whispering Angel",
     region: "Provence, France",
     year: 2021,
-    rating: 3,
+    rating: 6,
     type: "rosé" as const,
     image: "https://images.unsplash.com/photo-1588982637125-d704a8901dce?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=991&q=80"
   }

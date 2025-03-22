@@ -1,21 +1,21 @@
 
-import { useState } from 'react';
+import { useState, useRef, ChangeEvent } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import WineCard from '@/components/WineCard';
-import { Filter, Search, Plus, Grape } from 'lucide-react';
+import { Filter, Search, Plus, Grape, Upload } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 
-// Sample wine data (extended from WineCollection)
+// Sample wine data (updated to 1-10 rating scale)
 const wines = [
   {
     id: 1,
     name: "Château Margaux",
     region: "Bordeaux, France",
     year: 2015,
-    rating: 5,
+    rating: 10,
     type: "red" as const,
     image: "https://images.unsplash.com/photo-1586370434639-0fe27519d3e6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
   },
@@ -24,7 +24,7 @@ const wines = [
     name: "Barolo Riserva",
     region: "Piedmont, Italy",
     year: 2016,
-    rating: 4,
+    rating: 8,
     type: "red" as const,
     image: "https://images.unsplash.com/photo-1609951651556-5334e2706168?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80"
   },
@@ -33,7 +33,7 @@ const wines = [
     name: "Dom Pérignon",
     region: "Champagne, France",
     year: 2010,
-    rating: 5,
+    rating: 9,
     type: "sparkling" as const,
     image: "https://images.unsplash.com/photo-1594372425423-ba65d6e1e226?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80"
   },
@@ -42,7 +42,7 @@ const wines = [
     name: "Opus One",
     region: "Napa Valley, USA",
     year: 2017,
-    rating: 4,
+    rating: 8,
     type: "red" as const,
     image: "https://images.unsplash.com/photo-1566452348683-79f9cf5c3a8e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80"
   },
@@ -51,7 +51,7 @@ const wines = [
     name: "Chablis Grand Cru",
     region: "Burgundy, France",
     year: 2018,
-    rating: 4,
+    rating: 7,
     type: "white" as const,
     image: "https://images.unsplash.com/photo-1556340346-5e30da977c0d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=994&q=80"
   },
@@ -60,7 +60,7 @@ const wines = [
     name: "Whispering Angel",
     region: "Provence, France",
     year: 2021,
-    rating: 3,
+    rating: 6,
     type: "rosé" as const,
     image: "https://images.unsplash.com/photo-1588982637125-d704a8901dce?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=991&q=80"
   },
@@ -69,7 +69,7 @@ const wines = [
     name: "Sassicaia",
     region: "Tuscany, Italy",
     year: 2016,
-    rating: 5,
+    rating: 10,
     type: "red" as const,
     image: "https://images.unsplash.com/photo-1553361371-9fe24fca9c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80"
   },
@@ -78,7 +78,7 @@ const wines = [
     name: "Penfolds Grange",
     region: "South Australia",
     year: 2014,
-    rating: 5,
+    rating: 9,
     type: "red" as const,
     image: "https://images.unsplash.com/photo-1516594915697-87eb3b1c14ea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
   },
@@ -87,7 +87,7 @@ const wines = [
     name: "Cloudy Bay",
     region: "Marlborough, New Zealand",
     year: 2021,
-    rating: 4,
+    rating: 7,
     type: "white" as const,
     image: "https://images.unsplash.com/photo-1560148218-1a83060f7b32?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1035&q=80"
   }
@@ -98,6 +98,15 @@ const Collection = () => {
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [isAddWineDialogOpen, setIsAddWineDialogOpen] = useState(false);
+  const [newWine, setNewWine] = useState({
+    name: "",
+    region: "",
+    year: new Date().getFullYear(),
+    rating: 5,
+    type: "red" as "red" | "white" | "rosé" | "sparkling",
+    image: ""
+  });
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const toggleFilters = () => {
     setShowFilters(!showFilters);
@@ -121,6 +130,55 @@ const Collection = () => {
       description: "New wine has been added to your collection.",
     });
     setIsAddWineDialogOpen(false);
+    setNewWine({
+      name: "",
+      region: "",
+      year: new Date().getFullYear(),
+      rating: 5,
+      type: "red",
+      image: ""
+    });
+  };
+  
+  const handleChange = (field: string, value: string | number) => {
+    setNewWine({
+      ...newWine,
+      [field]: value
+    });
+  };
+  
+  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        handleChange('image', e.target.result as string);
+        toast({
+          title: "Image uploaded",
+          description: "Your wine image has been successfully uploaded.",
+        });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  // Rating selector for 1-10 scale
+  const renderRatingInput = () => {
+    return (
+      <div className="flex items-center space-x-4">
+        <input
+          type="range"
+          min="1"
+          max="10"
+          value={newWine.rating}
+          onChange={(e) => handleChange('rating', parseInt(e.target.value))}
+          className="w-full h-2 bg-noir rounded-lg appearance-none cursor-pointer accent-wine"
+        />
+        <span className="text-white font-medium">{newWine.rating}/10</span>
+      </div>
+    );
   };
   
   return (
@@ -242,6 +300,8 @@ const Collection = () => {
               <input
                 className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
                 placeholder="e.g. Château Margaux"
+                value={newWine.name}
+                onChange={(e) => handleChange('name', e.target.value)}
               />
             </div>
             
@@ -252,6 +312,8 @@ const Collection = () => {
               <input
                 className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
                 placeholder="e.g. Bordeaux, France"
+                value={newWine.region}
+                onChange={(e) => handleChange('region', e.target.value)}
               />
             </div>
             
@@ -264,20 +326,16 @@ const Collection = () => {
                   type="number"
                   className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
                   placeholder="e.g. 2015"
+                  value={newWine.year}
+                  onChange={(e) => handleChange('year', parseInt(e.target.value))}
                 />
               </div>
               
               <div className="space-y-2">
                 <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  Rating (1-5)
+                  Rating (1-10)
                 </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="5"
-                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
-                  placeholder="e.g. 4"
-                />
+                {renderRatingInput()}
               </div>
             </div>
             
@@ -285,8 +343,11 @@ const Collection = () => {
               <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Wine Type
               </label>
-              <select className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none">
-                <option value="">Select wine type</option>
+              <select 
+                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                value={newWine.type}
+                onChange={(e) => handleChange('type', e.target.value)}
+              >
                 <option value="red">Red</option>
                 <option value="white">White</option>
                 <option value="rosé">Rosé</option>
@@ -296,12 +357,41 @@ const Collection = () => {
             
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Image URL
+                Wine Image
               </label>
-              <input
-                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
-                placeholder="Enter image URL or upload an image"
-              />
+              <div className="flex gap-2">
+                <input
+                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                  placeholder="Enter image URL or upload an image"
+                  value={typeof newWine.image === 'string' ? newWine.image : ''}
+                  onChange={(e) => handleChange('image', e.target.value)}
+                />
+                <Button 
+                  variant="outline"
+                  className="border-white/10 hover:bg-wine hover:text-white"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload
+                </Button>
+                <input 
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  ref={fileInputRef}
+                  onChange={handleFileUpload}
+                />
+              </div>
+              
+              {newWine.image && (
+                <div className="mt-2 h-40 rounded-md overflow-hidden bg-noir-dark">
+                  <img 
+                    src={newWine.image.toString()} 
+                    alt="Wine preview" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
             </div>
           </div>
           
@@ -316,6 +406,7 @@ const Collection = () => {
             <Button
               onClick={handleAddWine}
               className="bg-wine hover:bg-wine-light"
+              disabled={!newWine.name || !newWine.region || !newWine.image}
             >
               Add to Collection
             </Button>
