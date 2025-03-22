@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { Wine, Mail, Instagram, Facebook } from 'lucide-react';
+import { Grape, Mail, Instagram, Facebook } from 'lucide-react';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -12,8 +12,8 @@ const Footer = () => {
           {/* Logo and About */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center space-x-2 text-white">
-              <Wine className="h-8 w-8 text-wine" />
-              <span className="font-serif text-xl">Vino Nero</span>
+              <Grape className="h-8 w-8 text-wine" />
+              <span className="font-serif text-xl">DBarrique</span>
             </Link>
             <p className="text-white/60 text-sm leading-relaxed">
               A personal wine cellar management system for the discerning collector. 
@@ -62,7 +62,7 @@ const Footer = () => {
                 <Facebook className="h-5 w-5" />
               </a>
               <a 
-                href="mailto:info@vinonero.com" 
+                href="mailto:info@dbarrique.com" 
                 className="h-10 w-10 rounded-full bg-white/5 hover:bg-wine flex items-center justify-center transition-colors duration-300"
                 aria-label="Email"
               >
@@ -70,14 +70,14 @@ const Footer = () => {
               </a>
             </div>
             <p className="text-white/60 text-sm">
-              Contact: <a href="mailto:info@vinonero.com" className="hover:text-wine">info@vinonero.com</a>
+              Contact: <a href="mailto:info@dbarrique.com" className="hover:text-wine">info@dbarrique.com</a>
             </p>
           </div>
         </div>
         
         <div className="border-t border-white/5 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center">
           <p className="text-white/40 text-sm">
-            © {currentYear} Vino Nero. All rights reserved.
+            © {currentYear} DBarrique. All rights reserved.
           </p>
           <p className="text-white/40 text-sm mt-2 md:mt-0">
             Designed with <span className="text-wine">♥</span> for wine lovers
