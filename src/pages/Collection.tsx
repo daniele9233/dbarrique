@@ -3,7 +3,10 @@ import { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import WineCard from '@/components/WineCard';
-import { Filter, Search } from 'lucide-react';
+import { Filter, Search, Plus, Grape } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/hooks/use-toast";
 
 // Sample wine data (extended from WineCollection)
 const wines = [
@@ -94,6 +97,7 @@ const Collection = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [isAddWineDialogOpen, setIsAddWineDialogOpen] = useState(false);
   
   const toggleFilters = () => {
     setShowFilters(!showFilters);
@@ -109,6 +113,15 @@ const Collection = () => {
     
     return matchesSearch && matchesType;
   });
+  
+  const handleAddWine = () => {
+    // This would normally submit the form data to a database
+    toast({
+      title: "Success",
+      description: "New wine has been added to your collection.",
+    });
+    setIsAddWineDialogOpen(false);
+  };
   
   return (
     <div className="min-h-screen bg-noir text-white">
@@ -147,6 +160,15 @@ const Collection = () => {
               >
                 <Filter className="h-5 w-5" />
                 <span>Filters</span>
+              </button>
+              
+              {/* Add Wine Button */}
+              <button
+                onClick={() => setIsAddWineDialogOpen(true)}
+                className="px-5 py-3 rounded-md bg-wine border border-wine hover:bg-wine-light transition-colors duration-300 flex items-center justify-center gap-2 group"
+              >
+                <Plus className="h-5 w-5 transition-transform group-hover:rotate-90" />
+                <span>Add Wine</span>
               </button>
             </div>
             
@@ -201,6 +223,105 @@ const Collection = () => {
           </div>
         </div>
       </main>
+      
+      {/* Add Wine Dialog */}
+      <Dialog open={isAddWineDialogOpen} onOpenChange={setIsAddWineDialogOpen}>
+        <DialogContent className="bg-noir-light border-white/10 text-white">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-2xl flex items-center gap-2">
+              <Grape className="h-6 w-6 text-wine" />
+              <span>Add New Wine</span>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Wine Name
+              </label>
+              <input
+                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                placeholder="e.g. Château Margaux"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Region
+              </label>
+              <input
+                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                placeholder="e.g. Bordeaux, France"
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Year
+                </label>
+                <input
+                  type="number"
+                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                  placeholder="e.g. 2015"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Rating (1-5)
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="5"
+                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                  placeholder="e.g. 4"
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Wine Type
+              </label>
+              <select className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none">
+                <option value="">Select wine type</option>
+                <option value="red">Red</option>
+                <option value="white">White</option>
+                <option value="rosé">Rosé</option>
+                <option value="sparkling">Sparkling</option>
+              </select>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Image URL
+              </label>
+              <input
+                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                placeholder="Enter image URL or upload an image"
+              />
+            </div>
+          </div>
+          
+          <div className="flex justify-end gap-4 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setIsAddWineDialogOpen(false)}
+              className="border-white/10 hover:bg-noir hover:text-white"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleAddWine}
+              className="bg-wine hover:bg-wine-light"
+            >
+              Add to Collection
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       
       <Footer />
     </div>

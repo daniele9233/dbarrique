@@ -1,5 +1,5 @@
 
-import { ArrowRight, Container } from 'lucide-react';
+import { ArrowRight, Grape } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Hero = () => {
@@ -21,21 +21,21 @@ const Hero = () => {
           The Private Collection
         </h4>
         <h1 className="font-serif text-5xl md:text-7xl font-medium mb-6">
-          <span className="block opacity-0 animate-fade-in animate-delay-100">Vino</span>
+          <span className="block opacity-0 animate-fade-in animate-delay-100">D</span>
           <div className="flex items-center justify-center space-x-3">
-            <Container className="h-10 w-10 md:h-14 md:w-14 text-wine opacity-0 animate-fade-in animate-delay-200" />
+            <Grape className="h-10 w-10 md:h-14 md:w-14 text-wine opacity-0 animate-fade-in animate-delay-200" />
             <span className="block relative overflow-hidden">
               <span className="inline-block text-wine opacity-0 animate-fade-in animate-delay-200">
-                Nero
+                Barrique
               </span>
               <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-wine to-wine-light transform -translate-x-full animate-[slideInLeft_1.5s_ease-in-out_forwards_0.5s]"></span>
             </span>
           </div>
         </h1>
-        <p className="max-w-xl mx-auto text-white/80 text-lg mb-10 leading-relaxed opacity-0 animate-fade-in animate-delay-200">
-          "Il vino è una delle cose più civili del mondo e una delle cose più naturali del mondo che è stata portata alla massima perfezione."
+        <p className="max-w-xl mx-auto text-white/80 text-lg mb-10 leading-relaxed opacity-0 animate-fade-in animate-delay-200 font-gothic">
+          "Bere del vino è bere del genio."
           <br />
-          <span className="text-wine/80 text-sm mt-2 italic block">Ernest Hemingway</span>
+          <span className="text-wine/80 text-sm mt-2 italic block">Charles Baudelaire</span>
         </p>
         
         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 justify-center opacity-0 animate-fade-in animate-delay-300">

@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Wine, Menu, X } from 'lucide-react';
+import { Grape, Menu, X } from 'lucide-react';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,8 +50,8 @@ const Navbar = () => {
           className="flex items-center space-x-2 text-white"
           onClick={() => setIsOpen(false)}
         >
-          <Wine className="h-8 w-8 text-wine" />
-          <span className="font-serif text-xl">Vino Nero</span>
+          <Grape className="h-8 w-8 text-wine" />
+          <span className="font-serif text-xl">DBarrique</span>
         </Link>
         
         <nav className="hidden md:block">
