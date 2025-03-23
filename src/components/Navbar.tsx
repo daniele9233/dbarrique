@@ -33,6 +33,7 @@ const Navbar = () => {
     { name: 'Home', path: '/' },
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'Collection', path: '/collection' },
+    { name: 'WNetwork', path: '/wnetwork' },
   ];
 
   const isActive = (path: string) => {
