@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
-// Citazione corretta sul vino di Hemingway
+// Citazione corretta sul vino di Hemingway con spazi appropriati
 const wineQuote = {
   quote: "Aprire una bottiglia di vino è come aprire una porta sulla storia.",
   author: "Ernest Hemingway"
