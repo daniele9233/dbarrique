@@ -52,9 +52,9 @@ const Navbar = () => {
           onClick={() => setIsOpen(false)}
         >
           <Grape className="h-8 w-8 text-wine" />
-          <span className="font-serif text-xl">
-            <span className="text-white font-light tracking-wide">D</span>
-            <span className="text-[#A71E22] tracking-wide">BARRIQUE</span>
+          <span className="font-gothic text-xl">
+            <span className="text-white">Vini</span>
+            <span className="text-wine ml-1">Pregiati</span>
           </span>
         </Link>
         

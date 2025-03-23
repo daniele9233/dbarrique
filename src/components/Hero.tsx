@@ -81,11 +81,11 @@ const Hero = () => {
         >
           <div className="flex items-center justify-center space-x-3 mb-10">
             <Grape className="h-14 w-14 text-wine opacity-0 animate-fade-in animate-delay-100" />
-            <span className="block relative overflow-hidden font-serif text-7xl font-medium opacity-0 animate-fade-in animate-delay-100">
+            <span className="block relative overflow-hidden font-gothic text-7xl opacity-0 animate-fade-in animate-delay-100">
               <span className="inline-block">
-                <span className="text-white font-light tracking-wide">D</span><span className="text-[#A71E22] tracking-wide">BARRIQUE</span>
+                <span className="text-white">Vini</span>
+                <span className="text-wine ml-1">Pregiati</span>
               </span>
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-wine to-wine-light transform -translate-x-full animate-[slideInLeft_1.5s_ease-in-out_forwards_0.5s]"></span>
             </span>
           </div>
           
