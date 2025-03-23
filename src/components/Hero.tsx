@@ -2,6 +2,7 @@
 import { ArrowDown, Grape } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import WineCollection from './WineCollection';
+import WineQuotes from './WineQuotes';
 
 const Hero = () => {
   const [hasScrolled, setHasScrolled] = useState(false);
@@ -88,15 +89,8 @@ const Hero = () => {
             </span>
           </div>
           
-          {/* Quote instead of search bar */}
-          <div className="max-w-md mx-auto mt-12 opacity-0 animate-fade-in animate-delay-300">
-            <p className="text-white/80 italic text-xl">
-              "Bere del vino è bere del genio."
-            </p>
-            <p className="text-white/60 text-sm mt-2">
-              — Charles Baudelaire
-            </p>
-          </div>
+          {/* Wine quotes component instead of static quote */}
+          <WineQuotes />
         </div>
         
         {/* Scrolling wine animation with parallax effect */}
