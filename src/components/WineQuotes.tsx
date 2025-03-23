@@ -55,6 +55,7 @@ const WineQuotes = () => {
                   )}
                   style={{ 
                     transitionDelay: `${index * 50}ms`, // Più lento (50ms invece di 30ms)
+                    marginLeft: char === " " ? "0.25em" : "0" // Aggiungi spazio per i caratteri spazio
                   }}
                 >
                   {char}
