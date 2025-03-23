@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
-// Singolo aforisma sul vino di Hemingway
+// Citazione corretta sul vino di Hemingway
 const wineQuote = {
   quote: "Aprire una bottiglia di vino è come aprire una porta sulla storia.",
   author: "Ernest Hemingway"
@@ -25,7 +25,7 @@ const WineQuotes = () => {
       setTimeout(() => {
         setIsRevealed(true);
       }, 500);
-    }, 10000); // Ricomincia l'animazione ogni 10 secondi
+    }, 12000); // Ricomincia l'animazione ogni 12 secondi (più lento)
     
     return () => {
       clearTimeout(timer);
@@ -39,7 +39,7 @@ const WineQuotes = () => {
         <div className="relative overflow-hidden">
           <p 
             ref={quoteRef}
-            className="text-white/80 italic text-xl font-serif relative"
+            className="text-white/80 italic text-xl font-serif relative leading-relaxed tracking-wide"
           >
             {/* Utilizziamo lettere individuali per l'animazione */}
             <span className="absolute -left-2 -top-2 text-4xl text-wine/20 font-serif">"</span>
@@ -48,13 +48,13 @@ const WineQuotes = () => {
                 <span 
                   key={index}
                   className={cn(
-                    "inline-block transition-all duration-75 transform",
+                    "inline-block transition-all duration-100 transform",
                     isRevealed 
                       ? "opacity-100 translate-y-0" 
                       : "opacity-0 translate-y-2"
                   )}
                   style={{ 
-                    transitionDelay: `${index * 30}ms`,
+                    transitionDelay: `${index * 50}ms`, // Più lento (50ms invece di 30ms)
                   }}
                 >
                   {char}
@@ -66,15 +66,15 @@ const WineQuotes = () => {
         </div>
         <div 
           className={cn(
-            "text-white/60 text-sm mt-2 font-light tracking-wider transition-all duration-500",
+            "text-white/60 text-sm mt-2 font-light tracking-wider transition-all duration-700", // Durata maggiore
             isRevealed ? "opacity-100" : "opacity-0"
           )}
-          style={{ transitionDelay: `${wineQuote.quote.length * 30 + 100}ms` }}
+          style={{ transitionDelay: `${wineQuote.quote.length * 50 + 200}ms` }} // Ritardo maggiore
         >
           — {wineQuote.author}
         </div>
         <div className={cn(
-          "absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-0.5 bg-gradient-to-r from-transparent via-wine/50 to-transparent transition-opacity duration-500",
+          "absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-0.5 bg-gradient-to-r from-transparent via-wine/50 to-transparent transition-opacity duration-700", // Durata maggiore
           isRevealed ? "opacity-100" : "opacity-0"
         )}></div>
       </div>
