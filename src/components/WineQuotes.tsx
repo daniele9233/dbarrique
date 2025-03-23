@@ -16,9 +16,7 @@ const WineQuotes = () => {
     // Imposta un breve ritardo prima di iniziare l'animazione
     const timer = setTimeout(() => {
       setIsRevealed(true);
-    }, 1200); // Ritardo prima di iniziare l'animazione
-    
-    // Rimuoviamo l'intervallo che faceva ricominciare l'animazione periodicamente
+    }, 800); // Ridotto il ritardo per iniziare l'animazione più velocemente
     
     return () => {
       clearTimeout(timer);
@@ -44,13 +42,13 @@ const WineQuotes = () => {
                     <span 
                       key={`${wordIndex}-${charIndex}`}
                       className={cn(
-                        "inline-block transition-all duration-700",
+                        "inline-block transition-all duration-400", // Ridotto da 700ms a 400ms per rendere la dissolvenza più veloce
                         isRevealed 
-                          ? "opacity-100 blur-none translate-y-0" 
-                          : "opacity-0 blur-md translate-y-2"
+                          ? "opacity-100 blur-none translate-x-0" 
+                          : "opacity-0 blur-md -translate-x-4" // Cambiato da translate-y-2 a -translate-x-4 per far apparire il testo da sinistra a destra
                       )}
                       style={{ 
-                        transitionDelay: `${(wordIndex * word.length + charIndex) * 120}ms`,
+                        transitionDelay: `${(wordIndex * 3 + charIndex) * 40}ms`, // Ridotto il ritardo tra i caratteri
                       }}
                     >
                       {char}
@@ -68,10 +66,10 @@ const WineQuotes = () => {
         </div>
         <div 
           className={cn(
-            "text-white/60 text-sm mt-2 font-light tracking-wider transition-all duration-1000 self-end mr-10", 
+            "text-white/60 text-sm mt-2 font-light tracking-wider transition-all duration-700 self-end mr-10", 
             isRevealed ? "opacity-100" : "opacity-0"
           )}
-          style={{ transitionDelay: `${wineQuote.quote.length * 120 + 300}ms` }}
+          style={{ transitionDelay: `${words.length * 40 + 300}ms` }}
         >
           — {wineQuote.author}
         </div>
