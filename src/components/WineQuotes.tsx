@@ -16,7 +16,7 @@ const WineQuotes = () => {
     // Imposta un breve ritardo prima di iniziare l'animazione
     const timer = setTimeout(() => {
       setIsRevealed(true);
-    }, 800); // Mantenuto lo stesso ritardo iniziale
+    }, 800);
     
     return () => {
       clearTimeout(timer);
@@ -42,13 +42,13 @@ const WineQuotes = () => {
                     <span 
                       key={`${wordIndex}-${charIndex}`}
                       className={cn(
-                        "inline-block transition-all duration-700 ease-wine-bounce", // Aumentato a 700ms e aggiunto ease-wine-bounce per una transizione più fluida
+                        "inline-block transition-all duration-1000 ease-in-out", 
                         isRevealed 
                           ? "opacity-100 blur-none translate-x-0" 
-                          : "opacity-0 blur-md -translate-x-4" // Mantenuto il movimento da sinistra a destra
+                          : "opacity-0 blur-lg -translate-x-4"
                       )}
                       style={{ 
-                        transitionDelay: `${(wordIndex * 3 + charIndex) * 60}ms`, // Aumentato da 40ms a 60ms per rallentare leggermente
+                        transitionDelay: `${(wordIndex * 3 + charIndex) * 80}ms`,
                       }}
                     >
                       {char}
@@ -66,10 +66,10 @@ const WineQuotes = () => {
         </div>
         <div 
           className={cn(
-            "text-white/60 text-sm mt-2 font-light tracking-wider transition-all duration-1000 ease-in-out self-end mr-10", // Aumentato a 1000ms e aggiunto ease-in-out
+            "text-white/60 text-sm mt-2 font-light tracking-wider transition-all duration-2000 ease-in-out self-end mr-10",
             isRevealed ? "opacity-100" : "opacity-0"
           )}
-          style={{ transitionDelay: `${words.length * 60 + 400}ms` }} // Aggiornato in base al nuovo ritardo dei caratteri
+          style={{ transitionDelay: `${words.length * 80 + 500}ms` }}
         >
           — {wineQuote.author}
         </div>
