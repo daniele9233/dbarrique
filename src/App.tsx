@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Collection from "./pages/Collection";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import "./styles/custom-scrollbar.css";
 
 const queryClient = new QueryClient();
 

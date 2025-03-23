@@ -8,6 +8,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 // Sample wine data (updated to 1-10 rating scale) - Solo vini rossi
 const wines = [
@@ -17,7 +21,7 @@ const wines = [
     region: "Bordeaux, France",
     year: 2015,
     rating: 10,
-    type: "red",
+    type: "red" as const,
     image: "https://images.unsplash.com/photo-1586370434639-0fe27519d3e6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
     grape: "Cabernet Sauvignon",
     body: "Corposo",
@@ -32,7 +36,7 @@ const wines = [
     region: "Piedmont, Italy",
     year: 2016,
     rating: 8,
-    type: "red",
+    type: "red" as const,
     image: "https://images.unsplash.com/photo-1609951651556-5334e2706168?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
     grape: "Nebbiolo",
     body: "Corposo",
@@ -47,7 +51,7 @@ const wines = [
     region: "Napa Valley, USA",
     year: 2017,
     rating: 8,
-    type: "red",
+    type: "red" as const,
     image: "https://images.unsplash.com/photo-1566452348683-79f9cf5c3a8e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
     grape: "Merlot",
     body: "Corposo",
@@ -62,7 +66,7 @@ const wines = [
     region: "Tuscany, Italy",
     year: 2016,
     rating: 10,
-    type: "red",
+    type: "red" as const,
     image: "https://images.unsplash.com/photo-1553361371-9fe24fca9c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
     grape: "Cabernet Sauvignon",
     body: "Medio",
@@ -77,7 +81,7 @@ const wines = [
     region: "South Australia",
     year: 2014,
     rating: 9,
-    type: "red",
+    type: "red" as const,
     image: "https://images.unsplash.com/photo-1516594915697-87eb3b1c14ea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
     grape: "Syrah",
     body: "Corposo",
@@ -91,11 +95,49 @@ const wines = [
 // Definisco le opzioni di filtro
 const regions = [...new Set(wines.map(wine => wine.region))];
 const grapes = [...new Set(wines.map(wine => wine.grape))];
+const years = [...new Set(wines.map(wine => wine.year))].sort((a, b) => b - a);
 const bodyOptions = ["Leggero", "Medio", "Corposo"];
 const structureOptions = ["Elegante", "Equilibrato", "Strutturato"];
 const tanninOptions = ["Morbido", "Equilibrato", "Tannico"];
 const sweetnessOptions = ["Secco", "Amabile", "Dolce"];
 const aromaOptions = ["Fruttato", "Speziato", "Evoluto"];
+
+// Definisco le opzioni per le occasioni
+const occasions = [
+  { id: "pranzo", label: "Pranzo della domenica", count: 219 },
+  { id: "cena", label: "Cena Romantica", count: 1 },
+  { id: "giorno", label: "Ogni giorno", count: 192 },
+  { id: "importante", label: "Occasione Importante", count: 405 },
+  { id: "dopocena", label: "Dopo cena", count: 3 },
+  { id: "aperitivo", label: "Aperitivo fra amici", count: 1 }
+];
+
+// Definisco le opzioni per l'affinamento
+const refinements = [
+  { id: "acciaio", label: "Acciaio", count: 106 },
+  { id: "anfora", label: "Anfora", count: 1 },
+  { id: "cemento", label: "Cemento", count: 13 },
+  { id: "legnogrande", label: "Legno grande", count: 335 },
+  { id: "legnopiccolo", label: "Legno piccolo", count: 563 },
+  { id: "surlieviti", label: "Sui lieviti", count: 3 }
+];
+
+// Definisco dei vini italiani per regioni
+const italianRegions = [
+  { id: "abruzzo", label: "Abruzzo", count: 4 },
+  { id: "altoadige", label: "Alto Adige", count: 40 },
+  { id: "basilicata", label: "Basilicata", count: 1 },
+  { id: "calabria", label: "Calabria", count: 1 },
+  { id: "campania", label: "Campania", count: 4 },
+  { id: "emiliaromagna", label: "Emilia Romagna", count: 21 },
+  { id: "friuli", label: "Friuli Venezia Giulia", count: 6 },
+  { id: "lazio", label: "Lazio", count: 6 },
+  { id: "toscana", label: "Toscana", count: 32 },
+  { id: "veneto", label: "Veneto", count: 28 },
+  { id: "piemonte", label: "Piemonte", count: 45 },
+  { id: "sicilia", label: "Sicilia", count: 18 },
+  { id: "sardegna", label: "Sardegna", count: 14 }
+];
 
 const Collection = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -103,20 +145,30 @@ const Collection = () => {
   const [isAddWineDialogOpen, setIsAddWineDialogOpen] = useState(false);
   
   // Filtri
-  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
-  const [selectedGrape, setSelectedGrape] = useState<string | null>(null);
+  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
+  const [selectedGrapes, setSelectedGrapes] = useState<string[]>([]);
+  const [selectedYears, setSelectedYears] = useState<number[]>([]);
   const [selectedBody, setSelectedBody] = useState<string | null>(null);
   const [selectedStructure, setSelectedStructure] = useState<string | null>(null);
   const [selectedTannins, setSelectedTannins] = useState<string | null>(null);
   const [selectedSweetness, setSelectedSweetness] = useState<string | null>(null);
   const [selectedAroma, setSelectedAroma] = useState<string | null>(null);
+  const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
+  const [selectedRefinements, setSelectedRefinements] = useState<string[]>([]);
+  
+  // Collapsible states
+  const [isRegionOpen, setIsRegionOpen] = useState(true);
+  const [isYearOpen, setIsYearOpen] = useState(true);
+  const [isOccasionOpen, setIsOccasionOpen] = useState(true);
+  const [isRefinementOpen, setIsRefinementOpen] = useState(true);
+  const [isCharacteristicsOpen, setIsCharacteristicsOpen] = useState(true);
   
   const [newWine, setNewWine] = useState({
     name: "",
     region: "",
     year: new Date().getFullYear(),
     rating: 5,
-    type: "red",
+    type: "red" as const,
     image: "",
     grape: "",
     body: "Medio",
@@ -131,6 +183,46 @@ const Collection = () => {
     setShowFilters(!showFilters);
   };
   
+  const handleRegionToggle = (region: string) => {
+    setSelectedRegions(prev => 
+      prev.includes(region) 
+        ? prev.filter(r => r !== region) 
+        : [...prev, region]
+    );
+  };
+  
+  const handleGrapeToggle = (grape: string) => {
+    setSelectedGrapes(prev => 
+      prev.includes(grape) 
+        ? prev.filter(g => g !== grape) 
+        : [...prev, grape]
+    );
+  };
+  
+  const handleYearToggle = (year: number) => {
+    setSelectedYears(prev => 
+      prev.includes(year) 
+        ? prev.filter(y => y !== year) 
+        : [...prev, year]
+    );
+  };
+  
+  const handleOccasionToggle = (occasion: string) => {
+    setSelectedOccasions(prev => 
+      prev.includes(occasion) 
+        ? prev.filter(o => o !== occasion) 
+        : [...prev, occasion]
+    );
+  };
+  
+  const handleRefinementToggle = (refinement: string) => {
+    setSelectedRefinements(prev => 
+      prev.includes(refinement) 
+        ? prev.filter(r => r !== refinement) 
+        : [...prev, refinement]
+    );
+  };
+  
   const filteredWines = wines.filter((wine) => {
     const matchesSearch = 
       wine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -138,16 +230,18 @@ const Collection = () => {
       wine.year.toString().includes(searchTerm) ||
       wine.grape.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesRegion = selectedRegion ? wine.region === selectedRegion : true;
-    const matchesGrape = selectedGrape ? wine.grape === selectedGrape : true;
+    const matchesRegion = selectedRegions.length === 0 || selectedRegions.some(region => wine.region.includes(region));
+    const matchesGrape = selectedGrapes.length === 0 || selectedGrapes.includes(wine.grape);
+    const matchesYear = selectedYears.length === 0 || selectedYears.includes(wine.year);
     const matchesBody = selectedBody ? wine.body === selectedBody : true;
     const matchesStructure = selectedStructure ? wine.structure === selectedStructure : true;
     const matchesTannins = selectedTannins ? wine.tannins === selectedTannins : true;
     const matchesSweetness = selectedSweetness ? wine.sweetness === selectedSweetness : true;
     const matchesAroma = selectedAroma ? wine.aroma === selectedAroma : true;
     
-    return matchesSearch && matchesRegion && matchesGrape && matchesBody && 
-           matchesStructure && matchesTannins && matchesSweetness && matchesAroma;
+    return matchesSearch && matchesRegion && matchesGrape && matchesYear && 
+           matchesBody && matchesStructure && matchesTannins && 
+           matchesSweetness && matchesAroma;
   });
   
   const handleAddWine = () => {
@@ -162,7 +256,7 @@ const Collection = () => {
       region: "",
       year: new Date().getFullYear(),
       rating: 5,
-      type: "red",
+      type: "red" as const,
       image: "",
       grape: "",
       body: "Medio",
@@ -213,6 +307,20 @@ const Collection = () => {
       </div>
     );
   };
+
+  const resetAllFilters = () => {
+    setSearchTerm("");
+    setSelectedRegions([]);
+    setSelectedGrapes([]);
+    setSelectedYears([]);
+    setSelectedBody(null);
+    setSelectedStructure(null);
+    setSelectedTannins(null);
+    setSelectedSweetness(null);
+    setSelectedAroma(null);
+    setSelectedOccasions([]);
+    setSelectedRefinements([]);
+  };
   
   return (
     <div className="min-h-screen bg-noir text-white">
@@ -230,7 +338,7 @@ const Collection = () => {
           </div>
           
           {/* Search and filters */}
-          <div className="max-w-5xl mx-auto mb-12 px-4">
+          <div className="max-w-7xl mx-auto mb-12 px-4">
             <div className="flex flex-col md:flex-row gap-4 items-stretch">
               <div className="relative flex-grow">
                 <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
@@ -265,169 +373,269 @@ const Collection = () => {
             
             {/* Expandable filters */}
             <div className={`mt-6 transition-all duration-300 ease-wine-bounce ${
-              showFilters ? 'opacity-100 max-h-[1000px]' : 'opacity-0 max-h-0 overflow-hidden'
+              showFilters ? 'opacity-100 max-h-[10000px]' : 'opacity-0 max-h-0 overflow-hidden'
             }`}>
-              <div className="bg-noir-light border border-white/10 rounded-lg p-5 space-y-5">
-                {/* Regione */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium">Regione</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {regions.map((region) => (
-                      <button
-                        key={region}
-                        className={`px-3 py-1.5 text-sm rounded-md border transition-colors duration-200 ${
-                          selectedRegion === region
-                            ? 'bg-wine border-wine text-white'
-                            : 'bg-transparent border-white/10 text-white hover:border-wine/50'
-                        }`}
-                        onClick={() => setSelectedRegion(selectedRegion === region ? null : region)}
-                      >
-                        {region}
-                      </button>
-                    ))}
+              <div className="bg-noir-light border border-white/10 rounded-lg p-5">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Left column - Regions */}
+                  <div className="space-y-5">
+                    <Collapsible open={isRegionOpen} onOpenChange={setIsRegionOpen}>
+                      <CollapsibleTrigger className="flex justify-between items-center w-full text-left font-medium mb-2">
+                        <h3 className="text-lg font-serif">Nome regione</h3>
+                        <span>{isRegionOpen ? '−' : '+'}</span>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                        {italianRegions.map((region) => (
+                          <div key={region.id} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={region.id} 
+                              checked={selectedRegions.includes(region.label)}
+                              onCheckedChange={() => handleRegionToggle(region.label)}
+                              className="border-white/30 data-[state=checked]:bg-wine data-[state=checked]:border-wine"
+                            />
+                            <Label 
+                              htmlFor={region.id} 
+                              className="text-sm font-normal cursor-pointer flex justify-between w-full"
+                            >
+                              <span>{region.label}</span>
+                              <span className="text-white/40">({region.count})</span>
+                            </Label>
+                          </div>
+                        ))}
+                      </CollapsibleContent>
+                    </Collapsible>
+                    
+                    {/* Grape filter section */}
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-serif mb-3">Vitigno</h3>
+                      <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                        {grapes.map((grape) => (
+                          <div key={grape} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`grape-${grape}`} 
+                              checked={selectedGrapes.includes(grape)}
+                              onCheckedChange={() => handleGrapeToggle(grape)}
+                              className="border-white/30 data-[state=checked]:bg-wine data-[state=checked]:border-wine"
+                            />
+                            <Label 
+                              htmlFor={`grape-${grape}`} 
+                              className="text-sm font-normal cursor-pointer"
+                            >
+                              {grape}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                </div>
-                
-                {/* Vitigno */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium">Vitigno</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {grapes.map((grape) => (
-                      <button
-                        key={grape}
-                        className={`px-3 py-1.5 text-sm rounded-md border transition-colors duration-200 ${
-                          selectedGrape === grape
-                            ? 'bg-wine border-wine text-white'
-                            : 'bg-transparent border-white/10 text-white hover:border-wine/50'
-                        }`}
-                        onClick={() => setSelectedGrape(selectedGrape === grape ? null : grape)}
-                      >
-                        {grape}
-                      </button>
-                    ))}
+                  
+                  {/* Middle column - Year, Occasions */}
+                  <div className="space-y-5">
+                    {/* Year filter */}
+                    <Collapsible open={isYearOpen} onOpenChange={setIsYearOpen}>
+                      <CollapsibleTrigger className="flex justify-between items-center w-full text-left font-medium mb-2">
+                        <h3 className="text-lg font-serif">Anno</h3>
+                        <span>{isYearOpen ? '−' : '+'}</span>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                        {years.map((year) => (
+                          <div key={year} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`year-${year}`} 
+                              checked={selectedYears.includes(year)}
+                              onCheckedChange={() => handleYearToggle(year)}
+                              className="border-white/30 data-[state=checked]:bg-wine data-[state=checked]:border-wine"
+                            />
+                            <Label 
+                              htmlFor={`year-${year}`} 
+                              className="text-sm font-normal cursor-pointer"
+                            >
+                              {year}
+                            </Label>
+                          </div>
+                        ))}
+                      </CollapsibleContent>
+                    </Collapsible>
+                    
+                    {/* Occasions filter */}
+                    <Collapsible open={isOccasionOpen} onOpenChange={setIsOccasionOpen}>
+                      <CollapsibleTrigger className="flex justify-between items-center w-full text-left font-medium mb-2">
+                        <h3 className="text-lg font-serif">Occasioni</h3>
+                        <span>{isOccasionOpen ? '−' : '+'}</span>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                        {occasions.map((occasion) => (
+                          <div key={occasion.id} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={occasion.id} 
+                              checked={selectedOccasions.includes(occasion.id)}
+                              onCheckedChange={() => handleOccasionToggle(occasion.id)}
+                              className="border-white/30 data-[state=checked]:bg-wine data-[state=checked]:border-wine"
+                            />
+                            <Label 
+                              htmlFor={occasion.id} 
+                              className="text-sm font-normal cursor-pointer flex justify-between w-full"
+                            >
+                              <span>{occasion.label}</span>
+                              <span className="text-white/40">({occasion.count})</span>
+                            </Label>
+                          </div>
+                        ))}
+                      </CollapsibleContent>
+                    </Collapsible>
                   </div>
-                </div>
-                
-                {/* Corpo */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium">Corpo</h3>
-                  <ToggleGroup 
-                    type="single" 
-                    className="justify-start"
-                    value={selectedBody || ""}
-                    onValueChange={(value) => setSelectedBody(value || null)}
-                  >
-                    {bodyOptions.map((option) => (
-                      <ToggleGroupItem 
-                        key={option} 
-                        value={option} 
-                        className="bg-transparent border border-white/10 data-[state=on]:bg-wine data-[state=on]:border-wine"
-                      >
-                        {option}
-                      </ToggleGroupItem>
-                    ))}
-                  </ToggleGroup>
-                </div>
-                
-                {/* Struttura */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium">Struttura</h3>
-                  <ToggleGroup 
-                    type="single" 
-                    className="justify-start"
-                    value={selectedStructure || ""}
-                    onValueChange={(value) => setSelectedStructure(value || null)}
-                  >
-                    {structureOptions.map((option) => (
-                      <ToggleGroupItem 
-                        key={option} 
-                        value={option} 
-                        className="bg-transparent border border-white/10 data-[state=on]:bg-wine data-[state=on]:border-wine"
-                      >
-                        {option}
-                      </ToggleGroupItem>
-                    ))}
-                  </ToggleGroup>
-                </div>
-                
-                {/* Tannini */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium">Tannini</h3>
-                  <ToggleGroup 
-                    type="single" 
-                    className="justify-start"
-                    value={selectedTannins || ""}
-                    onValueChange={(value) => setSelectedTannins(value || null)}
-                  >
-                    {tanninOptions.map((option) => (
-                      <ToggleGroupItem 
-                        key={option} 
-                        value={option} 
-                        className="bg-transparent border border-white/10 data-[state=on]:bg-wine data-[state=on]:border-wine"
-                      >
-                        {option}
-                      </ToggleGroupItem>
-                    ))}
-                  </ToggleGroup>
-                </div>
-                
-                {/* Dolcezza */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium">Dolcezza</h3>
-                  <ToggleGroup 
-                    type="single" 
-                    className="justify-start"
-                    value={selectedSweetness || ""}
-                    onValueChange={(value) => setSelectedSweetness(value || null)}
-                  >
-                    {sweetnessOptions.map((option) => (
-                      <ToggleGroupItem 
-                        key={option} 
-                        value={option} 
-                        className="bg-transparent border border-white/10 data-[state=on]:bg-wine data-[state=on]:border-wine"
-                      >
-                        {option}
-                      </ToggleGroupItem>
-                    ))}
-                  </ToggleGroup>
-                </div>
-                
-                {/* Aromi principali */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium">Aromi principali</h3>
-                  <ToggleGroup 
-                    type="single" 
-                    className="justify-start"
-                    value={selectedAroma || ""}
-                    onValueChange={(value) => setSelectedAroma(value || null)}
-                  >
-                    {aromaOptions.map((option) => (
-                      <ToggleGroupItem 
-                        key={option} 
-                        value={option} 
-                        className="bg-transparent border border-white/10 data-[state=on]:bg-wine data-[state=on]:border-wine"
-                      >
-                        {option}
-                      </ToggleGroupItem>
-                    ))}
-                  </ToggleGroup>
+                  
+                  {/* Right column - Wine characteristics, Refinement */}
+                  <div className="space-y-5">
+                    {/* Wine characteristics */}
+                    <Collapsible open={isCharacteristicsOpen} onOpenChange={setIsCharacteristicsOpen}>
+                      <CollapsibleTrigger className="flex justify-between items-center w-full text-left font-medium mb-2">
+                        <h3 className="text-lg font-serif">Caratteristiche Vino</h3>
+                        <span>{isCharacteristicsOpen ? '−' : '+'}</span>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-4">
+                        {/* Corpo */}
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-medium">Corpo</h4>
+                          <ToggleGroup 
+                            type="single" 
+                            className="justify-start"
+                            value={selectedBody || ""}
+                            onValueChange={(value) => setSelectedBody(value || null)}
+                          >
+                            {bodyOptions.map((option) => (
+                              <ToggleGroupItem 
+                                key={option} 
+                                value={option} 
+                                className="bg-transparent border border-white/10 data-[state=on]:bg-wine data-[state=on]:border-wine"
+                              >
+                                {option}
+                              </ToggleGroupItem>
+                            ))}
+                          </ToggleGroup>
+                        </div>
+                        
+                        {/* Struttura */}
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-medium">Struttura</h4>
+                          <ToggleGroup 
+                            type="single" 
+                            className="justify-start"
+                            value={selectedStructure || ""}
+                            onValueChange={(value) => setSelectedStructure(value || null)}
+                          >
+                            {structureOptions.map((option) => (
+                              <ToggleGroupItem 
+                                key={option} 
+                                value={option} 
+                                className="bg-transparent border border-white/10 data-[state=on]:bg-wine data-[state=on]:border-wine"
+                              >
+                                {option}
+                              </ToggleGroupItem>
+                            ))}
+                          </ToggleGroup>
+                        </div>
+                        
+                        {/* Tannini */}
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-medium">Tannini</h4>
+                          <ToggleGroup 
+                            type="single" 
+                            className="justify-start"
+                            value={selectedTannins || ""}
+                            onValueChange={(value) => setSelectedTannins(value || null)}
+                          >
+                            {tanninOptions.map((option) => (
+                              <ToggleGroupItem 
+                                key={option} 
+                                value={option} 
+                                className="bg-transparent border border-white/10 data-[state=on]:bg-wine data-[state=on]:border-wine"
+                              >
+                                {option}
+                              </ToggleGroupItem>
+                            ))}
+                          </ToggleGroup>
+                        </div>
+                        
+                        {/* Dolcezza */}
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-medium">Dolcezza</h4>
+                          <ToggleGroup 
+                            type="single" 
+                            className="justify-start"
+                            value={selectedSweetness || ""}
+                            onValueChange={(value) => setSelectedSweetness(value || null)}
+                          >
+                            {sweetnessOptions.map((option) => (
+                              <ToggleGroupItem 
+                                key={option} 
+                                value={option} 
+                                className="bg-transparent border border-white/10 data-[state=on]:bg-wine data-[state=on]:border-wine"
+                              >
+                                {option}
+                              </ToggleGroupItem>
+                            ))}
+                          </ToggleGroup>
+                        </div>
+                        
+                        {/* Aromi principali */}
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-medium">Aromi principali</h4>
+                          <ToggleGroup 
+                            type="single" 
+                            className="justify-start"
+                            value={selectedAroma || ""}
+                            onValueChange={(value) => setSelectedAroma(value || null)}
+                          >
+                            {aromaOptions.map((option) => (
+                              <ToggleGroupItem 
+                                key={option} 
+                                value={option} 
+                                className="bg-transparent border border-white/10 data-[state=on]:bg-wine data-[state=on]:border-wine"
+                              >
+                                {option}
+                              </ToggleGroupItem>
+                            ))}
+                          </ToggleGroup>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
+                    
+                    {/* Refinement filter */}
+                    <Collapsible open={isRefinementOpen} onOpenChange={setIsRefinementOpen}>
+                      <CollapsibleTrigger className="flex justify-between items-center w-full text-left font-medium mb-2">
+                        <h3 className="text-lg font-serif">Affinamento</h3>
+                        <span>{isRefinementOpen ? '−' : '+'}</span>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                        {refinements.map((refinement) => (
+                          <div key={refinement.id} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={refinement.id} 
+                              checked={selectedRefinements.includes(refinement.id)}
+                              onCheckedChange={() => handleRefinementToggle(refinement.id)}
+                              className="border-white/30 data-[state=checked]:bg-wine data-[state=checked]:border-wine"
+                            />
+                            <Label 
+                              htmlFor={refinement.id} 
+                              className="text-sm font-normal cursor-pointer flex justify-between w-full"
+                            >
+                              <span>{refinement.label}</span>
+                              <span className="text-white/40">({refinement.count})</span>
+                            </Label>
+                          </div>
+                        ))}
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </div>
                 </div>
                 
                 {/* Reset Filters */}
-                <div className="pt-2 flex justify-end">
+                <div className="pt-5 flex justify-end">
                   <Button 
                     variant="outline" 
                     className="border-white/10 hover:bg-wine hover:text-white"
-                    onClick={() => {
-                      setSearchTerm("");
-                      setSelectedRegion(null);
-                      setSelectedGrape(null);
-                      setSelectedBody(null);
-                      setSelectedStructure(null);
-                      setSelectedTannins(null);
-                      setSelectedSweetness(null);
-                      setSelectedAroma(null);
-                    }}
+                    onClick={resetAllFilters}
                   >
                     Azzera filtri
                   </Button>
@@ -454,16 +662,7 @@ const Collection = () => {
               <div className="text-center py-12">
                 <p className="text-white/60 text-lg mb-4">Nessun vino trovato che corrisponda ai tuoi criteri.</p>
                 <button
-                  onClick={() => {
-                    setSearchTerm("");
-                    setSelectedRegion(null);
-                    setSelectedGrape(null);
-                    setSelectedBody(null);
-                    setSelectedStructure(null);
-                    setSelectedTannins(null);
-                    setSelectedSweetness(null);
-                    setSelectedAroma(null);
-                  }}
+                  onClick={resetAllFilters}
                   className="text-wine hover:text-wine-light transition-colors duration-300"
                 >
                   Azzera tutti i filtri
@@ -486,11 +685,11 @@ const Collection = () => {
           
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <Label>
                 Nome del Vino
-              </label>
-              <input
-                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+              </Label>
+              <Input
+                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
                 placeholder="es. Brunello di Montalcino"
                 value={newWine.name}
                 onChange={(e) => handleChange('name', e.target.value)}
@@ -498,11 +697,11 @@ const Collection = () => {
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <Label>
                 Regione
-              </label>
-              <input
-                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+              </Label>
+              <Input
+                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
                 placeholder="es. Toscana, Italia"
                 value={newWine.region}
                 onChange={(e) => handleChange('region', e.target.value)}
@@ -510,11 +709,11 @@ const Collection = () => {
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <Label>
                 Vitigno
-              </label>
-              <input
-                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+              </Label>
+              <Input
+                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
                 placeholder="es. Sangiovese"
                 value={newWine.grape}
                 onChange={(e) => handleChange('grape', e.target.value)}
@@ -523,12 +722,12 @@ const Collection = () => {
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                <Label>
                   Anno
-                </label>
-                <input
+                </Label>
+                <Input
                   type="number"
-                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
                   placeholder="es. 2015"
                   value={newWine.year}
                   onChange={(e) => handleChange('year', parseInt(e.target.value))}
@@ -536,20 +735,20 @@ const Collection = () => {
               </div>
               
               <div className="space-y-2">
-                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                <Label>
                   Valutazione (1-10)
-                </label>
+                </Label>
                 {renderRatingInput()}
               </div>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium leading-none">
+                <Label>
                   Corpo
-                </label>
+                </Label>
                 <select 
-                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
                   value={newWine.body}
                   onChange={(e) => handleChange('body', e.target.value)}
                 >
@@ -560,11 +759,11 @@ const Collection = () => {
               </div>
               
               <div className="space-y-2">
-                <label className="text-sm font-medium leading-none">
+                <Label>
                   Struttura
-                </label>
+                </Label>
                 <select 
-                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
                   value={newWine.structure}
                   onChange={(e) => handleChange('structure', e.target.value)}
                 >
@@ -577,11 +776,11 @@ const Collection = () => {
             
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium leading-none">
+                <Label>
                   Tannini
-                </label>
+                </Label>
                 <select 
-                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
                   value={newWine.tannins}
                   onChange={(e) => handleChange('tannins', e.target.value)}
                 >
@@ -592,11 +791,11 @@ const Collection = () => {
               </div>
               
               <div className="space-y-2">
-                <label className="text-sm font-medium leading-none">
+                <Label>
                   Dolcezza
-                </label>
+                </Label>
                 <select 
-                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
                   value={newWine.sweetness}
                   onChange={(e) => handleChange('sweetness', e.target.value)}
                 >
@@ -607,11 +806,11 @@ const Collection = () => {
               </div>
               
               <div className="space-y-2">
-                <label className="text-sm font-medium leading-none">
+                <Label>
                   Aromi principali
-                </label>
+                </Label>
                 <select 
-                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
                   value={newWine.aroma}
                   onChange={(e) => handleChange('aroma', e.target.value)}
                 >
@@ -623,12 +822,12 @@ const Collection = () => {
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <Label>
                 Immagine del Vino
-              </label>
+              </Label>
               <div className="flex gap-2">
-                <input
-                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                <Input
+                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
                   placeholder="Inserisci URL immagine o carica un'immagine"
                   value={typeof newWine.image === 'string' ? newWine.image : ''}
                   onChange={(e) => handleChange('image', e.target.value)}

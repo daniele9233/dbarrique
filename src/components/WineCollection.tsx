@@ -1,9 +1,8 @@
-
 import { useState } from 'react';
 import WineCard from './WineCard';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 
-// Sample wine data with 1-10 rating scale
+// Sample wine data with 1-10 rating scale (only red wines)
 const wines = [
   {
     id: 1,
@@ -12,7 +11,13 @@ const wines = [
     year: 2015,
     rating: 10,
     type: "red" as const,
-    image: "https://images.unsplash.com/photo-1586370434639-0fe27519d3e6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+    image: "https://images.unsplash.com/photo-1586370434639-0fe27519d3e6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+    grape: "Cabernet Sauvignon",
+    body: "Corposo",
+    structure: "Strutturato",
+    tannins: "Tannico",
+    sweetness: "Secco",
+    aroma: "Fruttato"
   },
   {
     id: 2,
@@ -21,16 +26,13 @@ const wines = [
     year: 2016,
     rating: 8,
     type: "red" as const,
-    image: "https://images.unsplash.com/photo-1609951651556-5334e2706168?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80"
-  },
-  {
-    id: 3,
-    name: "Dom Pérignon",
-    region: "Champagne, France",
-    year: 2010,
-    rating: 9,
-    type: "sparkling" as const,
-    image: "https://images.unsplash.com/photo-1594372425423-ba65d6e1e226?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80"
+    image: "https://images.unsplash.com/photo-1609951651556-5334e2706168?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
+    grape: "Nebbiolo",
+    body: "Corposo",
+    structure: "Strutturato",
+    tannins: "Tannico",
+    sweetness: "Secco",
+    aroma: "Evoluto"
   },
   {
     id: 4,
@@ -39,25 +41,43 @@ const wines = [
     year: 2017,
     rating: 8,
     type: "red" as const,
-    image: "https://images.unsplash.com/photo-1566452348683-79f9cf5c3a8e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80"
+    image: "https://images.unsplash.com/photo-1566452348683-79f9cf5c3a8e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
+    grape: "Merlot",
+    body: "Corposo",
+    structure: "Equilibrato",
+    tannins: "Equilibrato",
+    sweetness: "Secco",
+    aroma: "Fruttato"
   },
   {
-    id: 5,
-    name: "Chablis Grand Cru",
-    region: "Burgundy, France",
-    year: 2018,
-    rating: 7,
-    type: "white" as const,
-    image: "https://images.unsplash.com/photo-1556340346-5e30da977c0d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=994&q=80"
+    id: 7,
+    name: "Sassicaia",
+    region: "Tuscany, Italy",
+    year: 2016,
+    rating: 10,
+    type: "red" as const,
+    image: "https://images.unsplash.com/photo-1553361371-9fe24fca9c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
+    grape: "Cabernet Sauvignon",
+    body: "Medio",
+    structure: "Equilibrato",
+    tannins: "Equilibrato",
+    sweetness: "Secco",
+    aroma: "Fruttato"
   },
   {
-    id: 6,
-    name: "Whispering Angel",
-    region: "Provence, France",
-    year: 2021,
-    rating: 6,
-    type: "rosé" as const,
-    image: "https://images.unsplash.com/photo-1588982637125-d704a8901dce?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=991&q=80"
+    id: 8,
+    name: "Penfolds Grange",
+    region: "South Australia",
+    year: 2014,
+    rating: 9,
+    type: "red" as const,
+    image: "https://images.unsplash.com/photo-1516594915697-87eb3b1c14ea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+    grape: "Syrah",
+    body: "Corposo",
+    structure: "Strutturato",
+    tannins: "Tannico",
+    sweetness: "Secco",
+    aroma: "Speziato"
   }
 ];
 
