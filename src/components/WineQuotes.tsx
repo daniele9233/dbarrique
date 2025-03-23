@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
+// Citazione corretta sul vino di Hemingway
 const wineQuote = {
   quote: "Aprire una bottiglia di vino è come aprire una porta sulla storia.",
   author: "Ernest Hemingway"
@@ -12,15 +13,20 @@ const WineQuotes = () => {
   const quoteRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
-    // Set a longer delay before starting the animation
+    // Imposta un breve ritardo prima di iniziare l'animazione
     const timer = setTimeout(() => {
       setIsRevealed(true);
-    }, 2000); // Increased delay before starting the animation
+    }, 1200); // Ritardo prima di iniziare l'animazione
+    
+    // Rimuoviamo l'intervallo che faceva ricominciare l'animazione periodicamente
     
     return () => {
       clearTimeout(timer);
     };
   }, []);
+
+  // Dividiamo la citazione in parole per prevenire che "porta" venga spezzata
+  const words = wineQuote.quote.split(' ');
 
   return (
     <div className="max-w-md mx-auto mt-12 relative h-24">
@@ -28,38 +34,51 @@ const WineQuotes = () => {
         <div className="relative overflow-hidden">
           <p 
             ref={quoteRef}
-            className="text-white/80 italic text-xl font-serif relative leading-relaxed tracking-wide"
+            className="text-white/80 italic text-xl font-serif relative leading-relaxed tracking-wide whitespace-pre-wrap"
           >
             <span className="absolute -left-2 -top-2 text-4xl text-wine/20 font-serif">"</span>
-            <span 
-              className={cn(
-                "inline-block transition-all duration-3000 ease-out", // Even slower animation
-                isRevealed ? "opacity-100" : "opacity-0"
-              )}
-              style={{
-                transitionDelay: "800ms" // Additional delay
-              }}
-            >
-              {wineQuote.quote}
+            <span className="inline-block">
+              {words.map((word, wordIndex) => (
+                <span key={wordIndex} className="inline-block whitespace-nowrap">
+                  {word.split('').map((char, charIndex) => (
+                    <span 
+                      key={`${wordIndex}-${charIndex}`}
+                      className={cn(
+                        "inline-block transition-all duration-700",
+                        isRevealed 
+                          ? "opacity-100 blur-none translate-y-0" 
+                          : "opacity-0 blur-md translate-y-2"
+                      )}
+                      style={{ 
+                        transitionDelay: `${(wordIndex * word.length + charIndex) * 120}ms`,
+                      }}
+                    >
+                      {char}
+                    </span>
+                  ))}
+                  {/* Aggiungi spazio dopo ogni parola tranne l'ultima */}
+                  {wordIndex < words.length - 1 && (
+                    <span className="inline-block" style={{ width: '0.25em' }}></span>
+                  )}
+                </span>
+              ))}
             </span>
             <span className="absolute -right-2 -bottom-2 text-4xl text-wine/20 font-serif">"</span>
           </p>
         </div>
         <div 
           className={cn(
-            "text-white/60 text-sm mt-2 font-light tracking-wider transition-all duration-3000 self-end mr-10", // Even slower animation
+            "text-white/60 text-sm mt-2 font-light tracking-wider transition-all duration-1000 self-end mr-10", 
             isRevealed ? "opacity-100" : "opacity-0"
           )}
-          style={{ transitionDelay: "4000ms" }} // Increased delay for the author
+          style={{ transitionDelay: `${wineQuote.quote.length * 120 + 300}ms` }}
         >
           — {wineQuote.author}
         </div>
         <div className={cn(
-          "absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-0.5 bg-gradient-to-r from-transparent via-wine/50 to-transparent transition-opacity duration-3000", // Even slower decoration line animation
+          "absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-0.5 bg-gradient-to-r from-transparent via-wine/50 to-transparent transition-opacity duration-1000",
           isRevealed ? "opacity-100" : "opacity-0"
-        )}
-        style={{ transitionDelay: "4500ms" }} // Increased delay for the decoration
-        ></div>
+        )}></div>
       </div>
     </div>
   );

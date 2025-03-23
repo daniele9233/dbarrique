@@ -48,21 +48,11 @@ const Navbar = () => {
       <div className="container mx-auto flex items-center justify-between px-4">
         <Link 
           to="/" 
-          className="flex items-center space-x-3 text-white"
+          className="flex items-center space-x-2 text-white"
           onClick={() => setIsOpen(false)}
         >
-          <div className="relative flex items-center">
-            <Grape className="h-8 w-8 text-red-500" />
-          </div>
-          <div className="relative">
-            <span className="font-serif text-xl flex items-center gap-1">
-              <span className="text-white font-medium tracking-wider">D</span>
-              <span className="text-red-500 font-serif" style={{ letterSpacing: '0.05em' }}>
-                Barrique
-              </span>
-            </span>
-            <div className="absolute -bottom-1 left-0 right-0 h-[1px] bg-red-500"></div>
-          </div>
+          <Grape className="h-8 w-8 text-wine" />
+          <span className="font-serif text-xl"><span className="text-white">D</span><span className="text-wine">Barrique</span></span>
         </Link>
         
         <nav className="hidden md:block">
@@ -93,6 +83,7 @@ const Navbar = () => {
         </button>
       </div>
       
+      {/* Mobile Menu */}
       <div 
         className={`fixed inset-0 bg-noir-dark z-40 md:hidden transition-transform duration-500 ease-wine-bounce ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
