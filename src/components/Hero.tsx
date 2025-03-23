@@ -1,21 +1,19 @@
-
 import { ArrowDown, Grape } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import WineCollection from './WineCollection';
 import WineQuotes from './WineQuotes';
+import '@fontsource/dancing-script';
+import '@fontsource/cormorant-garamond';
 
 const Hero = () => {
   const [hasScrolled, setHasScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   
-  // Listen for scroll events to create dynamic transition animations
   useEffect(() => {
     const handleScroll = () => {
-      // Get the hero section height
       const heroSection = document.querySelector('.hero-section');
       const heroHeight = heroSection?.clientHeight || 0;
       
-      // Calculate scroll progress as percentage
       const scrollTop = window.scrollY;
       const progress = Math.min(scrollTop / (heroHeight * 0.7), 1);
       
@@ -28,7 +26,6 @@ const Hero = () => {
   }, []);
   
   const scrollToCollection = () => {
-    // Add smooth scroll with fade transition
     document.getElementById('collection-section')?.scrollIntoView({ 
       behavior: 'smooth'
     });
@@ -36,9 +33,7 @@ const Hero = () => {
 
   return (
     <div className="flex flex-col">
-      {/* Hero Section with vineyard background */}
       <div className="relative min-h-screen flex items-center justify-center overflow-hidden hero-section">
-        {/* Dynamic background with parallax and scale effect based on scroll */}
         <div 
           className="absolute inset-0 bg-noir-dark transition-all duration-300 ease-out"
           style={{ 
@@ -58,7 +53,6 @@ const Hero = () => {
           ></div>
         </div>
         
-        {/* Wine glass decoration - positioned absolutely with parallax effect */}
         <div 
           className="absolute right-[10%] top-1/4 w-72 h-72 rounded-full bg-wine/5 blur-3xl animate-pulse opacity-50 transition-transform duration-700 ease-out"
           style={{ transform: `translate(${scrollProgress * 100}px, ${scrollProgress * -50}px)` }}
@@ -71,7 +65,6 @@ const Hero = () => {
           }}
         ></div>
         
-        {/* Main content with fade out effect on scroll */}
         <div 
           className="relative z-10 container mx-auto px-4 text-center transition-all duration-500 ease-out"
           style={{ 
@@ -79,29 +72,22 @@ const Hero = () => {
             transform: `translateY(${scrollProgress * 100}px)`
           }}
         >
-          <div className="flex items-center justify-center space-x-3 mb-10">
-            <Grape className="h-14 w-14 text-wine opacity-0 animate-fade-in animate-delay-100" />
-            <span className="block relative overflow-hidden font-gothic text-7xl font-medium opacity-0 animate-fade-in animate-delay-100">
-              <span className="inline-block">
-                <span className="text-white">D</span><span className="text-wine">Barrique</span>
-              </span>
-              <svg className="absolute -bottom-2 left-0 w-full h-5 transform -translate-x-full animate-[slideInLeft_1.5s_ease-in-out_forwards_0.5s]" viewBox="0 0 200 20" preserveAspectRatio="none">
-                <path 
-                  d="M0,10 Q25,5 50,10 T100,10 T150,10 T200,10" 
-                  fill="none" 
-                  stroke="#8C1C13" 
-                  strokeWidth="2"
-                  className="path-animate"
-                />
-              </svg>
-            </span>
+          <div className="flex flex-col items-center justify-center mb-12">
+            <Grape className="h-10 w-10 text-wine opacity-0 animate-fade-in animate-delay-100 mb-2" />
+            <div className="relative overflow-hidden opacity-0 animate-fade-in animate-delay-100">
+              <h1 className="font-dancing text-8xl text-white tracking-wide">
+                <span className="text-white">D</span>
+                <span className="text-wine">Barrique</span>
+              </h1>
+              <div className="font-cormorant text-xs tracking-[0.3em] uppercase text-white/70 mt-1">
+                WINE COLLECTION
+              </div>
+            </div>
           </div>
           
-          {/* Wine quotes component instead of static quote */}
           <WineQuotes />
         </div>
         
-        {/* Scrolling wine animation with parallax effect */}
         <div 
           className={`absolute bottom-10 left-0 right-0 flex justify-center animate-fade-in animate-delay-500 cursor-pointer transition-all duration-500 ease-out ${
             hasScrolled ? 'opacity-0 transform translate-y-10' : 'opacity-100'
@@ -118,15 +104,12 @@ const Hero = () => {
         </div>
       </div>
       
-      {/* Collection Section with dynamic transition */}
       <div 
         id="collection-section" 
         className="min-h-screen bg-noir relative"
       >
-        {/* Dynamic transition overlay with parallax */}
         <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-noir-dark to-transparent z-10"></div>
         
-        {/* Vineyard background image that comes into view as you scroll */}
         <div 
           className="absolute inset-0 overflow-hidden opacity-20 pointer-events-none"
           style={{ 
