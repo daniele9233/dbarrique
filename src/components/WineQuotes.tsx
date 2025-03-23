@@ -2,7 +2,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
-// Corrected wine quote with proper spacing between words
 const wineQuote = {
   quote: "Aprire una bottiglia di vino è come aprire una porta sulla storia.",
   author: "Ernest Hemingway"

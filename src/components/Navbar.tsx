@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Grape, Menu, X, Wine } from 'lucide-react';
+import { Grape, Menu, X } from 'lucide-react';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -52,7 +51,6 @@ const Navbar = () => {
           onClick={() => setIsOpen(false)}
         >
           <div className="relative flex items-center">
-            <Wine className="h-8 w-8 text-wine absolute -left-3 opacity-60" />
             <Grape className="h-8 w-8 text-wine" />
           </div>
           <div className="relative">
@@ -95,7 +93,6 @@ const Navbar = () => {
         </button>
       </div>
       
-      {/* Mobile Menu */}
       <div 
         className={`fixed inset-0 bg-noir-dark z-40 md:hidden transition-transform duration-500 ease-wine-bounce ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
