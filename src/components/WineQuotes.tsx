@@ -33,32 +33,41 @@ const WineQuotes = () => {
     };
   }, []);
 
+  // Dividiamo la citazione in parole per prevenire che "porta" venga spezzata
+  const words = wineQuote.quote.split(' ');
+
   return (
     <div className="max-w-md mx-auto mt-12 relative h-24">
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <div className="relative overflow-hidden">
           <p 
             ref={quoteRef}
-            className="text-white/80 italic text-xl font-serif relative leading-relaxed tracking-wide"
+            className="text-white/80 italic text-xl font-serif relative leading-relaxed tracking-wide whitespace-pre-wrap"
           >
-            {/* Utilizziamo lettere individuali per l'animazione */}
             <span className="absolute -left-2 -top-2 text-4xl text-wine/20 font-serif">"</span>
             <span className="inline-block">
-              {wineQuote.quote.split('').map((char, index) => (
-                <span 
-                  key={index}
-                  className={cn(
-                    "inline-block transition-all duration-700", // Aumentato duration da 300 a 700
-                    isRevealed 
-                      ? "opacity-100 blur-none translate-y-0" 
-                      : "opacity-0 blur-md translate-y-2"
+              {words.map((word, wordIndex) => (
+                <span key={wordIndex} className="inline-block whitespace-nowrap">
+                  {word.split('').map((char, charIndex) => (
+                    <span 
+                      key={`${wordIndex}-${charIndex}`}
+                      className={cn(
+                        "inline-block transition-all duration-700",
+                        isRevealed 
+                          ? "opacity-100 blur-none translate-y-0" 
+                          : "opacity-0 blur-md translate-y-2"
+                      )}
+                      style={{ 
+                        transitionDelay: `${(wordIndex * word.length + charIndex) * 120}ms`,
+                      }}
+                    >
+                      {char}
+                    </span>
+                  ))}
+                  {/* Aggiungi spazio dopo ogni parola tranne l'ultima */}
+                  {wordIndex < words.length - 1 && (
+                    <span className="inline-block" style={{ width: '0.25em' }}></span>
                   )}
-                  style={{ 
-                    transitionDelay: `${index * 120}ms`, // Più lento (120ms invece di 70ms)
-                    marginLeft: char === " " ? "0.25em" : "0" // Aggiungi spazio per i caratteri spazio
-                  }}
-                >
-                  {char}
                 </span>
               ))}
             </span>
@@ -67,15 +76,15 @@ const WineQuotes = () => {
         </div>
         <div 
           className={cn(
-            "text-white/60 text-sm mt-2 font-light tracking-wider transition-all duration-1000 self-end mr-10", // Aumentato duration a 1000ms
+            "text-white/60 text-sm mt-2 font-light tracking-wider transition-all duration-1000 self-end mr-10", 
             isRevealed ? "opacity-100" : "opacity-0"
           )}
-          style={{ transitionDelay: `${wineQuote.quote.length * 120 + 300}ms` }} // Ritardo maggiore in base al nuovo valore di transitionDelay
+          style={{ transitionDelay: `${wineQuote.quote.length * 120 + 300}ms` }}
         >
           — {wineQuote.author}
         </div>
         <div className={cn(
-          "absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-0.5 bg-gradient-to-r from-transparent via-wine/50 to-transparent transition-opacity duration-1000", // Durata maggiore
+          "absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-0.5 bg-gradient-to-r from-transparent via-wine/50 to-transparent transition-opacity duration-1000",
           isRevealed ? "opacity-100" : "opacity-0"
         )}></div>
       </div>
