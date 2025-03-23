@@ -35,7 +35,7 @@ const Hero = () => {
 
   return (
     <div className="flex flex-col">
-      {/* Hero Section with wine illustration background */}
+      {/* Hero Section with vineyard background */}
       <div className="relative min-h-screen flex items-center justify-center overflow-hidden hero-section">
         {/* Dynamic background with parallax and scale effect based on scroll */}
         <div 
@@ -45,10 +45,10 @@ const Hero = () => {
           }}
         >
           <div 
-            className="absolute inset-0 bg-[url('/lovable-uploads/4574b078-f6e3-4d0d-9355-3a94f72d96a6.png')] bg-contain bg-center opacity-20 transition-transform duration-1000 ease-out"
+            className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1464638681273-0962e9b53566?q=80&w=2070')] bg-cover bg-center opacity-25 transition-transform duration-1000 ease-out"
             style={{ 
               transform: `translateY(${scrollProgress * 50}px)`,
-              opacity: 0.2 - scrollProgress * 0.2,
+              opacity: 0.25 - scrollProgress * 0.1,
             }}
           ></div>
           <div 

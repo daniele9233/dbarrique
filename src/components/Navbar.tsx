@@ -31,6 +31,7 @@ const Navbar = () => {
 
   const links = [
     { name: 'Home', path: '/' },
+    { name: 'Dashboard', path: '/dashboard' },
     { name: 'Collection', path: '/collection' },
   ];
 
@@ -51,7 +52,7 @@ const Navbar = () => {
           onClick={() => setIsOpen(false)}
         >
           <Grape className="h-8 w-8 text-wine" />
-          <span className="font-serif text-xl">DBarrique</span>
+          <span className="font-serif text-xl"><span className="text-white">D</span><span className="text-wine">Barrique</span></span>
         </Link>
         
         <nav className="hidden md:block">
