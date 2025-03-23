@@ -1,11 +1,13 @@
 
-import { useState } from 'react';
+import { useState, useRef, ChangeEvent } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Wine, Star, ChevronDown, Plus, Grape, Award } from 'lucide-react';
+import { Wine, Star, ChevronDown, Plus, Grape, Award, Upload } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { toast } from "@/hooks/use-toast";
 
 // Types for our dashboard stats
 type WineStats = {
@@ -101,6 +103,76 @@ const Dashboard = () => {
     );
   };
 
+  // Add Wine Dialog State
+  const [isAddWineDialogOpen, setIsAddWineDialogOpen] = useState(false);
+  const [newWine, setNewWine] = useState({
+    name: "",
+    producer: "",
+    region: "",
+    year: new Date().getFullYear(),
+    rating: 5,
+    image: ""
+  });
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const handleAddWine = () => {
+    // This would normally submit the form data to a database
+    toast({
+      title: "Successo",
+      description: "Nuovo vino aggiunto alla tua collezione.",
+    });
+    setIsAddWineDialogOpen(false);
+    setNewWine({
+      name: "",
+      producer: "",
+      region: "",
+      year: new Date().getFullYear(),
+      rating: 5,
+      image: ""
+    });
+  };
+  
+  const handleChange = (field: string, value: string | number) => {
+    setNewWine({
+      ...newWine,
+      [field]: value
+    });
+  };
+  
+  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        handleChange('image', e.target.result as string);
+        toast({
+          title: "Immagine caricata",
+          description: "L'immagine del vino è stata caricata con successo.",
+        });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  // Rating selector for 1-10 scale
+  const renderRatingInput = () => {
+    return (
+      <div className="flex items-center space-x-4">
+        <input
+          type="range"
+          min="1"
+          max="10"
+          value={newWine.rating}
+          onChange={(e) => handleChange('rating', parseInt(e.target.value))}
+          className="w-full h-2 bg-noir rounded-lg appearance-none cursor-pointer accent-wine"
+        />
+        <span className="text-white font-medium">{newWine.rating}/10</span>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-noir text-white">
       <Navbar />
@@ -111,7 +183,10 @@ const Dashboard = () => {
             <h1 className="text-3xl md:text-4xl font-serif">
               La Tua <span className="text-wine">Collezione</span>
             </h1>
-            <Button className="bg-wine hover:bg-wine-light">
+            <Button 
+              className="bg-wine hover:bg-wine-light"
+              onClick={() => setIsAddWineDialogOpen(true)}
+            >
               <Plus size={16} className="mr-1" /> Aggiungi Vino
             </Button>
           </div>
@@ -212,6 +287,134 @@ const Dashboard = () => {
           </Table>
         </div>
       </div>
+      
+      {/* Add Wine Dialog */}
+      <Dialog open={isAddWineDialogOpen} onOpenChange={setIsAddWineDialogOpen}>
+        <DialogContent className="bg-noir-light border-white/10 text-white">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-2xl flex items-center gap-2">
+              <Grape className="h-6 w-6 text-wine" />
+              <span>Aggiungi Nuovo Vino</span>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Nome del Vino
+              </label>
+              <input
+                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                placeholder="es. Brunello di Montalcino"
+                value={newWine.name}
+                onChange={(e) => handleChange('name', e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Produttore
+              </label>
+              <input
+                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                placeholder="es. Biondi-Santi"
+                value={newWine.producer}
+                onChange={(e) => handleChange('producer', e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Regione
+              </label>
+              <input
+                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                placeholder="es. Toscana"
+                value={newWine.region}
+                onChange={(e) => handleChange('region', e.target.value)}
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Annata
+                </label>
+                <input
+                  type="number"
+                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                  placeholder="es. 2016"
+                  value={newWine.year}
+                  onChange={(e) => handleChange('year', parseInt(e.target.value))}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Valutazione (1-10)
+                </label>
+                {renderRatingInput()}
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Immagine del Vino
+              </label>
+              <div className="flex gap-2">
+                <input
+                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                  placeholder="Inserisci URL immagine o carica un'immagine"
+                  value={typeof newWine.image === 'string' ? newWine.image : ''}
+                  onChange={(e) => handleChange('image', e.target.value)}
+                />
+                <Button 
+                  variant="outline"
+                  className="border-white/10 hover:bg-wine hover:text-white"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Carica
+                </Button>
+                <input 
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  ref={fileInputRef}
+                  onChange={handleFileUpload}
+                />
+              </div>
+              
+              {newWine.image && (
+                <div className="mt-2 h-40 rounded-md overflow-hidden bg-noir-dark">
+                  <img 
+                    src={newWine.image.toString()} 
+                    alt="Anteprima vino" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="flex justify-end gap-4 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setIsAddWineDialogOpen(false)}
+              className="border-white/10 hover:bg-noir hover:text-white"
+            >
+              Annulla
+            </Button>
+            <Button
+              onClick={handleAddWine}
+              className="bg-wine hover:bg-wine-light"
+              disabled={!newWine.name || !newWine.producer || !newWine.region}
+            >
+              Aggiungi alla Collezione
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       
       <Footer />
     </div>
