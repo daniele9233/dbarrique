@@ -5,7 +5,7 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { WineGlass, Star, ChevronDown, Plus, Grape, Award, Wine } from 'lucide-react';
+import { Wine, Star, ChevronDown, Plus, Grape, Award } from 'lucide-react';
 
 // Types for our dashboard stats
 type WineStats = {
@@ -195,7 +195,7 @@ const Dashboard = () => {
                   <TableCell className="py-4">
                     <div className="flex items-center">
                       <div className="h-8 w-8 mr-4 rounded bg-noir-dark flex items-center justify-center">
-                        <WineGlass size={16} className="text-wine" />
+                        <Wine size={16} className="text-wine" />
                       </div>
                       <div>
                         <p className="font-medium">{wine.name}</p>
