@@ -48,13 +48,13 @@ const WineQuotes = () => {
                 <span 
                   key={index}
                   className={cn(
-                    "inline-block transition-all duration-100 transform",
+                    "inline-block transition-all duration-300", // Aumentato duration per rallentare
                     isRevealed 
-                      ? "opacity-100 translate-y-0" 
-                      : "opacity-0 translate-y-2"
+                      ? "opacity-100 blur-none translate-y-0" 
+                      : "opacity-0 blur-md translate-y-2"
                   )}
                   style={{ 
-                    transitionDelay: `${index * 50}ms`, // Più lento (50ms invece di 30ms)
+                    transitionDelay: `${index * 70}ms`, // Più lento (70ms invece di 50ms)
                     marginLeft: char === " " ? "0.25em" : "0" // Aggiungi spazio per i caratteri spazio
                   }}
                 >
@@ -67,10 +67,10 @@ const WineQuotes = () => {
         </div>
         <div 
           className={cn(
-            "text-white/60 text-sm mt-2 font-light tracking-wider transition-all duration-700", // Durata maggiore
+            "text-white/60 text-sm mt-2 font-light tracking-wider transition-all duration-700 self-end mr-10", // Aggiunto self-end e mr-10 per spostare a destra
             isRevealed ? "opacity-100" : "opacity-0"
           )}
-          style={{ transitionDelay: `${wineQuote.quote.length * 50 + 200}ms` }} // Ritardo maggiore
+          style={{ transitionDelay: `${wineQuote.quote.length * 70 + 200}ms` }} // Ritardo maggiore
         >
           — {wineQuote.author}
         </div>
