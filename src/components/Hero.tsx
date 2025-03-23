@@ -81,11 +81,19 @@ const Hero = () => {
         >
           <div className="flex items-center justify-center space-x-3 mb-10">
             <Grape className="h-14 w-14 text-wine opacity-0 animate-fade-in animate-delay-100" />
-            <span className="block relative overflow-hidden font-serif text-7xl font-medium opacity-0 animate-fade-in animate-delay-100">
+            <span className="block relative overflow-hidden font-gothic text-7xl font-medium opacity-0 animate-fade-in animate-delay-100">
               <span className="inline-block">
                 <span className="text-white">D</span><span className="text-wine">Barrique</span>
               </span>
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-wine to-wine-light transform -translate-x-full animate-[slideInLeft_1.5s_ease-in-out_forwards_0.5s]"></span>
+              <svg className="absolute -bottom-2 left-0 w-full h-5 transform -translate-x-full animate-[slideInLeft_1.5s_ease-in-out_forwards_0.5s]" viewBox="0 0 200 20" preserveAspectRatio="none">
+                <path 
+                  d="M0,10 Q25,5 50,10 T100,10 T150,10 T200,10" 
+                  fill="none" 
+                  stroke="#8C1C13" 
+                  strokeWidth="2"
+                  className="path-animate"
+                />
+              </svg>
             </span>
           </div>
           

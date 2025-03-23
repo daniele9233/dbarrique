@@ -101,6 +101,12 @@
   .animate-delay-500 {
     animation-delay: 500ms;
   }
+
+  .path-animate {
+    stroke-dasharray: 300;
+    stroke-dashoffset: 300;
+    animation: drawPath 1.5s ease-in-out forwards 0.5s;
+  }
 }
 
 /* Custom scroll bar */
@@ -149,6 +155,15 @@
   }
   100% {
     transform: translateX(0);
+  }
+}
+
+@keyframes drawPath {
+  0% {
+    stroke-dashoffset: 300;
+  }
+  100% {
+    stroke-dashoffset: 0;
   }
 }
 
