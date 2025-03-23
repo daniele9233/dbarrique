@@ -85,7 +85,7 @@ const Hero = () => {
               <span className="inline-block">
                 <span className="text-white">D</span><span className="text-wine">Barrique</span>
               </span>
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-wine to-wine-light transform -translate-x-full animate-[slideInLeft_1.5s_ease-in-out_forwards_0.5s]"></span>
+              {/* Removed the red line here */}
             </span>
           </div>
           

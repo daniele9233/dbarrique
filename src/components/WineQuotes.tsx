@@ -18,15 +18,10 @@ const WineQuotes = () => {
       setIsRevealed(true);
     }, 1200); // Ritardo prima di iniziare l'animazione
     
-    // Rimuoviamo l'intervallo che faceva ricominciare l'animazione periodicamente
-    
     return () => {
       clearTimeout(timer);
     };
   }, []);
-
-  // Dividiamo la citazione in parole per prevenire che "porta" venga spezzata
-  const words = wineQuote.quote.split(' ');
 
   return (
     <div className="max-w-md mx-auto mt-12 relative h-24">
@@ -37,31 +32,20 @@ const WineQuotes = () => {
             className="text-white/80 italic text-xl font-serif relative leading-relaxed tracking-wide whitespace-pre-wrap"
           >
             <span className="absolute -left-2 -top-2 text-4xl text-wine/20 font-serif">"</span>
-            <span className="inline-block">
-              {words.map((word, wordIndex) => (
-                <span key={wordIndex} className="inline-block whitespace-nowrap">
-                  {word.split('').map((char, charIndex) => (
-                    <span 
-                      key={`${wordIndex}-${charIndex}`}
-                      className={cn(
-                        "inline-block transition-all duration-700",
-                        isRevealed 
-                          ? "opacity-100 blur-none translate-y-0" 
-                          : "opacity-0 blur-md translate-y-2"
-                      )}
-                      style={{ 
-                        transitionDelay: `${(wordIndex * word.length + charIndex) * 120}ms`,
-                      }}
-                    >
-                      {char}
-                    </span>
-                  ))}
-                  {/* Aggiungi spazio dopo ogni parola tranne l'ultima */}
-                  {wordIndex < words.length - 1 && (
-                    <span className="inline-block" style={{ width: '0.25em' }}></span>
-                  )}
-                </span>
-              ))}
+            {/* Changed to use a left-to-right animation */}
+            <span className="relative overflow-hidden inline-block">
+              <span 
+                className={cn(
+                  "inline-block transition-all duration-1000 ease-out",
+                  isRevealed ? "w-full" : "w-0"
+                )}
+                style={{
+                  whiteSpace: "nowrap",
+                  overflow: "hidden"
+                }}
+              >
+                {wineQuote.quote}
+              </span>
             </span>
             <span className="absolute -right-2 -bottom-2 text-4xl text-wine/20 font-serif">"</span>
           </p>
@@ -71,7 +55,7 @@ const WineQuotes = () => {
             "text-white/60 text-sm mt-2 font-light tracking-wider transition-all duration-1000 self-end mr-10", 
             isRevealed ? "opacity-100" : "opacity-0"
           )}
-          style={{ transitionDelay: `${wineQuote.quote.length * 120 + 300}ms` }}
+          style={{ transitionDelay: "1200ms" }}
         >
           — {wineQuote.author}
         </div>
