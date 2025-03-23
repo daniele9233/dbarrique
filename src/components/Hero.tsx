@@ -83,13 +83,13 @@ const Hero = () => {
             <Grape className="h-14 w-14 text-wine opacity-0 animate-fade-in animate-delay-100" />
             <div className="relative overflow-hidden">
               <span className="block relative overflow-hidden font-serif text-7xl font-medium opacity-0 animate-fade-in animate-delay-100">
-                <span className="inline-block">
-                  <span className="text-white">D</span>
-                  <span className="text-wine tracking-wider font-gothic transform" style={{ letterSpacing: '0.1em' }}>Barrique</span>
+                <span className="inline-flex items-baseline">
+                  <span className="text-white font-medium tracking-wider mr-1">D</span>
+                  <span className="text-wine font-gothic relative" style={{ letterSpacing: '0.12em' }}>
+                    Barrique
+                    <span className="absolute -bottom-3 left-0 right-0 mx-auto w-3/4 h-[1px] bg-gradient-to-r from-transparent via-wine/40 to-transparent rounded-full"></span>
+                  </span>
                 </span>
-                {/* Barrel stave effect below the text */}
-                <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-3/4 h-1 bg-gradient-to-r from-transparent via-wine/40 to-transparent rounded-full"></span>
-                <span className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-2/3 h-0.5 bg-gradient-to-r from-transparent via-wine/20 to-transparent rounded-full"></span>
               </span>
             </div>
           </div>

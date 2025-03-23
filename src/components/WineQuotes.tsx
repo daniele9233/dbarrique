@@ -16,7 +16,7 @@ const WineQuotes = () => {
     // Imposta un breve ritardo prima di iniziare l'animazione
     const timer = setTimeout(() => {
       setIsRevealed(true);
-    }, 1200); // Ritardo prima di iniziare l'animazione
+    }, 1500); // Ritardo aumentato prima di iniziare l'animazione
     
     return () => {
       clearTimeout(timer);
@@ -35,11 +35,11 @@ const WineQuotes = () => {
             className="text-white/80 italic text-xl font-serif relative leading-relaxed tracking-wide whitespace-pre-wrap"
           >
             <span className="absolute -left-2 -top-2 text-4xl text-wine/20 font-serif">"</span>
-            {/* Combinazione di animazione left-to-right con motion blur */}
+            {/* Combinazione di animazione left-to-right con motion blur più lenta */}
             <span className="inline-block relative">
               <span 
                 className={cn(
-                  "inline-block transition-all duration-1000 ease-out overflow-hidden",
+                  "inline-block transition-all duration-1500 ease-out overflow-hidden", // Velocità diminuita
                   isRevealed ? "w-full" : "w-0"
                 )}
                 style={{
@@ -50,13 +50,13 @@ const WineQuotes = () => {
                   <span 
                     key={index}
                     className={cn(
-                      "inline-block transition-all duration-700",
+                      "inline-block transition-all duration-900", // Velocità diminuita
                       isRevealed 
                         ? "opacity-100 blur-none" 
                         : "opacity-0 blur-md"
                     )}
                     style={{ 
-                      transitionDelay: `${index * 30 + 300}ms`,
+                      transitionDelay: `${index * 40 + 500}ms`, // Ritardo aumentato tra i caratteri
                     }}
                   >
                     {char}
@@ -69,15 +69,15 @@ const WineQuotes = () => {
         </div>
         <div 
           className={cn(
-            "text-white/60 text-sm mt-2 font-light tracking-wider transition-all duration-1000 self-end mr-10", 
+            "text-white/60 text-sm mt-2 font-light tracking-wider transition-all duration-1500 self-end mr-10", // Velocità diminuita
             isRevealed ? "opacity-100" : "opacity-0"
           )}
-          style={{ transitionDelay: "1800ms" }}
+          style={{ transitionDelay: "2500ms" }} // Ritardo aumentato per il nome dell'autore
         >
           — {wineQuote.author}
         </div>
         <div className={cn(
-          "absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-0.5 bg-gradient-to-r from-transparent via-wine/50 to-transparent transition-opacity duration-1000",
+          "absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-0.5 bg-gradient-to-r from-transparent via-wine/50 to-transparent transition-opacity duration-1500", // Velocità diminuita
           isRevealed ? "opacity-100" : "opacity-0"
         )}></div>
       </div>
