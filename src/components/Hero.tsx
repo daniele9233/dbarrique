@@ -1,4 +1,5 @@
-import { ArrowDown, Grape, Sparkles } from 'lucide-react';
+
+import { ArrowDown, Grape } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import WineCollection from './WineCollection';
 import WineQuotes from './WineQuotes';
@@ -72,20 +73,19 @@ const Hero = () => {
         >
           <div className="flex flex-col items-center justify-center space-y-2 mb-10">
             <div className="relative flex items-center mb-2 opacity-0 animate-fade-in animate-delay-100">
-              <Grape className="h-14 w-14 text-wine" />
-              <Sparkles className="h-5 w-5 text-wine/40 absolute -right-5 -top-1" />
+              <Grape className="h-14 w-14 text-red-500" />
             </div>
             
             <div className="relative overflow-hidden">
               <span className="block relative overflow-hidden font-serif text-7xl font-medium opacity-0 animate-fade-in animate-delay-100">
                 <span className="inline-flex items-center gap-2">
-                  <span className="text-white font-medium tracking-wider relative pb-2 border-b border-wine/30">D</span>
-                  <span className="text-wine font-gothic relative" style={{ letterSpacing: '0.12em' }}>
+                  <span className="text-white font-medium tracking-wider">D</span>
+                  <span className="text-red-500 font-serif" style={{ letterSpacing: '0.05em' }}>
                     Barrique
-                    <span className="absolute -bottom-3 left-0 right-0 mx-auto w-3/4 h-[1px] bg-gradient-to-r from-transparent via-wine/40 to-transparent rounded-full"></span>
                   </span>
                 </span>
               </span>
+              <div className="h-[1px] bg-red-500 mt-1 w-full opacity-0 animate-fade-in animate-delay-300"></div>
               <span className="block text-[10px] uppercase tracking-[0.4em] text-white/50 mt-4 opacity-0 animate-fade-in animate-delay-300">Fine Wine Collection</span>
             </div>
           </div>

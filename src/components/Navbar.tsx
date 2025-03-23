@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Grape, Menu, X } from 'lucide-react';
@@ -47,21 +48,20 @@ const Navbar = () => {
       <div className="container mx-auto flex items-center justify-between px-4">
         <Link 
           to="/" 
-          className="flex items-center space-x-2 text-white"
+          className="flex items-center space-x-3 text-white"
           onClick={() => setIsOpen(false)}
         >
           <div className="relative flex items-center">
-            <Grape className="h-8 w-8 text-wine" />
+            <Grape className="h-8 w-8 text-red-500" />
           </div>
           <div className="relative">
             <span className="font-serif text-xl flex items-center gap-1">
-              <span className="text-white font-medium tracking-wider border-b border-wine/20 pb-0.5">D</span>
-              <span className="text-wine font-gothic relative" style={{ letterSpacing: '0.12em' }}>
+              <span className="text-white font-medium tracking-wider">D</span>
+              <span className="text-red-500 font-serif" style={{ letterSpacing: '0.05em' }}>
                 Barrique
-                <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-wine/40 to-transparent rounded-full"></span>
               </span>
             </span>
-            <span className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 text-[8px] uppercase tracking-[0.25em] text-white/50">Fine Wines</span>
+            <div className="absolute -bottom-1 left-0 right-0 h-[1px] bg-red-500"></div>
           </div>
         </Link>
         
