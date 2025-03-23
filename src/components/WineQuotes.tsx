@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
-// Citazione corretta sul vino di Hemingway con spazi appropriati
+// Corrected wine quote with proper spacing between words
 const wineQuote = {
   quote: "Aprire una bottiglia di vino è come aprire una porta sulla storia.",
   author: "Ernest Hemingway"
@@ -13,18 +13,18 @@ const WineQuotes = () => {
   const quoteRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
-    // Imposta un breve ritardo prima di iniziare l'animazione
+    // Set a longer delay before starting the animation
     const timer = setTimeout(() => {
       setIsRevealed(true);
-    }, 1500); // Ritardo aumentato prima di iniziare l'animazione
+    }, 2000); // Increased delay before starting the animation
     
     return () => {
       clearTimeout(timer);
     };
   }, []);
 
-  // Dividiamo la citazione in caratteri per creare l'effetto di comparsa progressiva
-  const characters = wineQuote.quote.split('');
+  // Split the quote into words to ensure proper spacing
+  const words = wineQuote.quote.split(' ');
 
   return (
     <div className="max-w-md mx-auto mt-12 relative h-24">
@@ -35,31 +35,48 @@ const WineQuotes = () => {
             className="text-white/80 italic text-xl font-serif relative leading-relaxed tracking-wide whitespace-pre-wrap"
           >
             <span className="absolute -left-2 -top-2 text-4xl text-wine/20 font-serif">"</span>
-            {/* Combinazione di animazione left-to-right con motion blur più lenta */}
+            {/* Slower animation with reduced speed */}
             <span className="inline-block relative">
               <span 
                 className={cn(
-                  "inline-block transition-all duration-1500 ease-out overflow-hidden", // Velocità diminuita
+                  "inline-block transition-all duration-2000 ease-out overflow-hidden", // Slowed down animation
                   isRevealed ? "w-full" : "w-0"
                 )}
                 style={{
                   whiteSpace: "nowrap"
                 }}
               >
-                {characters.map((char, index) => (
-                  <span 
-                    key={index}
-                    className={cn(
-                      "inline-block transition-all duration-900", // Velocità diminuita
-                      isRevealed 
-                        ? "opacity-100 blur-none" 
-                        : "opacity-0 blur-md"
+                {words.map((word, wordIndex) => (
+                  <span key={wordIndex} className="inline-block">
+                    {word.split('').map((char, charIndex) => (
+                      <span 
+                        key={`${wordIndex}-${charIndex}`}
+                        className={cn(
+                          "inline-block transition-all duration-1500", // Slowed down character animation
+                          isRevealed 
+                            ? "opacity-100 blur-none" 
+                            : "opacity-0 blur-md"
+                        )}
+                        style={{ 
+                          transitionDelay: `${(wordIndex * 5 + charIndex) * 60 + 800}ms`, // Increased delay between characters
+                        }}
+                      >
+                        {char}
+                      </span>
+                    ))}
+                    {wordIndex < words.length - 1 && (
+                      <span 
+                        className={cn(
+                          "inline-block transition-all duration-1500",
+                          isRevealed ? "opacity-100" : "opacity-0"
+                        )}
+                        style={{ 
+                          transitionDelay: `${wordIndex * 300 + 800}ms`, 
+                        }}
+                      >
+                        &nbsp;
+                      </span>
                     )}
-                    style={{ 
-                      transitionDelay: `${index * 40 + 500}ms`, // Ritardo aumentato tra i caratteri
-                    }}
-                  >
-                    {char}
                   </span>
                 ))}
               </span>
@@ -69,15 +86,15 @@ const WineQuotes = () => {
         </div>
         <div 
           className={cn(
-            "text-white/60 text-sm mt-2 font-light tracking-wider transition-all duration-1500 self-end mr-10", // Velocità diminuita
+            "text-white/60 text-sm mt-2 font-light tracking-wider transition-all duration-2000 self-end mr-10", // Slowed down author animation
             isRevealed ? "opacity-100" : "opacity-0"
           )}
-          style={{ transitionDelay: "2500ms" }} // Ritardo aumentato per il nome dell'autore
+          style={{ transitionDelay: "3500ms" }} // Increased delay for the author
         >
           — {wineQuote.author}
         </div>
         <div className={cn(
-          "absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-0.5 bg-gradient-to-r from-transparent via-wine/50 to-transparent transition-opacity duration-1500", // Velocità diminuita
+          "absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-0.5 bg-gradient-to-r from-transparent via-wine/50 to-transparent transition-opacity duration-2000", // Slowed down decoration line animation
           isRevealed ? "opacity-100" : "opacity-0"
         )}></div>
       </div>
