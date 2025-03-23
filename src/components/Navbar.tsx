@@ -52,7 +52,14 @@ const Navbar = () => {
           onClick={() => setIsOpen(false)}
         >
           <Grape className="h-8 w-8 text-wine" />
-          <span className="font-serif text-xl"><span className="text-white">D</span><span className="text-wine">Barrique</span></span>
+          <div className="relative">
+            <span className="font-serif text-xl">
+              <span className="text-white">D</span>
+              <span className="text-wine font-gothic" style={{ letterSpacing: '0.05em' }}>Barrique</span>
+            </span>
+            {/* Small barrel stave effect */}
+            <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-3/4 h-0.5 bg-gradient-to-r from-transparent via-wine/30 to-transparent rounded-full"></span>
+          </div>
         </Link>
         
         <nav className="hidden md:block">

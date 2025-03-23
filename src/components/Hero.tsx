@@ -81,12 +81,17 @@ const Hero = () => {
         >
           <div className="flex items-center justify-center space-x-3 mb-10">
             <Grape className="h-14 w-14 text-wine opacity-0 animate-fade-in animate-delay-100" />
-            <span className="block relative overflow-hidden font-serif text-7xl font-medium opacity-0 animate-fade-in animate-delay-100">
-              <span className="inline-block">
-                <span className="text-white">D</span><span className="text-wine">Barrique</span>
+            <div className="relative overflow-hidden">
+              <span className="block relative overflow-hidden font-serif text-7xl font-medium opacity-0 animate-fade-in animate-delay-100">
+                <span className="inline-block">
+                  <span className="text-white">D</span>
+                  <span className="text-wine tracking-wider font-gothic transform" style={{ letterSpacing: '0.1em' }}>Barrique</span>
+                </span>
+                {/* Barrel stave effect below the text */}
+                <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-3/4 h-1 bg-gradient-to-r from-transparent via-wine/40 to-transparent rounded-full"></span>
+                <span className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-2/3 h-0.5 bg-gradient-to-r from-transparent via-wine/20 to-transparent rounded-full"></span>
               </span>
-              {/* Removed the red line here */}
-            </span>
+            </div>
           </div>
           
           {/* Wine quotes component instead of static quote */}

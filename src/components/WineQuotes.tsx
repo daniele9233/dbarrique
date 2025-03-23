@@ -23,6 +23,9 @@ const WineQuotes = () => {
     };
   }, []);
 
+  // Dividiamo la citazione in caratteri per creare l'effetto di comparsa progressiva
+  const characters = wineQuote.quote.split('');
+
   return (
     <div className="max-w-md mx-auto mt-12 relative h-24">
       <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -32,19 +35,33 @@ const WineQuotes = () => {
             className="text-white/80 italic text-xl font-serif relative leading-relaxed tracking-wide whitespace-pre-wrap"
           >
             <span className="absolute -left-2 -top-2 text-4xl text-wine/20 font-serif">"</span>
-            {/* Changed to use a left-to-right animation */}
-            <span className="relative overflow-hidden inline-block">
+            {/* Combinazione di animazione left-to-right con motion blur */}
+            <span className="inline-block relative">
               <span 
                 className={cn(
-                  "inline-block transition-all duration-1000 ease-out",
+                  "inline-block transition-all duration-1000 ease-out overflow-hidden",
                   isRevealed ? "w-full" : "w-0"
                 )}
                 style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden"
+                  whiteSpace: "nowrap"
                 }}
               >
-                {wineQuote.quote}
+                {characters.map((char, index) => (
+                  <span 
+                    key={index}
+                    className={cn(
+                      "inline-block transition-all duration-700",
+                      isRevealed 
+                        ? "opacity-100 blur-none" 
+                        : "opacity-0 blur-md"
+                    )}
+                    style={{ 
+                      transitionDelay: `${index * 30 + 300}ms`,
+                    }}
+                  >
+                    {char}
+                  </span>
+                ))}
               </span>
             </span>
             <span className="absolute -right-2 -bottom-2 text-4xl text-wine/20 font-serif">"</span>
@@ -55,7 +72,7 @@ const WineQuotes = () => {
             "text-white/60 text-sm mt-2 font-light tracking-wider transition-all duration-1000 self-end mr-10", 
             isRevealed ? "opacity-100" : "opacity-0"
           )}
-          style={{ transitionDelay: "1200ms" }}
+          style={{ transitionDelay: "1800ms" }}
         >
           — {wineQuote.author}
         </div>
