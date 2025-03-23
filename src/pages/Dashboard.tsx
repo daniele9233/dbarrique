@@ -5,9 +5,10 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Wine, Star, ChevronDown, Plus, Grape, Award, Upload } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Wine, Star, Plus, Grape, Award, Upload } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
+import { wines, grapes, bodyOptions, structureOptions, tanninOptions, sweetnessOptions, aromaOptions } from "@/data/WineData";
 
 // Types for our dashboard stats
 type WineStats = {
@@ -23,66 +24,46 @@ type WineStats = {
 type WineEntry = {
   id: number;
   name: string;
-  producer: string;
+  producer?: string;
   year: number;
   region: string;
   rating: number;
+  grape?: string;
 };
 
 const Dashboard = () => {
-  // Sample data for the dashboard
-  const [stats] = useState<WineStats>({
-    totalWines: 5,
-    averageRating: 8.8,
-    mostCommonType: {
-      type: "rosso",
-      count: 4
-    }
-  });
+  // Calculate stats based on the actual wines array
+  const calculateStats = (): WineStats => {
+    const totalWines = wines.length;
+    const totalRating = wines.reduce((sum, wine) => sum + wine.rating, 0);
+    const averageRating = totalWines > 0 ? totalRating / totalWines : 0;
 
-  // Sample wine entries
-  const [wines] = useState<WineEntry[]>([
-    {
-      id: 1,
-      name: "Brunello di Montalcino",
-      producer: "Biondi-Santi",
-      year: 2016,
-      region: "Toscana",
-      rating: 10
-    },
-    {
-      id: 2,
-      name: "Amarone della Valpolicella",
-      producer: "Dal Forno Romano",
-      year: 2010,
-      region: "Veneto",
-      rating: 10
-    },
-    {
-      id: 3,
-      name: "Barolo Riserva",
-      producer: "Cantina Mascarello",
-      year: 2015,
-      region: "Piemonte",
-      rating: 8
-    },
-    {
-      id: 4,
-      name: "Franciacorta Brut",
-      producer: "Bellavista",
-      year: 2018,
-      region: "Lombardia",
-      rating: 8
-    },
-    {
-      id: 5,
-      name: "Sassicaia",
-      producer: "Tenuta San Guido",
-      year: 2018,
-      region: "Toscana",
-      rating: 8
-    }
-  ]);
+    return {
+      totalWines,
+      averageRating,
+      mostCommonType: {
+        type: "rosso",
+        count: totalWines
+      }
+    };
+  };
+
+  const [stats] = useState<WineStats>(calculateStats());
+
+  // Convert the wines array to WineEntry format
+  const convertWinesToEntries = (): WineEntry[] => {
+    return wines.map(wine => ({
+      id: wine.id,
+      name: wine.name,
+      producer: wine.name.split(' ')[0], // Simplified for demo
+      year: wine.year,
+      region: wine.region,
+      rating: wine.rating,
+      grape: wine.grape
+    }));
+  };
+
+  const [wineEntries] = useState<WineEntry[]>(convertWinesToEntries());
 
   // Render the wine rating as stars/icons
   const renderRating = (rating: number) => {
@@ -111,16 +92,57 @@ const Dashboard = () => {
     region: "",
     year: new Date().getFullYear(),
     rating: 5,
-    image: ""
+    type: "red" as const,
+    image: "",
+    grape: "",
+    body: "Medio",
+    structure: "Equilibrato",
+    tannins: "Equilibrato",
+    sweetness: "Secco",
+    aroma: "Fruttato"
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const handleAddWine = () => {
-    // This would normally submit the form data to a database
+    // Generate a unique ID
+    const newId = Date.now() + Math.floor(Math.random() * 1000);
+    
+    // Create full wine object
+    const wineToAdd = {
+      id: newId,
+      name: newWine.name,
+      region: newWine.region || "Non specificata",
+      year: newWine.year || new Date().getFullYear(),
+      rating: newWine.rating,
+      type: "red" as const,
+      image: newWine.image || "https://images.unsplash.com/photo-1553361371-9fe24fca9c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
+      grape: newWine.grape || "Non specificato",
+      body: newWine.body,
+      structure: newWine.structure,
+      tannins: newWine.tannins,
+      sweetness: newWine.sweetness,
+      aroma: newWine.aroma
+    };
+    
+    // Add to wine collection
+    wines.push(wineToAdd);
+    
+    // Add to wine entries for the dashboard
+    wineEntries.push({
+      id: newId,
+      name: newWine.name,
+      producer: newWine.producer || newWine.name.split(' ')[0],
+      year: newWine.year || new Date().getFullYear(),
+      region: newWine.region || "Non specificata",
+      rating: newWine.rating,
+      grape: newWine.grape
+    });
+    
     toast({
       title: "Successo",
       description: "Nuovo vino aggiunto alla tua collezione.",
     });
+    
     setIsAddWineDialogOpen(false);
     setNewWine({
       name: "",
@@ -128,7 +150,14 @@ const Dashboard = () => {
       region: "",
       year: new Date().getFullYear(),
       rating: 5,
-      image: ""
+      type: "red" as const,
+      image: "",
+      grape: "",
+      body: "Medio",
+      structure: "Equilibrato",
+      tannins: "Equilibrato",
+      sweetness: "Secco",
+      aroma: "Fruttato"
     });
   };
   
@@ -204,7 +233,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col">
-                <span className="text-4xl font-semibold">{stats.totalWines}</span>
+                <span className="text-4xl font-semibold">{wines.length}</span>
                 <span className="text-sm text-white/60 mt-1">
                   NELLA TUA COLLEZIONE
                 </span>
@@ -219,7 +248,11 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col">
-                <span className="text-4xl font-semibold">{stats.averageRating.toFixed(1)}</span>
+                <span className="text-4xl font-semibold">
+                  {wines.length > 0 
+                    ? (wines.reduce((sum, wine) => sum + wine.rating, 0) / wines.length).toFixed(1) 
+                    : "0.0"}
+                </span>
                 <span className="text-sm text-white/60 mt-1">
                   SU 10 PUNTI
                 </span>
@@ -234,9 +267,9 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col">
-                <span className="text-4xl font-semibold capitalize">{stats.mostCommonType.type}</span>
+                <span className="text-4xl font-semibold capitalize">Rosso</span>
                 <span className="text-sm text-white/60 mt-1">
-                  {stats.mostCommonType.count} BOTTIGLIE IN COLLEZIONE
+                  {wines.length} BOTTIGLIE IN COLLEZIONE
                 </span>
               </div>
             </CardContent>
@@ -262,7 +295,10 @@ const Dashboard = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {wines.map((wine) => (
+              {wines
+                .sort((a, b) => b.rating - a.rating) // Sort by rating
+                .slice(0, 5) // Take top 5
+                .map((wine) => (
                 <TableRow 
                   key={wine.id} 
                   className="border-b border-white/5 hover:bg-noir-light/40 transition-colors cursor-pointer"
@@ -274,7 +310,7 @@ const Dashboard = () => {
                       </div>
                       <div>
                         <p className="font-medium">{wine.name}</p>
-                        <p className="text-sm text-white/60">{wine.producer}</p>
+                        <p className="text-sm text-white/60">{wine.grape}</p>
                       </div>
                     </div>
                   </TableCell>
@@ -283,6 +319,13 @@ const Dashboard = () => {
                   <TableCell>{renderRating(wine.rating)}</TableCell>
                 </TableRow>
               ))}
+              {wines.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center py-8 text-white/50">
+                    Nessun vino nella collezione. Aggiungi il tuo primo vino!
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>
@@ -296,15 +339,18 @@ const Dashboard = () => {
               <Grape className="h-6 w-6 text-wine" />
               <span>Aggiungi Nuovo Vino</span>
             </DialogTitle>
+            <DialogDescription className="text-white/60">
+              Inserisci i dettagli del vino che desideri aggiungere alla tua collezione. I campi contrassegnati con * sono obbligatori.
+            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Nome del Vino
+                Nome del Vino *
               </label>
               <input
-                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
                 placeholder="es. Brunello di Montalcino"
                 value={newWine.name}
                 onChange={(e) => handleChange('name', e.target.value)}
@@ -316,7 +362,7 @@ const Dashboard = () => {
                 Produttore
               </label>
               <input
-                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
                 placeholder="es. Biondi-Santi"
                 value={newWine.producer}
                 onChange={(e) => handleChange('producer', e.target.value)}
@@ -328,11 +374,27 @@ const Dashboard = () => {
                 Regione
               </label>
               <input
-                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
                 placeholder="es. Toscana"
                 value={newWine.region}
                 onChange={(e) => handleChange('region', e.target.value)}
               />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Vitigno
+              </label>
+              <select 
+                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
+                value={newWine.grape}
+                onChange={(e) => handleChange('grape', e.target.value)}
+              >
+                <option value="">Seleziona un vitigno</option>
+                {grapes.map(grape => (
+                  <option key={grape} value={grape}>{grape}</option>
+                ))}
+              </select>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
@@ -342,10 +404,13 @@ const Dashboard = () => {
                 </label>
                 <input
                   type="number"
-                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
                   placeholder="es. 2016"
-                  value={newWine.year}
-                  onChange={(e) => handleChange('year', parseInt(e.target.value))}
+                  value={newWine.year || ''}
+                  onChange={(e) => {
+                    const value = e.target.value === '' ? '' : parseInt(e.target.value);
+                    handleChange('year', value || new Date().getFullYear());
+                  }}
                 />
               </div>
               
@@ -357,13 +422,92 @@ const Dashboard = () => {
               </div>
             </div>
             
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none">
+                  Corpo
+                </label>
+                <select 
+                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
+                  value={newWine.body}
+                  onChange={(e) => handleChange('body', e.target.value)}
+                >
+                  {bodyOptions.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none">
+                  Struttura
+                </label>
+                <select 
+                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
+                  value={newWine.structure}
+                  onChange={(e) => handleChange('structure', e.target.value)}
+                >
+                  {structureOptions.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none">
+                  Tannini
+                </label>
+                <select 
+                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
+                  value={newWine.tannins}
+                  onChange={(e) => handleChange('tannins', e.target.value)}
+                >
+                  {tanninOptions.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none">
+                  Dolcezza
+                </label>
+                <select 
+                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
+                  value={newWine.sweetness}
+                  onChange={(e) => handleChange('sweetness', e.target.value)}
+                >
+                  {sweetnessOptions.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none">
+                  Aromi principali
+                </label>
+                <select 
+                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
+                  value={newWine.aroma}
+                  onChange={(e) => handleChange('aroma', e.target.value)}
+                >
+                  {aromaOptions.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Immagine del Vino
               </label>
               <div className="flex gap-2">
                 <input
-                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none"
+                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
                   placeholder="Inserisci URL immagine o carica un'immagine"
                   value={typeof newWine.image === 'string' ? newWine.image : ''}
                   onChange={(e) => handleChange('image', e.target.value)}
@@ -408,7 +552,7 @@ const Dashboard = () => {
             <Button
               onClick={handleAddWine}
               className="bg-wine hover:bg-wine-light"
-              disabled={!newWine.name || !newWine.producer || !newWine.region}
+              disabled={!newWine.name} // Only name is required
             >
               Aggiungi alla Collezione
             </Button>

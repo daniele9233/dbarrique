@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Plus, Filter } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SearchBar from '@/components/collection/SearchBar';
@@ -128,12 +128,14 @@ const Collection = () => {
                 setSearchTerm={setSearchTerm}
               />
               
+              {/* Filter Button with Toggle */}
               <button
                 onClick={toggleFilters}
-                className="px-5 py-3 rounded-md bg-noir-light border border-white/10 hover:bg-wine transition-colors duration-300 flex items-center justify-center gap-2"
+                className={`px-5 py-3 rounded-md transition-colors duration-300 flex items-center justify-center gap-2 ${
+                  showFilters ? "bg-wine text-white" : "bg-noir-light border border-white/10 hover:bg-wine/90"
+                }`}
               >
-                <Filter className="h-5 w-5" />
-                <span>Filtri</span>
+                Filtri
               </button>
               
               {/* Add Wine Button */}

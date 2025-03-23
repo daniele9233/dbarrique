@@ -1,11 +1,6 @@
 
 import { useState } from 'react';
-import { Filter } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import FilterRegion from './FilterRegion';
 import FilterGrape from './FilterGrape';
 import FilterYear from './FilterYear';
@@ -41,7 +36,6 @@ interface FilterSectionProps {
 
 const FilterSection: React.FC<FilterSectionProps> = ({
   showFilters,
-  toggleFilters,
   selectedRegions,
   selectedGrapes,
   selectedYears,
@@ -65,82 +59,65 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   resetAllFilters
 }) => {
   return (
-    <div className="max-w-7xl mx-auto mb-12 px-4">
-      <div className="flex flex-col md:flex-row gap-4 items-stretch">
-        <div className="relative flex-grow">
-          {/* This will be replaced by the SearchBar component */}
-        </div>
-        
-        <button
-          onClick={toggleFilters}
-          className="px-5 py-3 rounded-md bg-noir-light border border-white/10 hover:bg-wine transition-colors duration-300 flex items-center justify-center gap-2"
-        >
-          <Filter className="h-5 w-5" />
-          <span>Filtri</span>
-        </button>
-      </div>
-      
-      {/* Expandable filters */}
-      <div className={`mt-6 transition-all duration-300 ease-wine-bounce ${
-        showFilters ? 'opacity-100 max-h-[10000px]' : 'opacity-0 max-h-0 overflow-hidden'
-      }`}>
-        <div className="bg-noir-light border border-white/10 rounded-lg p-5">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Left column - Regions and Grape */}
-            <div className="space-y-5">
-              <FilterRegion 
-                selectedRegions={selectedRegions} 
-                handleRegionToggle={handleRegionToggle} 
-              />
-              <FilterGrape 
-                selectedGrapes={selectedGrapes} 
-                handleGrapeToggle={handleGrapeToggle} 
-              />
-            </div>
-            
-            {/* Middle column - Year, Occasions */}
-            <div className="space-y-5">
-              <FilterYear 
-                selectedYears={selectedYears} 
-                handleYearToggle={handleYearToggle} 
-              />
-              <FilterOccasion 
-                selectedOccasions={selectedOccasions} 
-                handleOccasionToggle={handleOccasionToggle} 
-              />
-            </div>
-            
-            {/* Right column - Wine characteristics, Refinement */}
-            <div className="space-y-5">
-              <FilterWineCharacteristics 
-                selectedBody={selectedBody}
-                selectedStructure={selectedStructure}
-                selectedTannins={selectedTannins}
-                selectedSweetness={selectedSweetness}
-                selectedAroma={selectedAroma}
-                setSelectedBody={setSelectedBody}
-                setSelectedStructure={setSelectedStructure}
-                setSelectedTannins={setSelectedTannins}
-                setSelectedSweetness={setSelectedSweetness}
-                setSelectedAroma={setSelectedAroma}
-              />
-              <FilterRefinement 
-                selectedRefinements={selectedRefinements} 
-                handleRefinementToggle={handleRefinementToggle} 
-              />
-            </div>
+    <div className={`mt-6 transition-all duration-300 ease-wine-bounce ${
+      showFilters ? 'opacity-100 max-h-[10000px]' : 'opacity-0 max-h-0 overflow-hidden'
+    }`}>
+      <div className="bg-noir-light border border-white/10 rounded-lg p-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Left column - Regions and Grape */}
+          <div className="space-y-5">
+            <FilterRegion 
+              selectedRegions={selectedRegions} 
+              handleRegionToggle={handleRegionToggle} 
+            />
+            <FilterGrape 
+              selectedGrapes={selectedGrapes} 
+              handleGrapeToggle={handleGrapeToggle} 
+            />
           </div>
           
-          {/* Reset Filters */}
-          <div className="pt-5 flex justify-end">
-            <Button 
-              variant="outline" 
-              className="border-white/10 hover:bg-wine hover:text-white"
-              onClick={resetAllFilters}
-            >
-              Azzera filtri
-            </Button>
+          {/* Middle column - Year, Occasions */}
+          <div className="space-y-5">
+            <FilterYear 
+              selectedYears={selectedYears} 
+              handleYearToggle={handleYearToggle} 
+            />
+            <FilterOccasion 
+              selectedOccasions={selectedOccasions} 
+              handleOccasionToggle={handleOccasionToggle} 
+            />
           </div>
+          
+          {/* Right column - Wine characteristics, Refinement */}
+          <div className="space-y-5">
+            <FilterWineCharacteristics 
+              selectedBody={selectedBody}
+              selectedStructure={selectedStructure}
+              selectedTannins={selectedTannins}
+              selectedSweetness={selectedSweetness}
+              selectedAroma={selectedAroma}
+              setSelectedBody={setSelectedBody}
+              setSelectedStructure={setSelectedStructure}
+              setSelectedTannins={setSelectedTannins}
+              setSelectedSweetness={setSelectedSweetness}
+              setSelectedAroma={setSelectedAroma}
+            />
+            <FilterRefinement 
+              selectedRefinements={selectedRefinements} 
+              handleRefinementToggle={handleRefinementToggle} 
+            />
+          </div>
+        </div>
+        
+        {/* Reset Filters */}
+        <div className="pt-5 flex justify-end">
+          <Button 
+            variant="outline" 
+            className="border-white/10 hover:bg-wine hover:text-white"
+            onClick={resetAllFilters}
+          >
+            Azzera filtri
+          </Button>
         </div>
       </div>
     </div>

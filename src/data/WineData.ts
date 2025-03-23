@@ -19,7 +19,7 @@ export const wines = [
   {
     id: 2,
     name: "Barolo Riserva",
-    region: "Piedmont, Italy",
+    region: "Piemonte, Italy",
     year: 2016,
     rating: 8,
     type: "red" as const,
@@ -49,7 +49,7 @@ export const wines = [
   {
     id: 7,
     name: "Sassicaia",
-    region: "Tuscany, Italy",
+    region: "Toscana, Italy",
     year: 2016,
     rating: 10,
     type: "red" as const,
@@ -78,8 +78,48 @@ export const wines = [
   }
 ];
 
-// Get unique grapes from the wine data
-export const grapes = [...new Set(wines.map(wine => wine.grape))];
+// Lista completa di vitigni a bacca rossa (italiani e internazionali)
+export const grapes = [
+  // Vitigni italiani
+  "Aglianico",
+  "Barbera",
+  "Cabernet Sauvignon",
+  "Cannonau",
+  "Carignano",
+  "Carmignano",
+  "Corvina",
+  "Dolcetto",
+  "Lagrein",
+  "Lambrusco",
+  "Malvasia Nera",
+  "Marzemino",
+  "Merlot",
+  "Montepulciano",
+  "Nebbiolo",
+  "Negroamaro",
+  "Nero d'Avola",
+  "Pinot Noir",
+  "Primitivo",
+  "Rondinella",
+  "Sagrantino",
+  "Sangiovese",
+  "Schiava",
+  "Syrah",
+  "Teroldego",
+  
+  // Vitigni internazionali
+  "Cabernet Franc",
+  "Carignan",
+  "Carménère",
+  "Gamay",
+  "Grenache",
+  "Malbec",
+  "Mourvèdre",
+  "Petit Verdot",
+  "Petite Sirah",
+  "Tempranillo",
+  "Zinfandel"
+];
 
 // Get unique years from the wine data
 export const years = [...new Set(wines.map(wine => wine.year))].sort((a, b) => b - a);

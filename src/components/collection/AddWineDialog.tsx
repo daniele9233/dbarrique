@@ -1,18 +1,12 @@
 
 import { useState, useRef, ChangeEvent } from 'react';
 import { Grape, Upload } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
-
-// Define wine characteristics options
-const bodyOptions = ["Leggero", "Medio", "Corposo"];
-const structureOptions = ["Elegante", "Equilibrato", "Strutturato"];
-const tanninOptions = ["Morbido", "Equilibrato", "Tannico"];
-const sweetnessOptions = ["Secco", "Amabile", "Dolce"];
-const aromaOptions = ["Fruttato", "Speziato", "Evoluto"];
+import { grapes, bodyOptions, structureOptions, tanninOptions, sweetnessOptions, aromaOptions, wines } from "@/data/WineData";
 
 interface AddWineDialogProps {
   isOpen: boolean;
@@ -38,11 +32,25 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange }) =
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const handleAddWine = () => {
-    // This would normally submit the form data to a database
+    // Generate a unique ID by using the current timestamp plus a random number
+    const newId = Date.now() + Math.floor(Math.random() * 1000);
+    
+    // Create the new wine with the generated ID
+    const wineToAdd = {
+      ...newWine,
+      id: newId
+    };
+    
+    // Add the new wine to the existing wines array
+    // This is a workaround since we can't persist data to a database
+    // In a real application, this would be a call to an API
+    wines.push(wineToAdd);
+    
     toast({
       title: "Successo",
       description: "Il nuovo vino è stato aggiunto alla tua collezione.",
     });
+    
     onOpenChange(false);
     setNewWine({
       name: "",
@@ -109,12 +117,15 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange }) =
             <Grape className="h-6 w-6 text-wine" />
             <span>Aggiungi Nuovo Vino</span>
           </DialogTitle>
+          <DialogDescription className="text-white/60">
+            Inserisci i dettagli del vino che desideri aggiungere alla tua collezione. I campi contrassegnati con * sono obbligatori.
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4 py-4">
           <div className="space-y-2">
             <Label>
-              Nome del Vino
+              Nome del Vino *
             </Label>
             <Input
               className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
@@ -140,12 +151,16 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange }) =
             <Label>
               Vitigno
             </Label>
-            <Input
+            <select 
               className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
-              placeholder="es. Sangiovese"
               value={newWine.grape}
               onChange={(e) => handleChange('grape', e.target.value)}
-            />
+            >
+              <option value="">Seleziona un vitigno</option>
+              {grapes.map(grape => (
+                <option key={grape} value={grape}>{grape}</option>
+              ))}
+            </select>
           </div>
           
           <div className="grid grid-cols-2 gap-4">
@@ -157,8 +172,11 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange }) =
                 type="number"
                 className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
                 placeholder="es. 2015"
-                value={newWine.year}
-                onChange={(e) => handleChange('year', parseInt(e.target.value))}
+                value={newWine.year || ''}
+                onChange={(e) => {
+                  const value = e.target.value === '' ? '' : parseInt(e.target.value);
+                  handleChange('year', value || new Date().getFullYear());
+                }}
               />
             </div>
             
@@ -300,7 +318,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange }) =
           <Button
             onClick={handleAddWine}
             className="bg-wine hover:bg-wine-light"
-            disabled={!newWine.name || !newWine.region || !newWine.image || !newWine.grape}
+            disabled={!newWine.name} // Only require the name field
           >
             Aggiungi alla Collezione
           </Button>
