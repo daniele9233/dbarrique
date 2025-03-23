@@ -16,20 +16,12 @@ const WineQuotes = () => {
     // Imposta un breve ritardo prima di iniziare l'animazione
     const timer = setTimeout(() => {
       setIsRevealed(true);
-    }, 1200); // Ritardo maggiore prima di iniziare l'animazione
+    }, 1200); // Ritardo prima di iniziare l'animazione
     
-    // Imposta un intervallo per ricominciare l'animazione periodicamente
-    const intervalId = setInterval(() => {
-      setIsRevealed(false);
-      
-      setTimeout(() => {
-        setIsRevealed(true);
-      }, 800); // Più tempo prima di iniziare la nuova animazione
-    }, 15000); // Ricomincia l'animazione ogni 15 secondi (ancora più lento)
+    // Rimuoviamo l'intervallo che faceva ricominciare l'animazione periodicamente
     
     return () => {
       clearTimeout(timer);
-      clearInterval(intervalId);
     };
   }, []);
 
