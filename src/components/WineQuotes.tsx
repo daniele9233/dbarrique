@@ -16,7 +16,7 @@ const WineQuotes = () => {
     // Imposta un breve ritardo prima di iniziare l'animazione
     const timer = setTimeout(() => {
       setIsRevealed(true);
-    }, 800);
+    }, 1200); // Ritardo maggiore prima di iniziare l'animazione
     
     // Imposta un intervallo per ricominciare l'animazione periodicamente
     const intervalId = setInterval(() => {
@@ -24,8 +24,8 @@ const WineQuotes = () => {
       
       setTimeout(() => {
         setIsRevealed(true);
-      }, 500);
-    }, 12000); // Ricomincia l'animazione ogni 12 secondi (più lento)
+      }, 800); // Più tempo prima di iniziare la nuova animazione
+    }, 15000); // Ricomincia l'animazione ogni 15 secondi (ancora più lento)
     
     return () => {
       clearTimeout(timer);
@@ -48,13 +48,13 @@ const WineQuotes = () => {
                 <span 
                   key={index}
                   className={cn(
-                    "inline-block transition-all duration-300", // Aumentato duration per rallentare
+                    "inline-block transition-all duration-700", // Aumentato duration da 300 a 700
                     isRevealed 
                       ? "opacity-100 blur-none translate-y-0" 
                       : "opacity-0 blur-md translate-y-2"
                   )}
                   style={{ 
-                    transitionDelay: `${index * 70}ms`, // Più lento (70ms invece di 50ms)
+                    transitionDelay: `${index * 120}ms`, // Più lento (120ms invece di 70ms)
                     marginLeft: char === " " ? "0.25em" : "0" // Aggiungi spazio per i caratteri spazio
                   }}
                 >
@@ -67,15 +67,15 @@ const WineQuotes = () => {
         </div>
         <div 
           className={cn(
-            "text-white/60 text-sm mt-2 font-light tracking-wider transition-all duration-700 self-end mr-10", // Aggiunto self-end e mr-10 per spostare a destra
+            "text-white/60 text-sm mt-2 font-light tracking-wider transition-all duration-1000 self-end mr-10", // Aumentato duration a 1000ms
             isRevealed ? "opacity-100" : "opacity-0"
           )}
-          style={{ transitionDelay: `${wineQuote.quote.length * 70 + 200}ms` }} // Ritardo maggiore
+          style={{ transitionDelay: `${wineQuote.quote.length * 120 + 300}ms` }} // Ritardo maggiore in base al nuovo valore di transitionDelay
         >
           — {wineQuote.author}
         </div>
         <div className={cn(
-          "absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-0.5 bg-gradient-to-r from-transparent via-wine/50 to-transparent transition-opacity duration-700", // Durata maggiore
+          "absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-0.5 bg-gradient-to-r from-transparent via-wine/50 to-transparent transition-opacity duration-1000", // Durata maggiore
           isRevealed ? "opacity-100" : "opacity-0"
         )}></div>
       </div>
