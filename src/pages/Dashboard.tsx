@@ -1,3 +1,4 @@
+
 import { useState, useRef, ChangeEvent, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -591,5 +592,16 @@ const Dashboard = () => {
               onClick={handleAddWine}
               className="bg-wine hover:bg-wine-light"
               disabled={!newWine.name}
-           
+            >
+              Aggiungi
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
+      <Footer />
+    </div>
+  );
+};
+
+export default Dashboard;
