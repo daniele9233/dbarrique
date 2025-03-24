@@ -4,7 +4,7 @@ import { db } from '../config/firebase';
 // Sample wine data with 1-10 rating scale (only red wines)
 const defaultWines = [
   {
-    id: 1,
+    id: "1",
     name: "Château Margaux",
     region: "Bordeaux, France",
     year: 2015,
@@ -19,7 +19,7 @@ const defaultWines = [
     aroma: "Fruttato"
   },
   {
-    id: 2,
+    id: "2",
     name: "Barolo Riserva",
     region: "Piemonte, Italy",
     year: 2016,
@@ -34,7 +34,7 @@ const defaultWines = [
     aroma: "Evoluto"
   },
   {
-    id: 4,
+    id: "4",
     name: "Opus One",
     region: "Napa Valley, USA",
     year: 2017,
@@ -49,7 +49,7 @@ const defaultWines = [
     aroma: "Fruttato"
   },
   {
-    id: 7,
+    id: "7",
     name: "Sassicaia",
     region: "Toscana, Italy",
     year: 2016,
@@ -64,7 +64,7 @@ const defaultWines = [
     aroma: "Fruttato"
   },
   {
-    id: 8,
+    id: "8",
     name: "Penfolds Grange",
     region: "South Australia",
     year: 2014,
@@ -81,7 +81,7 @@ const defaultWines = [
 ];
 
 export interface Wine {
-  id: number;
+  id: string;
   name: string;
   region: string;
   year: number;
@@ -96,10 +96,8 @@ export interface Wine {
   aroma: string;
 }
 
-// Variabile per memorizzare i vini
 export let wines: Wine[] = [];
 
-// Carica i vini dal database Firestore
 export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
   try {
     const winesCollection = collection(db, 'wines');
@@ -107,8 +105,6 @@ export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
     const wineSnapshot = await getDocs(winesQuery);
     
     if (wineSnapshot.empty) {
-      // Se non ci sono vini nel database, utilizziamo i dati predefiniti
-      // e li aggiungiamo al database
       for (const wine of defaultWines) {
         await addDoc(collection(db, 'wines'), wine);
       }
@@ -127,16 +123,14 @@ export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
   }
 };
 
-// Inizializza i vini all'avvio dell'applicazione
 (async () => {
   wines = await loadWinesFromFirestore();
 })();
 
-// Aggiungi un nuovo vino al database
 export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
   try {
     const docRef = await addDoc(collection(db, 'wines'), wine);
-    const newWine = { ...wine, id: docRef.id as unknown as number };
+    const newWine = { ...wine, id: docRef.id };
     wines.push(newWine);
     return newWine;
   } catch (error) {
@@ -145,13 +139,11 @@ export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
   }
 };
 
-// Aggiorna un vino esistente
-export const updateWine = async (id: number, updatedWine: Partial<Omit<Wine, 'id'>>): Promise<void> => {
+export const updateWine = async (id: string, updatedWine: Partial<Omit<Wine, 'id'>>): Promise<void> => {
   try {
-    const wineRef = doc(db, 'wines', id.toString());
+    const wineRef = doc(db, 'wines', id);
     await updateDoc(wineRef, updatedWine);
     
-    // Aggiorna anche l'array locale
     const index = wines.findIndex(wine => wine.id === id);
     if (index !== -1) {
       wines[index] = { ...wines[index], ...updatedWine };
@@ -162,13 +154,11 @@ export const updateWine = async (id: number, updatedWine: Partial<Omit<Wine, 'id
   }
 };
 
-// Elimina un vino
-export const deleteWine = async (id: number): Promise<void> => {
+export const deleteWine = async (id: string): Promise<void> => {
   try {
-    const wineRef = doc(db, 'wines', id.toString());
+    const wineRef = doc(db, 'wines', id);
     await deleteDoc(wineRef);
     
-    // Rimuovi dal nostro array locale
     wines = wines.filter(wine => wine.id !== id);
   } catch (error) {
     console.error('Errore nell\'eliminazione del vino da Firestore:', error);
@@ -176,9 +166,7 @@ export const deleteWine = async (id: number): Promise<void> => {
   }
 };
 
-// Lista completa di vitigni a bacca rossa (italiani e internazionali)
 export const grapes = [
-  // Vitigni italiani
   "Aglianico",
   "Barbera",
   "Cabernet Sauvignon",
@@ -205,7 +193,6 @@ export const grapes = [
   "Syrah",
   "Teroldego",
   
-  // Vitigni internazionali
   "Cabernet Franc",
   "Carignan",
   "Carménère",
@@ -219,13 +206,10 @@ export const grapes = [
   "Zinfandel"
 ];
 
-// Get unique years from the wine data
 export const years = [...new Set(wines.map(wine => wine.year))].sort((a, b) => b - a);
 
-// Get unique regions from the wine data
 export const regions = [...new Set(wines.map(wine => wine.region))];
 
-// Define the wine characteristics options
 export const bodyOptions = ["Leggero", "Medio", "Corposo"];
 export const structureOptions = ["Elegante", "Equilibrato", "Strutturato"];
 export const tanninOptions = ["Morbido", "Equilibrato", "Tannico"];

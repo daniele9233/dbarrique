@@ -1,10 +1,9 @@
-
 import { useEffect, useState } from 'react';
 import WineCard from '@/components/WineCard';
 import { loadWinesFromFirestore } from '@/data/WineData';
 
 interface Wine {
-  id: number;
+  id: string;
   name: string;
   region: string;
   year: number;
@@ -43,7 +42,6 @@ const WineGrid: React.FC<WineGridProps> = ({ wines, resetAllFilters }) => {
     fetchWines();
   }, []);
   
-  // Utilizziamo i vini filtrati passati come props, ma se sono vuoti e stiamo ancora caricando, mostriamo il loader
   const displayWines = wines.length > 0 || !isLoading ? wines : localWines;
   
   if (isLoading && displayWines.length === 0) {
