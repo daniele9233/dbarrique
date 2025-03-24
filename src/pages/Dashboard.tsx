@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Wine as WineIcon, Star, Plus, Grape, Award, Upload } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import { wines, grapes, bodyOptions, structureOptions, tanninOptions, sweetnessOptions, aromaOptions, addWine, saveWines } from "@/data/WineData";
+import { wines, loadWinesFromFirestore, bodyOptions, structureOptions, tanninOptions, sweetnessOptions, aromaOptions, addWine } from "@/data/WineData";
 
 // Types for our dashboard stats
 type WineStats = {
@@ -31,10 +31,33 @@ type WineEntry = {
 };
 
 const Dashboard = () => {
+  const [localWines, setLocalWines] = useState([...wines]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchWines = async () => {
+      try {
+        const winesFromFirestore = await loadWinesFromFirestore();
+        setLocalWines(winesFromFirestore);
+      } catch (error) {
+        console.error('Errore nel caricamento dei vini:', error);
+        toast({
+          title: "Errore",
+          description: "Impossibile caricare i vini dal database.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchWines();
+  }, []);
+
   // Calculate stats based on the actual wines array
   const calculateStats = (): WineStats => {
-    const totalWines = wines.length;
-    const totalRating = wines.reduce((sum, wine) => sum + wine.rating, 0);
+    const totalWines = localWines.length;
+    const totalRating = localWines.reduce((sum, wine) => sum + wine.rating, 0);
     const averageRating = totalWines > 0 ? totalRating / totalWines : 0;
 
     return {
@@ -49,9 +72,13 @@ const Dashboard = () => {
 
   const [stats, setStats] = useState<WineStats>(calculateStats());
 
+  useEffect(() => {
+    setStats(calculateStats());
+  }, [localWines]);
+
   // Convert the wines array to WineEntry format
   const convertWinesToEntries = (): WineEntry[] => {
-    return wines.map(wine => ({
+    return localWines.map(wine => ({
       id: wine.id,
       name: wine.name,
       producer: wine.name.split(' ')[0], // Simplified for demo
@@ -63,6 +90,10 @@ const Dashboard = () => {
   };
 
   const [wineEntries, setWineEntries] = useState<WineEntry[]>(convertWinesToEntries());
+
+  useEffect(() => {
+    setWineEntries(convertWinesToEntries());
+  }, [localWines]);
 
   // Render the wine rating as stars/icons
   const renderRating = (rating: number) => {
@@ -102,7 +133,7 @@ const Dashboard = () => {
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const handleAddWine = () => {
+  const handleAddWine = async () => {
     // Crea il nuovo vino da aggiungere
     const wineToAdd = {
       name: newWine.name,
@@ -119,34 +150,42 @@ const Dashboard = () => {
       aroma: newWine.aroma
     };
     
-    // Usa la funzione addWine per aggiungere e salvare il vino
-    const addedWine = addWine(wineToAdd);
-    
-    // Aggiorna lo stato locale
-    setStats(calculateStats());
-    setWineEntries(convertWinesToEntries());
-    
-    toast({
-      title: "Successo",
-      description: "Nuovo vino aggiunto alla tua collezione.",
-    });
-    
-    setIsAddWineDialogOpen(false);
-    setNewWine({
-      name: "",
-      producer: "",
-      region: "",
-      year: new Date().getFullYear(),
-      rating: 5,
-      type: "red" as const,
-      image: "",
-      grape: "",
-      body: "Medio",
-      structure: "Equilibrato",
-      tannins: "Equilibrato",
-      sweetness: "Secco",
-      aroma: "Fruttato"
-    });
+    try {
+      // Usa la funzione addWine per aggiungere e salvare il vino
+      const addedWine = await addWine(wineToAdd);
+      
+      // Aggiorna lo stato locale
+      setLocalWines(prev => [...prev, addedWine]);
+      
+      toast({
+        title: "Successo",
+        description: "Nuovo vino aggiunto alla tua collezione.",
+      });
+      
+      setIsAddWineDialogOpen(false);
+      setNewWine({
+        name: "",
+        producer: "",
+        region: "",
+        year: new Date().getFullYear(),
+        rating: 5,
+        type: "red" as const,
+        image: "",
+        grape: "",
+        body: "Medio",
+        structure: "Equilibrato",
+        tannins: "Equilibrato",
+        sweetness: "Secco",
+        aroma: "Fruttato"
+      });
+    } catch (error) {
+      console.error('Errore nell\'aggiunta del vino:', error);
+      toast({
+        title: "Errore",
+        description: "Impossibile aggiungere il vino. Riprova più tardi.",
+        variant: "destructive"
+      });
+    }
   };
   
   const handleChange = (field: string, value: string | number) => {
@@ -212,111 +251,119 @@ const Dashboard = () => {
           </p>
         </header>
         
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <Card className="bg-noir-light border-wine/20 border">
-            <CardHeader className="pb-2 pt-6 flex flex-row items-center justify-between">
-              <h3 className="text-sm uppercase tracking-wide text-white/70">Totale Vini</h3>
-              <Grape className="h-5 w-5 text-wine" />
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col">
-                <span className="text-4xl font-semibold">{wines.length}</span>
-                <span className="text-sm text-white/60 mt-1">
-                  NELLA TUA COLLEZIONE
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-noir-light border-wine/20 border">
-            <CardHeader className="pb-2 pt-6 flex flex-row items-center justify-between">
-              <h3 className="text-sm uppercase tracking-wide text-white/70">Valutazione Media</h3>
-              <Award className="h-5 w-5 text-wine" />
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col">
-                <span className="text-4xl font-semibold">
-                  {wines.length > 0 
-                    ? (wines.reduce((sum, wine) => sum + wine.rating, 0) / wines.length).toFixed(1) 
-                    : "0.0"}
-                </span>
-                <span className="text-sm text-white/60 mt-1">
-                  SU 10 PUNTI
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-noir-light border-wine/20 border">
-            <CardHeader className="pb-2 pt-6 flex flex-row items-center justify-between">
-              <h3 className="text-sm uppercase tracking-wide text-white/70">Tipo Più Comune</h3>
-              <WineIcon className="h-5 w-5 text-wine" />
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col">
-                <span className="text-4xl font-semibold capitalize">Rosso</span>
-                <span className="text-sm text-white/60 mt-1">
-                  {wines.length} BOTTIGLIE IN COLLEZIONE
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        
-        {/* Top Wines Section */}
-        <div className="mb-5">
-          <div className="border-b border-white/10 pb-2 mb-6">
-            <h2 className="text-xl font-medium flex items-center">
-              <span className="inline-block w-8 h-px bg-wine mr-3"></span>
-              I TUOI MIGLIORI VINI
-            </h2>
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-wine"></div>
           </div>
-          
-          <Table>
-            <TableHeader className="bg-noir-light border-b border-white/10">
-              <TableRow className="hover:bg-transparent border-none">
-                <TableHead className="text-white/70 font-medium">VINO</TableHead>
-                <TableHead className="text-white/70 font-medium">ANNATA</TableHead>
-                <TableHead className="text-white/70 font-medium">REGIONE</TableHead>
-                <TableHead className="text-white/70 font-medium">VALUTAZIONE</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {wines
-                .sort((a, b) => b.rating - a.rating) // Sort by rating
-                .slice(0, 5) // Take top 5
-                .map((wine) => (
-                <TableRow 
-                  key={wine.id} 
-                  className="border-b border-white/5 hover:bg-noir-light/40 transition-colors cursor-pointer"
-                >
-                  <TableCell className="py-4">
-                    <div className="flex items-center">
-                      <div className="h-8 w-8 mr-4 rounded bg-noir-dark flex items-center justify-center">
-                        <WineIcon size={16} className="text-wine" />
-                      </div>
-                      <div>
-                        <p className="font-medium">{wine.name}</p>
-                        <p className="text-sm text-white/60">{wine.grape}</p>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{wine.year}</TableCell>
-                  <TableCell>{wine.region}</TableCell>
-                  <TableCell>{renderRating(wine.rating)}</TableCell>
-                </TableRow>
-              ))}
-              {wines.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center py-8 text-white/50">
-                    Nessun vino nella collezione. Aggiungi il tuo primo vino!
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+        ) : (
+          <>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              <Card className="bg-noir-light border-wine/20 border">
+                <CardHeader className="pb-2 pt-6 flex flex-row items-center justify-between">
+                  <h3 className="text-sm uppercase tracking-wide text-white/70">Totale Vini</h3>
+                  <Grape className="h-5 w-5 text-wine" />
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col">
+                    <span className="text-4xl font-semibold">{localWines.length}</span>
+                    <span className="text-sm text-white/60 mt-1">
+                      NELLA TUA COLLEZIONE
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-noir-light border-wine/20 border">
+                <CardHeader className="pb-2 pt-6 flex flex-row items-center justify-between">
+                  <h3 className="text-sm uppercase tracking-wide text-white/70">Valutazione Media</h3>
+                  <Award className="h-5 w-5 text-wine" />
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col">
+                    <span className="text-4xl font-semibold">
+                      {localWines.length > 0 
+                        ? (localWines.reduce((sum, wine) => sum + wine.rating, 0) / localWines.length).toFixed(1) 
+                        : "0.0"}
+                    </span>
+                    <span className="text-sm text-white/60 mt-1">
+                      SU 10 PUNTI
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-noir-light border-wine/20 border">
+                <CardHeader className="pb-2 pt-6 flex flex-row items-center justify-between">
+                  <h3 className="text-sm uppercase tracking-wide text-white/70">Tipo Più Comune</h3>
+                  <WineIcon className="h-5 w-5 text-wine" />
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col">
+                    <span className="text-4xl font-semibold capitalize">Rosso</span>
+                    <span className="text-sm text-white/60 mt-1">
+                      {localWines.length} BOTTIGLIE IN COLLEZIONE
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Top Wines Section */}
+            <div className="mb-5">
+              <div className="border-b border-white/10 pb-2 mb-6">
+                <h2 className="text-xl font-medium flex items-center">
+                  <span className="inline-block w-8 h-px bg-wine mr-3"></span>
+                  I TUOI MIGLIORI VINI
+                </h2>
+              </div>
+              
+              <Table>
+                <TableHeader className="bg-noir-light border-b border-white/10">
+                  <TableRow className="hover:bg-transparent border-none">
+                    <TableHead className="text-white/70 font-medium">VINO</TableHead>
+                    <TableHead className="text-white/70 font-medium">ANNATA</TableHead>
+                    <TableHead className="text-white/70 font-medium">REGIONE</TableHead>
+                    <TableHead className="text-white/70 font-medium">VALUTAZIONE</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {localWines
+                    .sort((a, b) => b.rating - a.rating) // Sort by rating
+                    .slice(0, 5) // Take top 5
+                    .map((wine) => (
+                    <TableRow 
+                      key={wine.id} 
+                      className="border-b border-white/5 hover:bg-noir-light/40 transition-colors cursor-pointer"
+                    >
+                      <TableCell className="py-4">
+                        <div className="flex items-center">
+                          <div className="h-8 w-8 mr-4 rounded bg-noir-dark flex items-center justify-center">
+                            <WineIcon size={16} className="text-wine" />
+                          </div>
+                          <div>
+                            <p className="font-medium">{wine.name}</p>
+                            <p className="text-sm text-white/60">{wine.grape}</p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>{wine.year}</TableCell>
+                      <TableCell>{wine.region}</TableCell>
+                      <TableCell>{renderRating(wine.rating)}</TableCell>
+                    </TableRow>
+                  ))}
+                  {localWines.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-8 text-white/50">
+                        Nessun vino nella collezione. Aggiungi il tuo primo vino!
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </>
+        )}
       </div>
       
       {/* Add Wine Dialog */}

@@ -1,11 +1,30 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import WineCard from './WineCard';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
-import { wines } from '@/data/WineData';
+import { loadWinesFromFirestore } from '@/data/WineData';
+import { Wine } from '@/data/WineData';
 
 const WineCollection = ({ limit }: { limit?: number }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [wines, setWines] = useState<Wine[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    const fetchWines = async () => {
+      try {
+        const winesFromFirestore = await loadWinesFromFirestore();
+        setWines(winesFromFirestore);
+      } catch (error) {
+        console.error('Errore nel caricamento dei vini:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchWines();
+  }, []);
+  
   const displayWines = limit ? wines.slice(0, limit) : wines;
   
   const nextSlide = () => {
@@ -15,6 +34,23 @@ const WineCollection = ({ limit }: { limit?: number }) => {
   const prevSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + wines.length) % wines.length);
   };
+  
+  if (isLoading) {
+    return (
+      <section className="section relative">
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <h4 className="text-wine uppercase tracking-[0.2em] text-sm mb-3">Premium Selection</h4>
+          <h2 className="font-serif text-4xl md:text-5xl mb-5">The Collection</h2>
+          <p className="text-white/70">
+            Caricamento della collezione di vini in corso...
+          </p>
+        </div>
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-wine"></div>
+        </div>
+      </section>
+    );
+  }
   
   return (
     <section className="section relative">

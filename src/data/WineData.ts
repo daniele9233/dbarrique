@@ -1,3 +1,5 @@
+import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
 // Sample wine data with 1-10 rating scale (only red wines)
 const defaultWines = [
@@ -78,36 +80,100 @@ const defaultWines = [
   }
 ];
 
-// Funzione per ottenere i vini dal localStorage o usare quelli predefiniti
-const loadWinesFromStorage = (): Wine[] => {
+export interface Wine {
+  id: number;
+  name: string;
+  region: string;
+  year: number;
+  rating: number;
+  type: "red";
+  image: string;
+  grape: string;
+  body: string;
+  structure: string;
+  tannins: string;
+  sweetness: string;
+  aroma: string;
+}
+
+// Variabile per memorizzare i vini
+export let wines: Wine[] = [];
+
+// Carica i vini dal database Firestore
+export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
   try {
-    const storedWines = localStorage.getItem('dbarrique-wines');
-    return storedWines ? JSON.parse(storedWines) : defaultWines;
+    const winesCollection = collection(db, 'wines');
+    const winesQuery = query(winesCollection, orderBy('name'));
+    const wineSnapshot = await getDocs(winesQuery);
+    
+    if (wineSnapshot.empty) {
+      // Se non ci sono vini nel database, utilizziamo i dati predefiniti
+      // e li aggiungiamo al database
+      for (const wine of defaultWines) {
+        await addDoc(collection(db, 'wines'), wine);
+      }
+      return defaultWines;
+    }
+    
+    const wineList = wineSnapshot.docs.map(doc => ({
+      ...doc.data(),
+      id: doc.id
+    })) as Wine[];
+    
+    return wineList;
   } catch (error) {
-    console.error('Errore nel caricamento dei vini dal localStorage:', error);
+    console.error('Errore nel caricamento dei vini da Firestore:', error);
     return defaultWines;
   }
 };
 
-// Funzione per salvare i vini nel localStorage
-export const saveWines = (updatedWines: Wine[]): void => {
+// Inizializza i vini all'avvio dell'applicazione
+(async () => {
+  wines = await loadWinesFromFirestore();
+})();
+
+// Aggiungi un nuovo vino al database
+export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
   try {
-    localStorage.setItem('dbarrique-wines', JSON.stringify(updatedWines));
+    const docRef = await addDoc(collection(db, 'wines'), wine);
+    const newWine = { ...wine, id: docRef.id as unknown as number };
+    wines.push(newWine);
+    return newWine;
   } catch (error) {
-    console.error('Errore nel salvataggio dei vini nel localStorage:', error);
+    console.error('Errore nell\'aggiunta del vino a Firestore:', error);
+    throw error;
   }
 };
 
-// Esportiamo i vini caricati dal localStorage
-export const wines = loadWinesFromStorage();
+// Aggiorna un vino esistente
+export const updateWine = async (id: number, updatedWine: Partial<Omit<Wine, 'id'>>): Promise<void> => {
+  try {
+    const wineRef = doc(db, 'wines', id.toString());
+    await updateDoc(wineRef, updatedWine);
+    
+    // Aggiorna anche l'array locale
+    const index = wines.findIndex(wine => wine.id === id);
+    if (index !== -1) {
+      wines[index] = { ...wines[index], ...updatedWine };
+    }
+  } catch (error) {
+    console.error('Errore nell\'aggiornamento del vino in Firestore:', error);
+    throw error;
+  }
+};
 
-// Aggiungi un nuovo vino e salva nel localStorage
-export const addWine = (wine: Omit<Wine, 'id'>): Wine => {
-  const newId = Date.now() + Math.floor(Math.random() * 1000);
-  const newWine = { ...wine, id: newId };
-  wines.push(newWine);
-  saveWines(wines);
-  return newWine;
+// Elimina un vino
+export const deleteWine = async (id: number): Promise<void> => {
+  try {
+    const wineRef = doc(db, 'wines', id.toString());
+    await deleteDoc(wineRef);
+    
+    // Rimuovi dal nostro array locale
+    wines = wines.filter(wine => wine.id !== id);
+  } catch (error) {
+    console.error('Errore nell\'eliminazione del vino da Firestore:', error);
+    throw error;
+  }
 };
 
 // Lista completa di vitigni a bacca rossa (italiani e internazionali)
@@ -165,19 +231,3 @@ export const structureOptions = ["Elegante", "Equilibrato", "Strutturato"];
 export const tanninOptions = ["Morbido", "Equilibrato", "Tannico"];
 export const sweetnessOptions = ["Secco", "Amabile", "Dolce"];
 export const aromaOptions = ["Fruttato", "Speziato", "Evoluto"];
-
-export interface Wine {
-  id: number;
-  name: string;
-  region: string;
-  year: number;
-  rating: number;
-  type: "red";
-  image: string;
-  grape: string;
-  body: string;
-  structure: string;
-  tannins: string;
-  sweetness: string;
-  aroma: string;
-}
