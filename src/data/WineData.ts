@@ -8,6 +8,7 @@ const defaultWines = [
     id: "1",
     name: "Château Margaux",
     region: "Bordeaux, France",
+    winery: "Château Margaux",
     year: 2015,
     rating: 10,
     type: "red" as const,
@@ -236,6 +237,7 @@ export interface Wine {
   id: string;
   name: string;
   region: string;
+  winery?: string; // Nuovo campo opzionale per la cantina
   year: number;
   rating: number;
   type: "red";

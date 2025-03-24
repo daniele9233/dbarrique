@@ -1,3 +1,4 @@
+
 import { useState, useRef, ChangeEvent } from 'react';
 import { Grape, Upload } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -16,6 +17,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange }) =
   const [newWine, setNewWine] = useState({
     name: "",
     region: "",
+    winery: "", // Nuovo campo per la cantina
     year: new Date().getFullYear(),
     rating: 5,
     type: "red" as const,
@@ -34,6 +36,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange }) =
     addWine({
       ...newWine,
       region: newWine.region || "Non specificata",
+      winery: newWine.winery || "Non specificata", // Gestione del campo vuoto
       grape: newWine.grape || "Non specificato",
       image: newWine.image || "https://images.unsplash.com/photo-1553361371-9fe24fca9c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
     });
@@ -47,6 +50,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange }) =
     setNewWine({
       name: "",
       region: "",
+      winery: "",
       year: new Date().getFullYear(),
       rating: 5,
       type: "red" as const,
@@ -123,6 +127,18 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange }) =
               placeholder="es. Brunello di Montalcino"
               value={newWine.name}
               onChange={(e) => handleChange('name', e.target.value)}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label>
+              Cantina
+            </Label>
+            <Input
+              className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
+              placeholder="es. Biondi-Santi"
+              value={newWine.winery}
+              onChange={(e) => handleChange('winery', e.target.value)}
             />
           </div>
           
