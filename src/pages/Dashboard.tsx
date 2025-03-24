@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Wine as WineIcon, Star, Plus, Grape, Award, Upload } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import { wines, loadWinesFromFirestore, bodyOptions, structureOptions, tanninOptions, sweetnessOptions, aromaOptions, addWine } from "@/data/WineData";
+import { wines, loadWinesFromFirestore, bodyOptions, structureOptions, tanninOptions, sweetnessOptions, aromaOptions, addWine, grapes } from "@/data/WineData";
 
 // Types for our dashboard stats
 type WineStats = {
