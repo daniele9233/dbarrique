@@ -1,4 +1,3 @@
-
 import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
@@ -82,7 +81,7 @@ const defaultWines = [
 ];
 
 export interface Wine {
-  id: number | string; // Changed to accept both number and string to accommodate Firestore IDs
+  id: number;
   name: string;
   region: string;
   year: number;
@@ -116,13 +115,10 @@ export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
       return defaultWines;
     }
     
-    const wineList = wineSnapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        ...data,
-        id: doc.id // Now correctly typed as string or number
-      } as Wine;
-    });
+    const wineList = wineSnapshot.docs.map(doc => ({
+      ...doc.data(),
+      id: doc.id
+    })) as Wine[];
     
     return wineList;
   } catch (error) {
@@ -140,7 +136,7 @@ export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
 export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
   try {
     const docRef = await addDoc(collection(db, 'wines'), wine);
-    const newWine = { ...wine, id: docRef.id }; // ID is now a string from Firestore
+    const newWine = { ...wine, id: docRef.id as unknown as number };
     wines.push(newWine);
     return newWine;
   } catch (error) {
@@ -150,7 +146,7 @@ export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
 };
 
 // Aggiorna un vino esistente
-export const updateWine = async (id: number | string, updatedWine: Partial<Omit<Wine, 'id'>>): Promise<void> => {
+export const updateWine = async (id: number, updatedWine: Partial<Omit<Wine, 'id'>>): Promise<void> => {
   try {
     const wineRef = doc(db, 'wines', id.toString());
     await updateDoc(wineRef, updatedWine);
@@ -167,7 +163,7 @@ export const updateWine = async (id: number | string, updatedWine: Partial<Omit<
 };
 
 // Elimina un vino
-export const deleteWine = async (id: number | string): Promise<void> => {
+export const deleteWine = async (id: number): Promise<void> => {
   try {
     const wineRef = doc(db, 'wines', id.toString());
     await deleteDoc(wineRef);

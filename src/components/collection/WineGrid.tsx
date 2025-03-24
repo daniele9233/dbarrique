@@ -4,7 +4,7 @@ import WineCard from '@/components/WineCard';
 import { loadWinesFromFirestore } from '@/data/WineData';
 
 interface Wine {
-  id: number | string; // Updated to match the Wine interface in WineData.ts
+  id: number;
   name: string;
   region: string;
   year: number;
