@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { grapes, bodyOptions, structureOptions, tanninOptions, sweetnessOptions, aromaOptions, addWine } from "@/data/WineData";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface AddWineDialogProps {
   isOpen: boolean;
@@ -17,12 +18,13 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange }) =
   const [newWine, setNewWine] = useState({
     name: "",
     region: "",
-    winery: "", // Nuovo campo per la cantina
+    winery: "", // Campo per la cantina
     year: new Date().getFullYear(),
     rating: 5,
     type: "red" as const,
     image: "",
     grape: "",
+    grapes: [] as string[], // New field for multiple grapes
     body: "Medio",
     structure: "Equilibrato",
     tannins: "Equilibrato",
@@ -30,14 +32,20 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange }) =
     aroma: "Fruttato"
   });
   
+  const [isBlend, setIsBlend] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const handleAddWine = () => {
+    // Determine grape value based on selection mode
+    const grapeValue = isBlend ? "Blend" : newWine.grape;
+    const grapesArray = isBlend ? newWine.grapes : newWine.grape ? [newWine.grape] : [];
+    
     addWine({
       ...newWine,
       region: newWine.region || "Non specificata",
-      winery: newWine.winery || "Non specificata", // Gestione del campo vuoto
-      grape: newWine.grape || "Non specificato",
+      winery: newWine.winery || "Non specificata",
+      grape: grapeValue || "Non specificato",
+      grapes: grapesArray,
       image: newWine.image || "https://images.unsplash.com/photo-1553361371-9fe24fca9c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
     });
     
@@ -56,19 +64,29 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange }) =
       type: "red" as const,
       image: "",
       grape: "",
+      grapes: [],
       body: "Medio",
       structure: "Equilibrato",
       tannins: "Equilibrato",
       sweetness: "Secco",
       aroma: "Fruttato"
     });
+    setIsBlend(false);
   };
   
-  const handleChange = (field: string, value: string | number) => {
+  const handleChange = (field: string, value: string | number | string[]) => {
     setNewWine({
       ...newWine,
       [field]: value
     });
+  };
+  
+  const handleGrapeToggle = (grape: string) => {
+    const updatedGrapes = newWine.grapes.includes(grape)
+      ? newWine.grapes.filter(g => g !== grape)
+      : [...newWine.grapes, grape];
+    
+    handleChange('grapes', updatedGrapes);
   };
   
   const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
@@ -155,19 +173,71 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange }) =
           </div>
           
           <div className="space-y-2">
-            <Label>
-              Vitigno
-            </Label>
-            <select 
-              className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
-              value={newWine.grape}
-              onChange={(e) => handleChange('grape', e.target.value)}
-            >
-              <option value="">Seleziona un vitigno</option>
-              {grapes.map(grape => (
-                <option key={grape} value={grape}>{grape}</option>
-              ))}
-            </select>
+            <div className="flex items-center justify-between mb-2">
+              <Label>
+                Vitigno
+              </Label>
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="is-blend"
+                  checked={isBlend}
+                  onCheckedChange={() => {
+                    setIsBlend(!isBlend);
+                    if (!isBlend) {
+                      handleChange('grape', ''); // Clear single grape selection when switching to blend
+                    } else {
+                      handleChange('grapes', []); // Clear blend selections when switching to single
+                    }
+                  }}
+                  className="border-wine data-[state=checked]:bg-wine data-[state=checked]:border-wine"
+                />
+                <Label
+                  htmlFor="is-blend"
+                  className="text-sm cursor-pointer"
+                >
+                  Blend (seleziona più vitigni)
+                </Label>
+              </div>
+            </div>
+            
+            {isBlend ? (
+              <div className="max-h-40 overflow-y-auto pr-2 border border-white/10 rounded-md p-2 bg-noir custom-scrollbar">
+                <div className="grid grid-cols-2 gap-2">
+                  {grapes.filter(g => g !== "Blend").map(grape => (
+                    <div key={grape} className="flex items-center space-x-2">
+                      <Checkbox 
+                        id={`grape-${grape}`}
+                        checked={newWine.grapes.includes(grape)}
+                        onCheckedChange={() => handleGrapeToggle(grape)}
+                        className="border-wine data-[state=checked]:bg-wine data-[state=checked]:border-wine"
+                      />
+                      <Label 
+                        htmlFor={`grape-${grape}`}
+                        className="text-sm cursor-pointer"
+                      >
+                        {grape}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+                {newWine.grapes.length > 0 && (
+                  <div className="mt-2 pt-2 border-t border-white/10">
+                    <p className="text-xs text-white/70">Vitigni selezionati: {newWine.grapes.join(', ')}</p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <select 
+                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
+                value={newWine.grape}
+                onChange={(e) => handleChange('grape', e.target.value)}
+              >
+                <option value="">Seleziona un vitigno</option>
+                {grapes.filter(g => g !== "Blend").map(grape => (
+                  <option key={grape} value={grape}>{grape}</option>
+                ))}
+              </select>
+            )}
           </div>
           
           <div className="grid grid-cols-2 gap-4">
@@ -325,7 +395,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange }) =
           <Button
             onClick={handleAddWine}
             className="bg-wine hover:bg-wine-light"
-            disabled={!newWine.name} // Only require the name field
+            disabled={!newWine.name || (isBlend && newWine.grapes.length === 0)} // Require name and at least one grape for blends
           >
             Aggiungi alla Collezione
           </Button>

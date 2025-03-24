@@ -1,4 +1,3 @@
-
 import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
@@ -14,6 +13,7 @@ const defaultWines = [
     type: "red" as const,
     image: "https://images.unsplash.com/photo-1586370434639-0fe27519d3e6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
     grape: "Cabernet Sauvignon",
+    grapes: ["Cabernet Sauvignon"],
     body: "Corposo",
     structure: "Strutturato",
     tannins: "Tannico",
@@ -80,7 +80,6 @@ const defaultWines = [
     sweetness: "Secco",
     aroma: "Speziato"
   },
-  // Aggiunti 10 vini rossi di alta qualità alla collezione
   {
     id: "9",
     name: "Brunello di Montalcino",
@@ -237,12 +236,13 @@ export interface Wine {
   id: string;
   name: string;
   region: string;
-  winery?: string; // Nuovo campo opzionale per la cantina
+  winery?: string;
   year: number;
   rating: number;
   type: "red";
   image: string;
   grape: string;
+  grapes?: string[];
   body: string;
   structure: string;
   tannins: string;
@@ -250,7 +250,6 @@ export interface Wine {
   aroma: string;
 }
 
-// Inizializziamo l'array dei vini con i vini predefiniti per evitare lo stato di loading
 export let wines: Wine[] = [...defaultWines];
 
 export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
@@ -260,7 +259,6 @@ export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
     const wineSnapshot = await getDocs(winesQuery);
     
     if (wineSnapshot.empty) {
-      // Se non ci sono vini nel database, aggiungi i vini predefiniti
       for (const wine of defaultWines) {
         await addDoc(collection(db, 'wines'), wine);
       }
@@ -272,25 +270,21 @@ export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
       id: doc.id
     })) as Wine[];
     
-    // Aggiorna la variabile globale dei vini
     wines = wineList;
     
     return wineList;
   } catch (error) {
     console.error('Errore nel caricamento dei vini da Firestore:', error);
-    // In caso di errore, ritorna i vini predefiniti
     return defaultWines;
   }
 };
 
-// Carica i vini all'avvio dell'applicazione
 (async () => {
   try {
     const loadedWines = await loadWinesFromFirestore();
     wines = loadedWines;
   } catch (error) {
     console.error('Errore nel caricamento iniziale dei vini:', error);
-    // In caso di errore, mantieni i vini predefiniti
   }
 })();
 
@@ -370,7 +364,8 @@ export const grapes = [
   "Petit Verdot",
   "Petite Sirah",
   "Tempranillo",
-  "Zinfandel"
+  "Zinfandel",
+  "Blend"
 ];
 
 export const years = [...new Set(wines.map(wine => wine.year))].sort((a, b) => b - a);
