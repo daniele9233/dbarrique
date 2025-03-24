@@ -1,4 +1,3 @@
-
 import { useState, useRef, ChangeEvent, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -20,7 +19,6 @@ import {
   grapes 
 } from "@/data/WineData";
 
-// Types for our dashboard stats
 type WineStats = {
   totalWines: number;
   averageRating: number;
@@ -30,7 +28,6 @@ type WineStats = {
   };
 };
 
-// Types for our wine entries
 type WineEntry = {
   id: string;
   name: string;
@@ -42,11 +39,10 @@ type WineEntry = {
 };
 
 const Dashboard = () => {
-  const [localWines, setLocalWines] = useState([...wines]);
+  const [localWines, setLocalWines] = useState(wines);
   const [isLoading, setIsLoading] = useState(wines.length === 0);
 
   useEffect(() => {
-    // Se abbiamo già i vini, non carichiamo di nuovo
     if (wines.length > 0) {
       setLocalWines(wines);
       setIsLoading(false);
@@ -72,7 +68,6 @@ const Dashboard = () => {
     fetchWines();
   }, []);
 
-  // Calculate stats based on the actual wines array
   const calculateStats = (): WineStats => {
     const totalWines = localWines.length;
     const totalRating = localWines.reduce((sum, wine) => sum + wine.rating, 0);
@@ -94,12 +89,11 @@ const Dashboard = () => {
     setStats(calculateStats());
   }, [localWines]);
 
-  // Convert the wines array to WineEntry format
   const convertWinesToEntries = (): WineEntry[] => {
     return localWines.map(wine => ({
       id: wine.id,
       name: wine.name,
-      producer: wine.name.split(' ')[0], // Simplified for demo
+      producer: wine.name.split(' ')[0],
       year: wine.year,
       region: wine.region,
       rating: wine.rating,
@@ -113,7 +107,6 @@ const Dashboard = () => {
     setWineEntries(convertWinesToEntries());
   }, [localWines]);
 
-  // Render the wine rating as stars/icons
   const renderRating = (rating: number) => {
     const maxRating = 10;
     const fullStars = Math.floor(rating);
@@ -132,7 +125,6 @@ const Dashboard = () => {
     );
   };
 
-  // Add Wine Dialog State
   const [isAddWineDialogOpen, setIsAddWineDialogOpen] = useState(false);
   const [newWine, setNewWine] = useState({
     name: "",
@@ -152,7 +144,6 @@ const Dashboard = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const handleAddWine = async () => {
-    // Crea il nuovo vino da aggiungere
     const wineToAdd = {
       name: newWine.name,
       region: newWine.region || "Non specificata",
@@ -169,10 +160,8 @@ const Dashboard = () => {
     };
     
     try {
-      // Usa la funzione addWine per aggiungere e salvare il vino
       const addedWine = await addWine(wineToAdd);
       
-      // Aggiorna lo stato locale
       setLocalWines(prev => [...prev, addedWine]);
       
       toast({
@@ -230,7 +219,6 @@ const Dashboard = () => {
     reader.readAsDataURL(file);
   };
   
-  // Rating selector for 1-10 scale
   const renderRatingInput = () => {
     return (
       <div className="flex items-center space-x-4">
@@ -275,7 +263,6 @@ const Dashboard = () => {
           </div>
         ) : (
           <>
-            {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
               <Card className="bg-noir-light border-wine/20 border">
                 <CardHeader className="pb-2 pt-6 flex flex-row items-center justify-between">
@@ -327,7 +314,6 @@ const Dashboard = () => {
               </Card>
             </div>
             
-            {/* Top Wines Section */}
             <div className="mb-5">
               <div className="border-b border-white/10 pb-2 mb-6">
                 <h2 className="text-xl font-medium flex items-center">
@@ -347,29 +333,29 @@ const Dashboard = () => {
                 </TableHeader>
                 <TableBody>
                   {localWines
-                    .sort((a, b) => b.rating - a.rating) // Sort by rating
-                    .slice(0, 5) // Take top 5
+                    .sort((a, b) => b.rating - a.rating)
+                    .slice(0, 5)
                     .map((wine) => (
-                    <TableRow 
-                      key={wine.id} 
-                      className="border-b border-white/5 hover:bg-noir-light/40 transition-colors cursor-pointer"
-                    >
-                      <TableCell className="py-4">
-                        <div className="flex items-center">
-                          <div className="h-8 w-8 mr-4 rounded bg-noir-dark flex items-center justify-center">
-                            <WineIcon size={16} className="text-wine" />
+                      <TableRow 
+                        key={wine.id} 
+                        className="border-b border-white/5 hover:bg-noir-light/40 transition-colors cursor-pointer"
+                      >
+                        <TableCell className="py-4">
+                          <div className="flex items-center">
+                            <div className="h-8 w-8 mr-4 rounded bg-noir-dark flex items-center justify-center">
+                              <WineIcon size={16} className="text-wine" />
+                            </div>
+                            <div>
+                              <p className="font-medium">{wine.name}</p>
+                              <p className="text-sm text-white/60">{wine.grape}</p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-medium">{wine.name}</p>
-                            <p className="text-sm text-white/60">{wine.grape}</p>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{wine.year}</TableCell>
-                      <TableCell>{wine.region}</TableCell>
-                      <TableCell>{renderRating(wine.rating)}</TableCell>
-                    </TableRow>
-                  ))}
+                        </TableCell>
+                        <TableCell>{wine.year}</TableCell>
+                        <TableCell>{wine.region}</TableCell>
+                        <TableCell>{renderRating(wine.rating)}</TableCell>
+                      </TableRow>
+                    ))}
                   {localWines.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={4} className="text-center py-8 text-white/50">
@@ -384,7 +370,6 @@ const Dashboard = () => {
         )}
       </div>
       
-      {/* Add Wine Dialog */}
       <Dialog open={isAddWineDialogOpen} onOpenChange={setIsAddWineDialogOpen}>
         <DialogContent className="bg-noir-light border-white/10 text-white">
           <DialogHeader>
@@ -605,17 +590,6 @@ const Dashboard = () => {
             <Button
               onClick={handleAddWine}
               className="bg-wine hover:bg-wine-light"
-              disabled={!newWine.name} // Only name is required
-            >
-              Aggiungi alla Collezione
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-      
-      <Footer />
-    </div>
-  );
-};
+              disabled={!newWine.name}
+           
 
-export default Dashboard;

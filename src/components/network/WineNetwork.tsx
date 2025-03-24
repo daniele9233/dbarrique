@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { NetworkWine } from '@/data/NetworkWineData';
@@ -10,7 +9,7 @@ interface WineNetworkProps {
 }
 
 interface SimulationNode extends d3.SimulationNodeDatum {
-  id: number;
+  id: string;
   x?: number;
   y?: number;
   fx?: number | null;
@@ -58,7 +57,6 @@ const WineNetwork: React.FC<WineNetworkProps> = ({ wines, filters }) => {
     };
   }, []);
 
-  // Filtra i vini in base ai filtri selezionati
   const filteredWines = wines.filter(wine => {
     const grapeMatch = filters.grapes.length === 0 || filters.grapes.includes(wine.grape);
     const regionMatch = filters.regions.length === 0 || filters.regions.includes(wine.region);
@@ -87,12 +85,10 @@ const WineNetwork: React.FC<WineNetworkProps> = ({ wines, filters }) => {
   useEffect(() => {
     if (!svgRef.current || !tooltipRef.current || dimensions.width === 0 || dimensions.height === 0) return;
 
-    // Pulisci il grafico precedente
     d3.select(svgRef.current).selectAll("*").remove();
 
     if (filteredWines.length === 0) return;
 
-    // Prepara i nodi e i collegamenti per la simulazione
     const nodes: SimulationNode[] = filteredWines.map(wine => ({
       id: wine.id,
       radius: wine.radius,
@@ -110,7 +106,6 @@ const WineNetwork: React.FC<WineNetworkProps> = ({ wines, filters }) => {
       image: wine.image
     }));
 
-    // Crea i collegamenti solo tra i nodi filtrati
     const links: SimulationLink[] = [];
     filteredWines.forEach(wine => {
       const sourceId = wine.id;
@@ -125,7 +120,6 @@ const WineNetwork: React.FC<WineNetworkProps> = ({ wines, filters }) => {
       });
     });
 
-    // Configura la simulazione
     const simulation = d3.forceSimulation<SimulationNode, SimulationLink>(nodes)
       .force("charge", d3.forceManyBody().strength(-200))
       .force("center", d3.forceCenter(dimensions.width / 2, dimensions.height / 2))
@@ -133,10 +127,8 @@ const WineNetwork: React.FC<WineNetworkProps> = ({ wines, filters }) => {
       .force("link", d3.forceLink<SimulationNode, SimulationLink>(links).id(d => d.id))
       .on("tick", ticked);
 
-    // Crea gli elementi SVG
     const svg = d3.select(svgRef.current);
     
-    // Aggiungi uno sfondo con gradiente
     const defs = svg.append("defs");
     const gradient = defs.append("radialGradient")
       .attr("id", "network-bg-gradient")
@@ -157,7 +149,6 @@ const WineNetwork: React.FC<WineNetworkProps> = ({ wines, filters }) => {
       .attr("height", dimensions.height)
       .attr("fill", "url(#network-bg-gradient)");
 
-    // Disegna i collegamenti
     const link = svg.append("g")
       .attr("stroke", "#333")
       .attr("stroke-opacity", 0.4)
@@ -166,7 +157,6 @@ const WineNetwork: React.FC<WineNetworkProps> = ({ wines, filters }) => {
       .enter().append("line")
       .attr("stroke-width", 1);
 
-    // Disegna i nodi
     const node = svg.append("g")
       .selectAll("circle")
       .data(nodes)
@@ -181,7 +171,6 @@ const WineNetwork: React.FC<WineNetworkProps> = ({ wines, filters }) => {
         .on("drag", dragged)
         .on("end", dragended) as any);
 
-    // Aggiungi interattività
     node
       .on("mouseover", (event, d) => {
         d3.select(event.currentTarget)
@@ -213,7 +202,6 @@ const WineNetwork: React.FC<WineNetworkProps> = ({ wines, filters }) => {
         event.stopPropagation();
       });
 
-    // Funzione per aggiornare la posizione degli elementi ad ogni tick della simulazione
     function ticked() {
       link
         .attr("x1", d => (d.source as SimulationNode).x!)
@@ -226,7 +214,6 @@ const WineNetwork: React.FC<WineNetworkProps> = ({ wines, filters }) => {
         .attr("cy", d => Math.max(d.radius, Math.min(dimensions.height - d.radius, d.y!)));
     }
 
-    // Funzioni per gestire il drag & drop
     function dragstarted(event: d3.D3DragEvent<SVGCircleElement, SimulationNode, SimulationNode>) {
       if (!event.active) simulation.alphaTarget(0.3).restart();
       event.subject.fx = event.subject.x;
@@ -244,7 +231,6 @@ const WineNetwork: React.FC<WineNetworkProps> = ({ wines, filters }) => {
       event.subject.fy = null;
     }
 
-    // Chiudi il pannello dei dettagli quando si fa clic sullo sfondo
     svg.on("click", () => {
       setSelectedNode(null);
     });

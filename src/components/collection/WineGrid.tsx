@@ -9,17 +9,17 @@ interface WineGridProps {
 }
 
 const WineGrid: React.FC<WineGridProps> = ({ wines, resetAllFilters }) => {
-  const [isLoading, setIsLoading] = useState(globalWines.length === 0);
+  const [isLoading, setIsLoading] = useState(false);
   const [localWines, setLocalWines] = useState<Wine[]>(globalWines);
   
   useEffect(() => {
     // Se abbiamo già i vini globali, non carichiamo di nuovo
     if (globalWines.length > 0) {
       setLocalWines(globalWines);
-      setIsLoading(false);
       return;
     }
 
+    setIsLoading(true);
     const fetchWines = async () => {
       try {
         const winesFromFirestore = await loadWinesFromFirestore();

@@ -2,15 +2,22 @@
 import { useState, useEffect } from 'react';
 import WineCard from './WineCard';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
-import { loadWinesFromFirestore } from '@/data/WineData';
+import { loadWinesFromFirestore, wines as globalWines } from '@/data/WineData';
 import { Wine } from '@/data/WineData';
 
 const WineCollection = ({ limit }: { limit?: number }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [wines, setWines] = useState<Wine[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [wines, setWines] = useState<Wine[]>(globalWines);
+  const [isLoading, setIsLoading] = useState(globalWines.length === 0);
   
   useEffect(() => {
+    // Se abbiamo già i vini globali, non carichiamo di nuovo
+    if (globalWines.length > 0) {
+      setWines(globalWines);
+      setIsLoading(false);
+      return;
+    }
+
     const fetchWines = async () => {
       try {
         const winesFromFirestore = await loadWinesFromFirestore();
