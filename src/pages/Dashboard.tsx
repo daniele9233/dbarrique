@@ -1,3 +1,4 @@
+
 import { useState, useRef, ChangeEvent, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -7,7 +8,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Wine as WineIcon, Star, Plus, Grape, Award, Upload } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import { wines, loadWinesFromFirestore, bodyOptions, structureOptions, tanninOptions, sweetnessOptions, aromaOptions, addWine, grapes } from "@/data/WineData";
+import { 
+  wines, 
+  loadWinesFromFirestore, 
+  bodyOptions, 
+  structureOptions, 
+  tanninOptions, 
+  sweetnessOptions, 
+  aromaOptions, 
+  addWine, 
+  grapes 
+} from "@/data/WineData";
 
 // Types for our dashboard stats
 type WineStats = {
@@ -21,7 +32,7 @@ type WineStats = {
 
 // Types for our wine entries
 type WineEntry = {
-  id: number;
+  id: string;
   name: string;
   producer?: string;
   year: number;
@@ -32,9 +43,16 @@ type WineEntry = {
 
 const Dashboard = () => {
   const [localWines, setLocalWines] = useState([...wines]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(wines.length === 0);
 
   useEffect(() => {
+    // Se abbiamo già i vini, non carichiamo di nuovo
+    if (wines.length > 0) {
+      setLocalWines(wines);
+      setIsLoading(false);
+      return;
+    }
+
     const fetchWines = async () => {
       try {
         const winesFromFirestore = await loadWinesFromFirestore();

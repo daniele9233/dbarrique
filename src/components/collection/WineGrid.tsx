@@ -1,22 +1,7 @@
+
 import { useEffect, useState } from 'react';
 import WineCard from '@/components/WineCard';
-import { loadWinesFromFirestore } from '@/data/WineData';
-
-interface Wine {
-  id: string;
-  name: string;
-  region: string;
-  year: number;
-  rating: number;
-  type: "red";
-  image: string;
-  grape: string;
-  body: string;
-  structure: string;
-  tannins: string;
-  sweetness: string;
-  aroma: string;
-}
+import { Wine, loadWinesFromFirestore, wines as globalWines } from '@/data/WineData';
 
 interface WineGridProps {
   wines: Wine[];
@@ -24,10 +9,17 @@ interface WineGridProps {
 }
 
 const WineGrid: React.FC<WineGridProps> = ({ wines, resetAllFilters }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [localWines, setLocalWines] = useState<Wine[]>([]);
+  const [isLoading, setIsLoading] = useState(globalWines.length === 0);
+  const [localWines, setLocalWines] = useState<Wine[]>(globalWines);
   
   useEffect(() => {
+    // Se abbiamo già i vini globali, non carichiamo di nuovo
+    if (globalWines.length > 0) {
+      setLocalWines(globalWines);
+      setIsLoading(false);
+      return;
+    }
+
     const fetchWines = async () => {
       try {
         const winesFromFirestore = await loadWinesFromFirestore();

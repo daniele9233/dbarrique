@@ -22,11 +22,11 @@ const getGrapeColor = (grape: string): string => {
 };
 
 // Estendi i dati dei vini con informazioni aggiuntive per la visualizzazione della rete
-export interface NetworkWine extends Wine {
-  id: number;
+export interface NetworkWine extends Omit<Wine, 'id'> {
+  id: string;
   color: string;
   radius: number;
-  connections: number[];
+  connections: string[];
 }
 
 // Generiamo più vini per la visualizzazione della rete
@@ -34,7 +34,7 @@ const generateMoreWines = (): NetworkWine[] => {
   // Aggiungiamo alcuni vini fittizi per avere un dataset più grande
   const additionalWines: Wine[] = [
     {
-      id: 10,
+      id: "10",
       name: "Tignanello",
       region: "Toscana, Italy",
       year: 2018,
@@ -49,7 +49,7 @@ const generateMoreWines = (): NetworkWine[] => {
       aroma: "Fruttato"
     },
     {
-      id: 11,
+      id: "11",
       name: "Amarone della Valpolicella",
       region: "Veneto, Italy",
       year: 2017,
@@ -64,7 +64,7 @@ const generateMoreWines = (): NetworkWine[] => {
       aroma: "Speziato"
     },
     {
-      id: 12,
+      id: "12",
       name: "Rioja Reserva",
       region: "Rioja, Spain",
       year: 2015,
@@ -79,7 +79,7 @@ const generateMoreWines = (): NetworkWine[] => {
       aroma: "Evoluto"
     },
     {
-      id: 13,
+      id: "13",
       name: "Chianti Classico",
       region: "Toscana, Italy",
       year: 2019,
@@ -94,7 +94,7 @@ const generateMoreWines = (): NetworkWine[] => {
       aroma: "Fruttato"
     },
     {
-      id: 14,
+      id: "14",
       name: "Malbec Reserva",
       region: "Mendoza, Argentina",
       year: 2020,
@@ -109,7 +109,7 @@ const generateMoreWines = (): NetworkWine[] => {
       aroma: "Fruttato"
     },
     {
-      id: 15,
+      id: "15",
       name: "Pinot Noir",
       region: "Burgundy, France",
       year: 2018,
