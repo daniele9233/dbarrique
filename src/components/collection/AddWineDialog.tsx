@@ -1,4 +1,3 @@
-
 import { useState, useRef, ChangeEvent } from 'react';
 import { Grape, Upload } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -6,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
-import { grapes, bodyOptions, structureOptions, tanninOptions, sweetnessOptions, aromaOptions, wines } from "@/data/WineData";
+import { grapes, bodyOptions, structureOptions, tanninOptions, sweetnessOptions, aromaOptions, addWine } from "@/data/WineData";
 
 interface AddWineDialogProps {
   isOpen: boolean;
@@ -32,19 +31,12 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange }) =
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const handleAddWine = () => {
-    // Generate a unique ID by using the current timestamp plus a random number
-    const newId = Date.now() + Math.floor(Math.random() * 1000);
-    
-    // Create the new wine with the generated ID
-    const wineToAdd = {
+    addWine({
       ...newWine,
-      id: newId
-    };
-    
-    // Add the new wine to the existing wines array
-    // This is a workaround since we can't persist data to a database
-    // In a real application, this would be a call to an API
-    wines.push(wineToAdd);
+      region: newWine.region || "Non specificata",
+      grape: newWine.grape || "Non specificato",
+      image: newWine.image || "https://images.unsplash.com/photo-1553361371-9fe24fca9c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
+    });
     
     toast({
       title: "Successo",
@@ -92,7 +84,6 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange }) =
     reader.readAsDataURL(file);
   };
   
-  // Rating selector for 1-10 scale
   const renderRatingInput = () => {
     return (
       <div className="flex items-center space-x-4">

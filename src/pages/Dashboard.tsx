@@ -1,14 +1,13 @@
-
-import { useState, useRef, ChangeEvent } from 'react';
+import { useState, useRef, ChangeEvent, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Wine, Star, Plus, Grape, Award, Upload } from 'lucide-react';
+import { Wine as WineIcon, Star, Plus, Grape, Award, Upload } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import { wines, grapes, bodyOptions, structureOptions, tanninOptions, sweetnessOptions, aromaOptions } from "@/data/WineData";
+import { wines, grapes, bodyOptions, structureOptions, tanninOptions, sweetnessOptions, aromaOptions, addWine, saveWines } from "@/data/WineData";
 
 // Types for our dashboard stats
 type WineStats = {
@@ -48,7 +47,7 @@ const Dashboard = () => {
     };
   };
 
-  const [stats] = useState<WineStats>(calculateStats());
+  const [stats, setStats] = useState<WineStats>(calculateStats());
 
   // Convert the wines array to WineEntry format
   const convertWinesToEntries = (): WineEntry[] => {
@@ -63,7 +62,7 @@ const Dashboard = () => {
     }));
   };
 
-  const [wineEntries] = useState<WineEntry[]>(convertWinesToEntries());
+  const [wineEntries, setWineEntries] = useState<WineEntry[]>(convertWinesToEntries());
 
   // Render the wine rating as stars/icons
   const renderRating = (rating: number) => {
@@ -104,12 +103,8 @@ const Dashboard = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const handleAddWine = () => {
-    // Generate a unique ID
-    const newId = Date.now() + Math.floor(Math.random() * 1000);
-    
-    // Create full wine object
+    // Crea il nuovo vino da aggiungere
     const wineToAdd = {
-      id: newId,
       name: newWine.name,
       region: newWine.region || "Non specificata",
       year: newWine.year || new Date().getFullYear(),
@@ -124,19 +119,12 @@ const Dashboard = () => {
       aroma: newWine.aroma
     };
     
-    // Add to wine collection
-    wines.push(wineToAdd);
+    // Usa la funzione addWine per aggiungere e salvare il vino
+    const addedWine = addWine(wineToAdd);
     
-    // Add to wine entries for the dashboard
-    wineEntries.push({
-      id: newId,
-      name: newWine.name,
-      producer: newWine.producer || newWine.name.split(' ')[0],
-      year: newWine.year || new Date().getFullYear(),
-      region: newWine.region || "Non specificata",
-      rating: newWine.rating,
-      grape: newWine.grape
-    });
+    // Aggiorna lo stato locale
+    setStats(calculateStats());
+    setWineEntries(convertWinesToEntries());
     
     toast({
       title: "Successo",
@@ -263,7 +251,7 @@ const Dashboard = () => {
           <Card className="bg-noir-light border-wine/20 border">
             <CardHeader className="pb-2 pt-6 flex flex-row items-center justify-between">
               <h3 className="text-sm uppercase tracking-wide text-white/70">Tipo Più Comune</h3>
-              <Wine className="h-5 w-5 text-wine" />
+              <WineIcon className="h-5 w-5 text-wine" />
             </CardHeader>
             <CardContent>
               <div className="flex flex-col">
@@ -306,7 +294,7 @@ const Dashboard = () => {
                   <TableCell className="py-4">
                     <div className="flex items-center">
                       <div className="h-8 w-8 mr-4 rounded bg-noir-dark flex items-center justify-center">
-                        <Wine size={16} className="text-wine" />
+                        <WineIcon size={16} className="text-wine" />
                       </div>
                       <div>
                         <p className="font-medium">{wine.name}</p>

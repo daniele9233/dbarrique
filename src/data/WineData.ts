@@ -1,6 +1,6 @@
 
 // Sample wine data with 1-10 rating scale (only red wines)
-export const wines = [
+const defaultWines = [
   {
     id: 1,
     name: "Château Margaux",
@@ -77,6 +77,38 @@ export const wines = [
     aroma: "Speziato"
   }
 ];
+
+// Funzione per ottenere i vini dal localStorage o usare quelli predefiniti
+const loadWinesFromStorage = (): Wine[] => {
+  try {
+    const storedWines = localStorage.getItem('dbarrique-wines');
+    return storedWines ? JSON.parse(storedWines) : defaultWines;
+  } catch (error) {
+    console.error('Errore nel caricamento dei vini dal localStorage:', error);
+    return defaultWines;
+  }
+};
+
+// Funzione per salvare i vini nel localStorage
+export const saveWines = (updatedWines: Wine[]): void => {
+  try {
+    localStorage.setItem('dbarrique-wines', JSON.stringify(updatedWines));
+  } catch (error) {
+    console.error('Errore nel salvataggio dei vini nel localStorage:', error);
+  }
+};
+
+// Esportiamo i vini caricati dal localStorage
+export const wines = loadWinesFromStorage();
+
+// Aggiungi un nuovo vino e salva nel localStorage
+export const addWine = (wine: Omit<Wine, 'id'>): Wine => {
+  const newId = Date.now() + Math.floor(Math.random() * 1000);
+  const newWine = { ...wine, id: newId };
+  wines.push(newWine);
+  saveWines(wines);
+  return newWine;
+};
 
 // Lista completa di vitigni a bacca rossa (italiani e internazionali)
 export const grapes = [
