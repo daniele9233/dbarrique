@@ -1,3 +1,4 @@
+
 import { useState, useRef, ChangeEvent, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -17,7 +18,8 @@ import {
   tanninOptions, 
   sweetnessOptions, 
   aromaOptions, 
-  addWine, 
+  addWine,
+  Wine, 
   grapes 
 } from "@/data/WineData";
 
@@ -41,7 +43,7 @@ type WineEntry = {
 };
 
 const Dashboard = () => {
-  const [localWines, setLocalWines] = useState(wines);
+  const [localWines, setLocalWines] = useState<Wine[]>(wines);
   const [isLoading, setIsLoading] = useState(wines.length === 0);
   const [isAddWineDialogOpen, setIsAddWineDialogOpen] = useState(false);
 
@@ -128,9 +130,14 @@ const Dashboard = () => {
     );
   };
 
-  const handleAddWineComplete = (newWine: any) => {
+  const handleAddWineComplete = (newWine: Wine) => {
+    console.log("Wine added to collection:", newWine);
     setLocalWines(prev => [...prev, newWine]);
     setIsAddWineDialogOpen(false);
+    toast({
+      title: "Vino Aggiunto",
+      description: `${newWine.name} è stato aggiunto alla tua collezione.`
+    });
   };
 
   return (

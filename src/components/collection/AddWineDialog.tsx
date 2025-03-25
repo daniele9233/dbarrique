@@ -1,3 +1,4 @@
+
 import { useState, useRef, ChangeEvent } from 'react';
 import { Grape, Upload } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -37,6 +38,34 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
   
   const handleAddWine = async () => {
     try {
+      // Check for required fields
+      if (!newWine.name) {
+        toast({
+          title: "Errore",
+          description: "Il nome del vino è obbligatorio.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      if (isBlend && newWine.grapes.length === 0) {
+        toast({
+          title: "Errore",
+          description: "Seleziona almeno un vitigno per il blend.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (!isBlend && !newWine.grape) {
+        toast({
+          title: "Errore",
+          description: "Seleziona un vitigno.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
       const grapeValue = isBlend ? "Blend" : newWine.grape;
       const grapesArray = isBlend ? newWine.grapes : newWine.grape ? [newWine.grape] : [];
       
@@ -49,7 +78,9 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
         image: newWine.image || "https://images.unsplash.com/photo-1553361371-9fe24fca9c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
       };
       
+      console.log("Adding wine:", wineToAdd);
       const addedWine = await addWine(wineToAdd);
+      console.log("Wine added:", addedWine);
       
       toast({
         title: "Successo",
