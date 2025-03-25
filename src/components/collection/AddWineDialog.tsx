@@ -82,16 +82,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
       const addedWine = await addWine(wineToAdd);
       console.log("Wine added:", addedWine);
       
-      toast({
-        title: "Successo",
-        description: "Il nuovo vino è stato aggiunto alla tua collezione.",
-      });
-      
-      if (onWineAdded) {
-        onWineAdded(addedWine);
-      }
-      
-      onOpenChange(false);
+      // Clear form
       setNewWine({
         name: "",
         region: "",
@@ -109,6 +100,17 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
         aroma: "Fruttato"
       });
       setIsBlend(false);
+      
+      toast({
+        title: "Successo",
+        description: "Il nuovo vino è stato aggiunto alla tua collezione.",
+      });
+      
+      if (onWineAdded) {
+        onWineAdded(addedWine);
+      }
+      
+      onOpenChange(false);
     } catch (error) {
       console.error('Errore nell\'aggiunta del vino:', error);
       toast({
@@ -440,7 +442,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
           <Button
             onClick={handleAddWine}
             className="bg-wine hover:bg-wine-light"
-            disabled={!newWine.name || (isBlend && newWine.grapes.length === 0)}
+            disabled={!newWine.name || (isBlend && newWine.grapes.length === 0) || (!isBlend && !newWine.grape)}
           >
             Aggiungi alla Collezione
           </Button>

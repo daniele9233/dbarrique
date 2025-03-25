@@ -1,26 +1,16 @@
-
-import { useState, useRef, ChangeEvent, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Wine as WineIcon, Star, Plus, Grape, Award, Upload } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Wine as WineIcon, Star, Plus, Grape, Award } from 'lucide-react';
 import { toast } from "@/hooks/use-toast";
-import { Checkbox } from "@/components/ui/checkbox";
 import AddWineDialog from "@/components/collection/AddWineDialog";
 import { 
   wines, 
   loadWinesFromFirestore, 
-  bodyOptions, 
-  structureOptions, 
-  tanninOptions, 
-  sweetnessOptions, 
-  aromaOptions, 
-  addWine,
-  Wine, 
-  grapes 
+  Wine
 } from "@/data/WineData";
 
 type WineStats = {
