@@ -1,4 +1,3 @@
-
 import { useState, useRef, ChangeEvent, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -8,6 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Wine as WineIcon, Star, Plus, Grape, Award, Upload } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
+import AddWineDialog from "@/components/collection/AddWineDialog";
 import { 
   wines, 
   loadWinesFromFirestore, 
@@ -42,6 +43,7 @@ type WineEntry = {
 const Dashboard = () => {
   const [localWines, setLocalWines] = useState(wines);
   const [isLoading, setIsLoading] = useState(wines.length === 0);
+  const [isAddWineDialogOpen, setIsAddWineDialogOpen] = useState(false);
 
   useEffect(() => {
     if (wines.length > 0) {
@@ -126,114 +128,9 @@ const Dashboard = () => {
     );
   };
 
-  const [isAddWineDialogOpen, setIsAddWineDialogOpen] = useState(false);
-  const [newWine, setNewWine] = useState({
-    name: "",
-    producer: "",
-    region: "",
-    year: new Date().getFullYear(),
-    rating: 5,
-    type: "red" as const,
-    image: "",
-    grape: "",
-    body: "Medio",
-    structure: "Equilibrato",
-    tannins: "Equilibrato",
-    sweetness: "Secco",
-    aroma: "Fruttato"
-  });
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  const handleAddWine = async () => {
-    const wineToAdd = {
-      name: newWine.name,
-      region: newWine.region || "Non specificata",
-      year: newWine.year || new Date().getFullYear(),
-      rating: newWine.rating,
-      type: "red" as const,
-      image: newWine.image || "https://images.unsplash.com/photo-1553361371-9fe24fca9c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
-      grape: newWine.grape || "Non specificato",
-      body: newWine.body,
-      structure: newWine.structure,
-      tannins: newWine.tannins,
-      sweetness: newWine.sweetness,
-      aroma: newWine.aroma
-    };
-    
-    try {
-      const addedWine = await addWine(wineToAdd);
-      
-      setLocalWines(prev => [...prev, addedWine]);
-      
-      toast({
-        title: "Successo",
-        description: "Nuovo vino aggiunto alla tua collezione.",
-      });
-      
-      setIsAddWineDialogOpen(false);
-      setNewWine({
-        name: "",
-        producer: "",
-        region: "",
-        year: new Date().getFullYear(),
-        rating: 5,
-        type: "red" as const,
-        image: "",
-        grape: "",
-        body: "Medio",
-        structure: "Equilibrato",
-        tannins: "Equilibrato",
-        sweetness: "Secco",
-        aroma: "Fruttato"
-      });
-    } catch (error) {
-      console.error('Errore nell\'aggiunta del vino:', error);
-      toast({
-        title: "Errore",
-        description: "Impossibile aggiungere il vino. Riprova più tardi.",
-        variant: "destructive"
-      });
-    }
-  };
-  
-  const handleChange = (field: string, value: string | number) => {
-    setNewWine({
-      ...newWine,
-      [field]: value
-    });
-  };
-  
-  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (e.target?.result) {
-        handleChange('image', e.target.result as string);
-        toast({
-          title: "Immagine caricata",
-          description: "L'immagine del vino è stata caricata con successo.",
-        });
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-  
-  const renderRatingInput = () => {
-    return (
-      <div className="flex items-center space-x-4">
-        <input
-          type="range"
-          min="1"
-          max="10"
-          value={newWine.rating}
-          onChange={(e) => handleChange('rating', parseInt(e.target.value))}
-          className="w-full h-2 bg-noir rounded-lg appearance-none cursor-pointer accent-wine"
-        />
-        <span className="text-white font-medium">{newWine.rating}/10</span>
-      </div>
-    );
+  const handleAddWineComplete = (newWine: any) => {
+    setLocalWines(prev => [...prev, newWine]);
+    setIsAddWineDialogOpen(false);
   };
 
   return (
@@ -371,233 +268,11 @@ const Dashboard = () => {
         )}
       </div>
       
-      <Dialog open={isAddWineDialogOpen} onOpenChange={setIsAddWineDialogOpen}>
-        <DialogContent className="bg-noir-light border-white/10 text-white">
-          <DialogHeader>
-            <DialogTitle className="font-serif text-2xl flex items-center gap-2">
-              <Grape className="h-6 w-6 text-wine" />
-              <span>Aggiungi Nuovo Vino</span>
-            </DialogTitle>
-            <DialogDescription className="text-white/60">
-              Inserisci i dettagli del vino che desideri aggiungere alla tua collezione. I campi contrassegnati con * sono obbligatori.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Nome del Vino *
-              </label>
-              <input
-                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
-                placeholder="es. Brunello di Montalcino"
-                value={newWine.name}
-                onChange={(e) => handleChange('name', e.target.value)}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Produttore
-              </label>
-              <input
-                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
-                placeholder="es. Biondi-Santi"
-                value={newWine.producer}
-                onChange={(e) => handleChange('producer', e.target.value)}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Regione
-              </label>
-              <input
-                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
-                placeholder="es. Toscana"
-                value={newWine.region}
-                onChange={(e) => handleChange('region', e.target.value)}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Vitigno
-              </label>
-              <select 
-                className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
-                value={newWine.grape}
-                onChange={(e) => handleChange('grape', e.target.value)}
-              >
-                <option value="">Seleziona un vitigno</option>
-                {grapes.map(grape => (
-                  <option key={grape} value={grape}>{grape}</option>
-                ))}
-              </select>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  Annata
-                </label>
-                <input
-                  type="number"
-                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
-                  placeholder="es. 2016"
-                  value={newWine.year || ''}
-                  onChange={(e) => {
-                    const value = e.target.value === '' ? '' : parseInt(e.target.value);
-                    handleChange('year', value || new Date().getFullYear());
-                  }}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  Valutazione (1-10)
-                </label>
-                {renderRatingInput()}
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none">
-                  Corpo
-                </label>
-                <select 
-                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
-                  value={newWine.body}
-                  onChange={(e) => handleChange('body', e.target.value)}
-                >
-                  {bodyOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none">
-                  Struttura
-                </label>
-                <select 
-                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
-                  value={newWine.structure}
-                  onChange={(e) => handleChange('structure', e.target.value)}
-                >
-                  {structureOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none">
-                  Tannini
-                </label>
-                <select 
-                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
-                  value={newWine.tannins}
-                  onChange={(e) => handleChange('tannins', e.target.value)}
-                >
-                  {tanninOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none">
-                  Dolcezza
-                </label>
-                <select 
-                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
-                  value={newWine.sweetness}
-                  onChange={(e) => handleChange('sweetness', e.target.value)}
-                >
-                  {sweetnessOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none">
-                  Aromi principali
-                </label>
-                <select 
-                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
-                  value={newWine.aroma}
-                  onChange={(e) => handleChange('aroma', e.target.value)}
-                >
-                  {aromaOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Immagine del Vino
-              </label>
-              <div className="flex gap-2">
-                <input
-                  className="w-full px-3 py-2 rounded-md bg-noir border border-white/10 focus:border-wine focus:outline-none text-white"
-                  placeholder="Inserisci URL immagine o carica un'immagine"
-                  value={typeof newWine.image === 'string' ? newWine.image : ''}
-                  onChange={(e) => handleChange('image', e.target.value)}
-                />
-                <Button 
-                  variant="outline"
-                  className="border-white/10 hover:bg-wine hover:text-white"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Upload className="h-4 w-4 mr-2" />
-                  Carica
-                </Button>
-                <input 
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  ref={fileInputRef}
-                  onChange={handleFileUpload}
-                />
-              </div>
-              
-              {newWine.image && (
-                <div className="mt-2 h-40 rounded-md overflow-hidden bg-noir-dark">
-                  <img 
-                    src={newWine.image.toString()} 
-                    alt="Anteprima vino" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-          
-          <div className="flex justify-end gap-4 mt-4">
-            <Button
-              variant="outline"
-              onClick={() => setIsAddWineDialogOpen(false)}
-              className="border-white/10 hover:bg-noir hover:text-white"
-            >
-              Annulla
-            </Button>
-            <Button
-              onClick={handleAddWine}
-              className="bg-wine hover:bg-wine-light"
-              disabled={!newWine.name}
-            >
-              Aggiungi
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <AddWineDialog 
+        isOpen={isAddWineDialogOpen}
+        onOpenChange={setIsAddWineDialogOpen}
+        onWineAdded={handleAddWineComplete}
+      />
 
       <Footer />
     </div>

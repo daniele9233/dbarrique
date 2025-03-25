@@ -1,4 +1,3 @@
-
 import { useState, useRef, ChangeEvent } from 'react';
 import { Grape, Upload } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -12,19 +11,20 @@ import { Checkbox } from "@/components/ui/checkbox";
 interface AddWineDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  onWineAdded?: (wine: any) => void;
 }
 
-const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange }) => {
+const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onWineAdded }) => {
   const [newWine, setNewWine] = useState({
     name: "",
     region: "",
-    winery: "", // Campo per la cantina
+    winery: "",
     year: new Date().getFullYear(),
     rating: 5,
     type: "red" as const,
     image: "",
     grape: "",
-    grapes: [] as string[], // New field for multiple grapes
+    grapes: [] as string[],
     body: "Medio",
     structure: "Equilibrato",
     tannins: "Equilibrato",
@@ -35,43 +35,57 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange }) =
   const [isBlend, setIsBlend] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const handleAddWine = () => {
-    // Determine grape value based on selection mode
-    const grapeValue = isBlend ? "Blend" : newWine.grape;
-    const grapesArray = isBlend ? newWine.grapes : newWine.grape ? [newWine.grape] : [];
-    
-    addWine({
-      ...newWine,
-      region: newWine.region || "Non specificata",
-      winery: newWine.winery || "Non specificata",
-      grape: grapeValue || "Non specificato",
-      grapes: grapesArray,
-      image: newWine.image || "https://images.unsplash.com/photo-1553361371-9fe24fca9c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
-    });
-    
-    toast({
-      title: "Successo",
-      description: "Il nuovo vino è stato aggiunto alla tua collezione.",
-    });
-    
-    onOpenChange(false);
-    setNewWine({
-      name: "",
-      region: "",
-      winery: "",
-      year: new Date().getFullYear(),
-      rating: 5,
-      type: "red" as const,
-      image: "",
-      grape: "",
-      grapes: [],
-      body: "Medio",
-      structure: "Equilibrato",
-      tannins: "Equilibrato",
-      sweetness: "Secco",
-      aroma: "Fruttato"
-    });
-    setIsBlend(false);
+  const handleAddWine = async () => {
+    try {
+      const grapeValue = isBlend ? "Blend" : newWine.grape;
+      const grapesArray = isBlend ? newWine.grapes : newWine.grape ? [newWine.grape] : [];
+      
+      const wineToAdd = {
+        ...newWine,
+        region: newWine.region || "Non specificata",
+        winery: newWine.winery || "Non specificata",
+        grape: grapeValue || "Non specificato",
+        grapes: grapesArray,
+        image: newWine.image || "https://images.unsplash.com/photo-1553361371-9fe24fca9c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
+      };
+      
+      const addedWine = await addWine(wineToAdd);
+      
+      toast({
+        title: "Successo",
+        description: "Il nuovo vino è stato aggiunto alla tua collezione.",
+      });
+      
+      if (onWineAdded) {
+        onWineAdded(addedWine);
+      }
+      
+      onOpenChange(false);
+      setNewWine({
+        name: "",
+        region: "",
+        winery: "",
+        year: new Date().getFullYear(),
+        rating: 5,
+        type: "red" as const,
+        image: "",
+        grape: "",
+        grapes: [],
+        body: "Medio",
+        structure: "Equilibrato",
+        tannins: "Equilibrato",
+        sweetness: "Secco",
+        aroma: "Fruttato"
+      });
+      setIsBlend(false);
+    } catch (error) {
+      console.error('Errore nell\'aggiunta del vino:', error);
+      toast({
+        title: "Errore",
+        description: "Impossibile aggiungere il vino. Riprova più tardi.",
+        variant: "destructive"
+      });
+    }
   };
   
   const handleChange = (field: string, value: string | number | string[]) => {
@@ -395,7 +409,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange }) =
           <Button
             onClick={handleAddWine}
             className="bg-wine hover:bg-wine-light"
-            disabled={!newWine.name || (isBlend && newWine.grapes.length === 0)} // Require name and at least one grape for blends
+            disabled={!newWine.name || (isBlend && newWine.grapes.length === 0)}
           >
             Aggiungi alla Collezione
           </Button>
