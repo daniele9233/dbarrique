@@ -1,3 +1,4 @@
+
 import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
@@ -239,7 +240,7 @@ export interface Wine {
   winery?: string;
   year: number;
   rating: number;
-  type: "red";
+  type: "red" | "white" | "rosé" | "sparkling";
   image: string;
   grape: string;
   grapes?: string[];
