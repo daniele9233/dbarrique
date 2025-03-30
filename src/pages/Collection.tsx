@@ -7,7 +7,7 @@ import SearchBar from '@/components/collection/SearchBar';
 import FilterSection from '@/components/collection/FilterSection';
 import WineGrid from '@/components/collection/WineGrid';
 import AddWineDialog from '@/components/collection/AddWineDialog';
-import { wines } from '@/data/WineData';
+import { wines } from '@/data/services/wineService';
 
 const Collection = () => {
   const [searchTerm, setSearchTerm] = useState("");

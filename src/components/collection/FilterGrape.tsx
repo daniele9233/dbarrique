@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { grapes } from "@/data/WineData";
+import { grapes } from "@/data/constants/wineConstants";
 
 interface FilterGrapeProps {
   selectedGrapes: string[];

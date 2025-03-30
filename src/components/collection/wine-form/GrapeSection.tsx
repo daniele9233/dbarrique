@@ -1,7 +1,7 @@
 
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { grapes } from "@/data/WineData";
+import { grapes } from "@/data/constants/wineConstants";
 import { WineFormData } from "@/hooks/useWineForm";
 
 interface GrapeSectionProps {

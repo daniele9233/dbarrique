@@ -1,6 +1,6 @@
 
 import { Label } from "@/components/ui/label";
-import { bodyOptions, structureOptions, tanninOptions, sweetnessOptions, aromaOptions } from "@/data/WineData";
+import { bodyOptions, structureOptions, tanninOptions, sweetnessOptions, aromaOptions } from "@/data/constants/wineConstants";
 import { WineFormData } from "@/hooks/useWineForm";
 
 interface CharacteristicsSectionProps {
