@@ -161,7 +161,10 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
         description: "Il nuovo vino è stato aggiunto alla tua collezione.",
       });
       
-      // Call onComplete callback if provided
+      // Reset submission state now that everything is completed
+      setIsSubmitting(false);
+      
+      // Call callbacks AFTER resetting state to avoid state updates on unmounted components
       if (onComplete && addedWine) {
         console.log("useWineForm: Calling onComplete callback with wine:", addedWine);
         onComplete(addedWine);
@@ -179,9 +182,7 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
         description: "Impossibile aggiungere il vino. Riprova più tardi.",
         variant: "destructive"
       });
-    } finally {
-      // Always reset submission state
-      console.log("useWineForm: Resetting submission state");
+      // Make sure to reset submission state even in case of error
       setIsSubmitting(false);
     }
   };

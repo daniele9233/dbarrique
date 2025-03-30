@@ -37,11 +37,6 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
         console.log("AddWineDialog: Calling parent onWineAdded callback");
         onWineAdded(wine);
       }
-    },
-    // On close callback - explicitly close the dialog
-    () => {
-      console.log("AddWineDialog: onClose callback triggered");
-      onOpenChange(false);
     }
   );
 
@@ -57,6 +52,14 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     e.preventDefault();
     console.log("AddWineDialog: Form submitted");
     handleSubmit();
+  };
+
+  // Create a function to handle the cancel button click
+  const handleCancel = () => {
+    console.log("AddWineDialog: Cancel button clicked");
+    if (!isSubmitting) {
+      onOpenChange(false);
+    }
   };
 
   return (
@@ -108,7 +111,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
           <div className="flex justify-end gap-4 mt-4">
             <Button
               variant="outline"
-              onClick={() => !isSubmitting && onOpenChange(false)}
+              onClick={handleCancel}
               className="border-white/10 hover:bg-noir hover:text-white"
               type="button"
               disabled={isSubmitting}
