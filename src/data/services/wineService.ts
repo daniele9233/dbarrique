@@ -1,3 +1,4 @@
+
 import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { Wine } from '../models/Wine';
@@ -94,7 +95,7 @@ export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
       grapes: Array.isArray(wine.grapes) ? wine.grapes : [],
       body: wine.body || "Medio",
       structure: wine.structure || "Equilibrato",
-      tannins: wine.tannins || "Equilibrato",
+      tannins: wine.tannins || "Equilibrato", 
       sweetness: wine.sweetness || "Secco",
       aroma: wine.aroma || "Fruttato",
       region: wine.region || "Non specificata",

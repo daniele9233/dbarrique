@@ -21,11 +21,11 @@ const Dashboard = () => {
       // Se abbiamo vini nella cache, li mostriamo subito
       if (cachedWines.length > 0) {
         setLocalWines(cachedWines);
+        setIsLoading(false);
         
         // Poi aggiorniamo in background
         loadWinesFromFirestore(false).then(freshWines => {
           setLocalWines(freshWines);
-          setIsLoading(false);
         }).catch(console.error);
         return;
       }

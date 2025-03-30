@@ -132,6 +132,12 @@ export const useWineFormActions = (
       const addedWine = await addWine(wineToAdd);
       console.log("useWineForm: Wine added to Firestore:", addedWine);
       
+      // Execute callbacks if available
+      if (callbacksRef.current.onComplete && addedWine) {
+        console.log("useWineForm: Executing onComplete callback with wine:", addedWine);
+        callbacksRef.current.onComplete(addedWine);
+      }
+      
       // Reset form
       resetForm();
       
@@ -141,18 +147,13 @@ export const useWineFormActions = (
         description: "Il nuovo vino è stato aggiunto alla tua collezione.",
       });
       
-      // Execute callbacks DIRECTLY - no setTimeout that can cause issues
-      if (callbacksRef.current.onComplete && addedWine) {
-        console.log("useWineForm: Executing onComplete callback with wine:", addedWine);
-        callbacksRef.current.onComplete(addedWine);
-      }
-      
+      // Finalize modal closing if needed
       if (callbacksRef.current.onClose) {
         console.log("useWineForm: Executing onClose callback");
         callbacksRef.current.onClose();
       }
       
-      // IMPORTANT: Reset submission state AFTER calling callbacks
+      // Reset submission state AFTER all callbacks are executed
       setIsSubmitting(false);
       
     } catch (error) {

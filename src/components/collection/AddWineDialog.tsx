@@ -40,11 +40,6 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
       if (onWineAdded) {
         onWineAdded(wine);
       }
-    },
-    // Callback for the dialog close
-    () => {
-      console.log("AddWineDialog: Close callback triggered");
-      onOpenChange(false);
     }
   );
 
