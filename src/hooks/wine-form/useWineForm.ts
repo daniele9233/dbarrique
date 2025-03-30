@@ -1,9 +1,9 @@
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { WineFormData, WineFormCallbacks } from './types';
 import { useWineFormActions } from './useWineFormActions';
 
-export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => void) => {
+export const useWineForm = (onCompleteCallback?: (wine: any) => void, onCloseCallback?: () => void) => {
   const [newWine, setNewWine] = useState<WineFormData>({
     name: "",
     region: "",
@@ -25,7 +25,12 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
   const [isBlend, setIsBlend] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const callbacks: WineFormCallbacks = { onComplete, onClose };
+  // Create a stable callbacks object that won't change between renders
+  // using useMemo to prevent unnecessary re-renders
+  const callbacks = useMemo<WineFormCallbacks>(() => ({
+    onComplete: onCompleteCallback,
+    onClose: onCloseCallback
+  }), [onCompleteCallback, onCloseCallback]);
   
   const {
     handleChange,

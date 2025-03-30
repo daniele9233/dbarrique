@@ -1,3 +1,4 @@
+
 import { useWineForm } from '@/hooks/useWineForm';
 import { Grape } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -17,6 +18,7 @@ interface AddWineDialogProps {
 }
 
 const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onWineAdded }) => {
+  // Use the hook with stable callbacks
   const {
     newWine,
     isBlend,
@@ -29,13 +31,12 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     handleSubmit,
     isDisabled
   } = useWineForm(
-    // On wine added callback
-    (wine) => {
-      console.log("AddWineDialog: onComplete callback triggered with wine:", wine);
-      if (onWineAdded) {
-        console.log("AddWineDialog: Calling parent onWineAdded callback");
-        onWineAdded(wine);
-      }
+    // Always pass the same function reference (don't use inline function)
+    onWineAdded,
+    // Provide the onClose callback that will be called after submission
+    () => {
+      console.log("AddWineDialog: Close callback triggered");
+      onOpenChange(false);
     }
   );
 

@@ -11,8 +11,11 @@ export const useWineFormActions = (
   setIsSubmitting: Dispatch<SetStateAction<boolean>>,
   setIsBlend: Dispatch<SetStateAction<boolean>>,
   fileInputRef: React.RefObject<HTMLInputElement>,
-  { onComplete, onClose }: WineFormCallbacks
+  callbacks: WineFormCallbacks
 ) => {
+  // Destructure callbacks outside of any hooks to maintain hook order consistency
+  const { onComplete, onClose } = callbacks;
+
   const handleChange = useCallback((field: string, value: string | number | string[]) => {
     console.log(`useWineForm: Updating field ${field} to`, value);
     setNewWine(prev => ({
