@@ -1,3 +1,4 @@
+
 import { Dispatch, SetStateAction, useCallback, useRef } from 'react';
 import { toast } from "@/hooks/use-toast";
 import { addWine } from "@/data/services/wineService";
@@ -141,19 +142,25 @@ export const useWineFormActions = (
         description: "Il nuovo vino è stato aggiunto alla tua collezione.",
       });
       
-      // Execute callbacks
-      if (callbacksRef.current.onComplete && addedWine) {
-        console.log("useWineForm: Executing onComplete callback with wine:", addedWine);
-        callbacksRef.current.onComplete(addedWine);
-      }
+      // IMPORTANTE: Salva temporaneamente i callbacks per eseguirli dopo il reset dello stato
+      const onComplete = callbacksRef.current.onComplete;
+      const onClose = callbacksRef.current.onClose;
       
-      if (callbacksRef.current.onClose) {
-        console.log("useWineForm: Executing onClose callback");
-        callbacksRef.current.onClose();
-      }
-      
-      // Clear submission state
+      // Reset submission state PRIMA di chiamare i callbacks
       setIsSubmitting(false);
+      
+      // Esegui i callbacks dopo il reset dello stato
+      setTimeout(() => {
+        if (onComplete && addedWine) {
+          console.log("useWineForm: Executing onComplete callback with wine:", addedWine);
+          onComplete(addedWine);
+        }
+        
+        if (onClose) {
+          console.log("useWineForm: Executing onClose callback");
+          onClose();
+        }
+      }, 0);
       
     } catch (error) {
       console.error('useWineForm: Error adding wine:', error);

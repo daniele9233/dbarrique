@@ -1,6 +1,6 @@
 
 import { useWineForm } from '@/hooks/useWineForm';
-import { Grape } from 'lucide-react';
+import { Grape, Loader } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
@@ -11,7 +11,7 @@ import YearRatingSection from './wine-form/YearRatingSection';
 import CharacteristicsSection from './wine-form/CharacteristicsSection';
 import ImageUploadSection from './wine-form/ImageUploadSection';
 import { Wine } from '@/data/models/Wine';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface AddWineDialogProps {
   isOpen: boolean;
@@ -21,6 +21,9 @@ interface AddWineDialogProps {
 
 const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onWineAdded }) => {
   console.log("AddWineDialog: Rendering with props", { isOpen, hasOnWineAdded: !!onWineAdded });
+  
+  // Aggiungiamo uno stato locale per gestire meglio il processo di invio
+  const [submissionCompleted, setSubmissionCompleted] = useState(false);
   
   const {
     newWine,
@@ -34,24 +37,33 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     handleSubmit,
     isDisabled
   } = useWineForm(
-    // Callback for when a wine is added successfully
+    // Callback per quando un vino viene aggiunto con successo
     (wine: Wine) => {
       console.log("AddWineDialog: Wine added successfully, triggering callback:", wine);
+      setSubmissionCompleted(true);
       if (onWineAdded) {
         onWineAdded(wine);
       }
     },
-    // Callback for dialog close
+    // Callback per la chiusura della dialog
     () => {
       console.log("AddWineDialog: Close callback triggered");
+      setSubmissionCompleted(true);
       onOpenChange(false);
     }
   );
 
-  // Monitor isSubmitting for debugging
+  // Monitoriamo isSubmitting e submissionCompleted per debugging
   useEffect(() => {
     console.log("AddWineDialog: isSubmitting changed to:", isSubmitting);
-  }, [isSubmitting]);
+    
+    // Se abbiamo completato la sottomissione e non stiamo più inviando, chiudiamo la dialog
+    if (submissionCompleted && !isSubmitting) {
+      console.log("AddWineDialog: Submission completed, closing dialog");
+      onOpenChange(false);
+      setSubmissionCompleted(false); // Reset per il prossimo utilizzo
+    }
+  }, [isSubmitting, submissionCompleted, onOpenChange]);
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -128,10 +140,10 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
               type="submit"
             >
               {isSubmitting ? (
-                <>
-                  <span className="mr-2">⏳</span>
+                <span className="flex items-center gap-2">
+                  <Loader className="h-4 w-4 animate-spin" />
                   Aggiunta in corso...
-                </>
+                </span>
               ) : (
                 "Aggiungi alla Collezione"
               )}

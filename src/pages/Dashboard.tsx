@@ -60,12 +60,6 @@ const Dashboard = () => {
       console.log("Dashboard: Updated wines list:", updatedWines.length);
       return updatedWines;
     });
-    
-    // Show success toast
-    toast({
-      title: "Successo",
-      description: "Il vino è stato aggiunto alla tua collezione.",
-    });
   }, []);
 
   const handleDialogOpenChange = useCallback((open: boolean) => {
