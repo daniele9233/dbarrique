@@ -1,7 +1,7 @@
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Wine as WineIcon, Star } from 'lucide-react';
-import { Wine } from "@/data/WineData";
+import { Wine } from "@/data/models/Wine";
 
 interface TopWinesTableProps {
   wines: Wine[];

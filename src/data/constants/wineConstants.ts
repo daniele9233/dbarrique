@@ -1,9 +1,6 @@
 
-import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
-import { db } from '../config/firebase';
-
 // Sample wine data with 1-10 rating scale (only red wines)
-const defaultWines = [
+export const defaultWines = [
   {
     id: "1",
     name: "Château Margaux",
@@ -233,101 +230,6 @@ const defaultWines = [
   }
 ];
 
-export interface Wine {
-  id: string;
-  name: string;
-  region: string;
-  winery?: string;
-  year: number;
-  rating: number;
-  type: "red" | "white" | "rosé" | "sparkling";
-  image: string;
-  grape: string;
-  grapes?: string[];
-  body: string;
-  structure: string;
-  tannins: string;
-  sweetness: string;
-  aroma: string;
-}
-
-export let wines: Wine[] = [...defaultWines];
-
-export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
-  try {
-    const winesCollection = collection(db, 'wines');
-    const winesQuery = query(winesCollection, orderBy('name'));
-    const wineSnapshot = await getDocs(winesQuery);
-    
-    if (wineSnapshot.empty) {
-      for (const wine of defaultWines) {
-        await addDoc(collection(db, 'wines'), wine);
-      }
-      return defaultWines;
-    }
-    
-    const wineList = wineSnapshot.docs.map(doc => ({
-      ...doc.data(),
-      id: doc.id
-    })) as Wine[];
-    
-    wines = wineList;
-    
-    return wineList;
-  } catch (error) {
-    console.error('Errore nel caricamento dei vini da Firestore:', error);
-    return defaultWines;
-  }
-};
-
-(async () => {
-  try {
-    const loadedWines = await loadWinesFromFirestore();
-    wines = loadedWines;
-  } catch (error) {
-    console.error('Errore nel caricamento iniziale dei vini:', error);
-  }
-})();
-
-export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
-  try {
-    const docRef = await addDoc(collection(db, 'wines'), wine);
-    const newWine = { ...wine, id: docRef.id };
-    wines.push(newWine);
-    return newWine;
-  } catch (error) {
-    console.error('Errore nell\'aggiunta del vino a Firestore:', error);
-    throw error;
-  }
-};
-
-export const updateWine = async (id: string, updatedWine: Partial<Omit<Wine, 'id'>>): Promise<void> => {
-  try {
-    const wineRef = doc(db, 'wines', id);
-    await updateDoc(wineRef, updatedWine);
-    
-    const index = wines.findIndex(wine => wine.id === id);
-    if (index !== -1) {
-      wines[index] = { ...wines[index], ...updatedWine };
-    }
-  } catch (error) {
-    console.error('Errore nell\'aggiornamento del vino in Firestore:', error);
-    throw error;
-  }
-};
-
-export const deleteWine = async (id: string): Promise<void> => {
-  try {
-    const wineRef = doc(db, 'wines', id);
-    await deleteDoc(wineRef);
-    
-    wines = wines.filter(wine => wine.id !== id);
-  } catch (error) {
-    console.error('Errore nell\'eliminazione del vino da Firestore:', error);
-    throw error;
-  }
-};
-
 export const grapes = [
   "Aglianico",
   "Barbera",
@@ -368,10 +270,6 @@ export const grapes = [
   "Zinfandel",
   "Blend"
 ];
-
-export const years = [...new Set(wines.map(wine => wine.year))].sort((a, b) => b - a);
-
-export const regions = [...new Set(wines.map(wine => wine.region))];
 
 export const bodyOptions = ["Leggero", "Medio", "Corposo"];
 export const structureOptions = ["Elegante", "Equilibrato", "Strutturato"];

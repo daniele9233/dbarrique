@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { loadWinesFromFirestore, wines as globalWines } from '@/data/WineData';
-import { Wine } from '@/data/WineData';
+import { loadWinesFromFirestore, wines as globalWines } from '@/data/services/wineService';
+import { Wine } from '@/data/models/Wine';
 import CollectionHeader from './collection/CollectionHeader';
 import WineGridDisplay from './collection/WineGridDisplay';
 import Pagination from './collection/Pagination';

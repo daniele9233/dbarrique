@@ -1,5 +1,5 @@
 
-import { Wine } from '@/data/WineData';
+import { Wine } from '@/data/models/Wine';
 import WineCard from '@/components/WineCard';
 
 interface WineGridDisplayProps {

@@ -1,5 +1,6 @@
 
-import { wines as originalWines, Wine } from './WineData';
+import { Wine } from './models/Wine';
+import { wines as originalWines } from './services/wineService';
 
 // Genera un colore esadecimale casuale per ogni vitigno
 const getGrapeColor = (grape: string): string => {

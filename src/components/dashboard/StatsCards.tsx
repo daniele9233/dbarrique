@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Grape, Award, Wine as WineIcon } from 'lucide-react';
-import { Wine } from "@/data/WineData";
+import { Wine } from "@/data/models/Wine";
 
 interface StatsCardsProps {
   localWines: Wine[];

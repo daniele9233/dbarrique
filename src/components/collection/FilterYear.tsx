@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { years } from "@/data/WineData";
+import { getYears } from "@/data/services/wineService";
 
 interface FilterYearProps {
   selectedYears: number[];
@@ -12,6 +12,7 @@ interface FilterYearProps {
 
 const FilterYear: React.FC<FilterYearProps> = ({ selectedYears, handleYearToggle }) => {
   const [isYearOpen, setIsYearOpen] = useState(true);
+  const years = getYears();
   
   return (
     <Collapsible open={isYearOpen} onOpenChange={setIsYearOpen}>

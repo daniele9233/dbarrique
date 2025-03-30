@@ -1,7 +1,8 @@
 
 import { useEffect, useState } from 'react';
 import WineCard from '@/components/WineCard';
-import { Wine, loadWinesFromFirestore, wines as globalWines } from '@/data/WineData';
+import { Wine } from '@/data/models/Wine';
+import { loadWinesFromFirestore, wines as globalWines } from '@/data/services/wineService';
 
 interface WineGridProps {
   wines: Wine[];

@@ -1,4 +1,3 @@
-
 import { useState, useRef, ChangeEvent } from 'react';
 import { Star, Plus, Edit, Save, Upload, Grape } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -8,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { grapes, bodyOptions, structureOptions, tanninOptions, sweetnessOptions, aromaOptions, updateWine } from "@/data/WineData";
+import { updateWine } from "@/data/services/wineService";
+import { grapes, bodyOptions, structureOptions, tanninOptions, sweetnessOptions, aromaOptions } from "@/data/constants/wineConstants";
 
 interface WineCardProps {
   id: string;
@@ -93,7 +93,6 @@ const WineCard = ({
 
   const handleSaveChanges = async () => {
     try {
-      // Determine grape value based on selection mode
       const grapeValue = isBlend ? "Blend" : editedWine.grape;
       const grapesArray = isBlend ? editedWine.grapes : editedWine.grape ? [editedWine.grape] : [];
       
@@ -162,7 +161,6 @@ const WineCard = ({
     reader.readAsDataURL(file);
   };
   
-  // Convert 1-10 rating to an array of 10 positions for stars
   const renderRatingStars = (rating: number, editable = false) => {
     return [...Array(10)].map((_, i) => (
       <Star 
@@ -182,12 +180,10 @@ const WineCard = ({
         onMouseLeave={() => setIsHovered(false)}
         onClick={() => setIsDialogOpen(true)}
       >
-        {/* Wine type badge */}
         <div className={`absolute top-4 right-4 z-20 px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wider ${typeColors[type]} ${typeTextColors[type]}`}>
           {type}
         </div>
         
-        {/* Wine image */}
         <div className="absolute inset-0 bg-noir-dark overflow-hidden">
           <div 
             className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110"
@@ -196,7 +192,6 @@ const WineCard = ({
           <div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/70 to-transparent"></div>
         </div>
         
-        {/* Main content */}
         <div className="absolute bottom-0 left-0 w-full p-6 transform transition-transform duration-500 ease-wine-bounce">
           <div className="space-y-3">
             <div className="flex items-center space-x-0.5 flex-wrap">
@@ -215,7 +210,6 @@ const WineCard = ({
                 className="h-10 w-10 rounded-full flex items-center justify-center bg-wine hover:bg-wine-light transition-colors duration-300"
                 onClick={(e) => {
                   e.stopPropagation();
-                  // Add to collection logic would go here
                 }}
               >
                 <Plus className="h-5 w-5" />
@@ -224,7 +218,6 @@ const WineCard = ({
           </div>
         </div>
         
-        {/* Overlay on hover */}
         <div 
           className={`absolute inset-0 bg-wine/10 backdrop-blur-sm transition-opacity duration-300 ${
             isHovered ? 'opacity-100' : 'opacity-0'
@@ -232,7 +225,6 @@ const WineCard = ({
         ></div>
       </div>
 
-      {/* Wine Details Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="bg-noir-light border-white/10 text-white max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -303,9 +295,9 @@ const WineCard = ({
                       onCheckedChange={() => {
                         setIsBlend(!isBlend);
                         if (!isBlend) {
-                          handleEditField('grape', ''); // Clear single grape selection when switching to blend
+                          handleEditField('grape', '');
                         } else {
-                          handleEditField('grapes', []); // Clear blend selections when switching to single
+                          handleEditField('grapes', []);
                         }
                       }}
                       className="border-wine data-[state=checked]:bg-wine data-[state=checked]:border-wine"
