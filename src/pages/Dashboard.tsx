@@ -16,7 +16,6 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAddWineDialogOpen, setIsAddWineDialogOpen] = useState(false);
 
-  // Estraggo fetchWines in uno useCallback per stabilizzarne il riferimento
   const fetchWines = useCallback(async () => {
     try {
       console.log("Dashboard: Loading wines...");
@@ -40,11 +39,9 @@ const Dashboard = () => {
     fetchWines();
   }, [fetchWines]);
 
-  // Utilizzo useCallback per stabilizzare la funzione
   const handleAddWineComplete = useCallback((newWine: Wine) => {
     console.log("Dashboard: Wine added to collection:", newWine);
     
-    // Verifico che il nuovo vino abbia un ID prima di aggiungerlo allo stato locale
     if (!newWine || !newWine.id) {
       console.error("Dashboard: Cannot add wine without ID to local state");
       return;
@@ -68,7 +65,6 @@ const Dashboard = () => {
     setIsAddWineDialogOpen(false);
   }, []);
 
-  // Utilizzo useCallback per stabilizzare la funzione
   const handleDialogOpenChange = useCallback((open: boolean) => {
     console.log("Dashboard: Dialog openChange triggered", open);
     setIsAddWineDialogOpen(open);

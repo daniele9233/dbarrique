@@ -114,10 +114,6 @@ export const useWineFormActions = (
       setIsSubmitting(true);
       console.log("useWineForm: Submitting form...");
       
-      // Cattura i callbacks prima di iniziare l'operazione asincrona
-      // Questo è cruciale per evitare reference stale durante l'operazione asincrona
-      const currentCallbacks = { ...callbacksRef.current };
-      
       // Define default values for optional fields
       const grapeValue = newWine.grape || "Non specificato";
       const grapesArray = newWine.grapes || [];
@@ -145,18 +141,25 @@ export const useWineFormActions = (
         description: "Il nuovo vino è stato aggiunto alla tua collezione.",
       });
       
+      // Gestione sicura dei callback
+      const currentCallbacks = { ...callbacksRef.current };
+      
       // IMPORTANTE: Reset dello stato di invio PRIMA di chiamare i callbacks
       setIsSubmitting(false);
       
-      // Utilizziamo i callbacks catturati all'inizio per evitare stale references
+      // Chiamiamo onComplete solo se abbiamo un vino aggiunto con successo
       if (currentCallbacks.onComplete && addedWine) {
         console.log("useWineForm: Calling onComplete callback with wine:", addedWine);
-        currentCallbacks.onComplete(addedWine);
+        setTimeout(() => {
+          currentCallbacks.onComplete(addedWine);
+        }, 0);
       }
       
       if (currentCallbacks.onClose) {
         console.log("useWineForm: Calling onClose callback");
-        currentCallbacks.onClose();
+        setTimeout(() => {
+          currentCallbacks.onClose();
+        }, 100);
       }
       
     } catch (error) {

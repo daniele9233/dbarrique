@@ -10,11 +10,12 @@ import GrapeSection from './wine-form/GrapeSection';
 import YearRatingSection from './wine-form/YearRatingSection';
 import CharacteristicsSection from './wine-form/CharacteristicsSection';
 import ImageUploadSection from './wine-form/ImageUploadSection';
+import { Wine } from '@/data/models/Wine';
 
 interface AddWineDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onWineAdded?: (wine: any) => void;
+  onWineAdded?: (wine: Wine) => void;
 }
 
 const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onWineAdded }) => {
@@ -34,7 +35,12 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     isDisabled
   } = useWineForm(
     // Passiamo la callback onWineAdded
-    onWineAdded,
+    (wine: Wine) => {
+      console.log("AddWineDialog: onWineAdded callback triggered with wine:", wine);
+      if (onWineAdded) {
+        onWineAdded(wine);
+      }
+    },
     // Forniamo la callback onClose per chiudere il dialog
     () => {
       console.log("AddWineDialog: Close callback triggered");
