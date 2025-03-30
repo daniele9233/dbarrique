@@ -9,20 +9,20 @@ export let wines: Wine[] = [...defaultWines];
 
 export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
   try {
-    console.log("Loading wines from Firestore...");
+    console.log("wineService: Loading wines from Firestore...");
     const winesCollection = collection(db, 'wines');
     const winesQuery = query(winesCollection, orderBy('name'));
     const wineSnapshot = await getDocs(winesQuery);
     
     if (wineSnapshot.empty) {
-      console.log("No wines in Firestore, adding default wines...");
+      console.log("wineService: No wines in Firestore, adding default wines...");
       for (const wine of defaultWines) {
         await addDoc(collection(db, 'wines'), wine);
       }
       return defaultWines;
     }
     
-    console.log(`Found ${wineSnapshot.docs.length} wines in Firestore`);
+    console.log(`wineService: Found ${wineSnapshot.docs.length} wines in Firestore`);
     const wineList = wineSnapshot.docs.map(doc => ({
       ...doc.data(),
       id: doc.id
@@ -32,7 +32,7 @@ export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
     
     return wineList;
   } catch (error) {
-    console.error('Errore nel caricamento dei vini da Firestore:', error);
+    console.error('wineService: Errore nel caricamento dei vini da Firestore:', error);
     return defaultWines;
   }
 };
@@ -42,21 +42,38 @@ export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
   try {
     const loadedWines = await loadWinesFromFirestore();
     wines = loadedWines;
+    console.log("wineService: Initialized with", wines.length, "wines");
   } catch (error) {
-    console.error('Errore nel caricamento iniziale dei vini:', error);
+    console.error('wineService: Errore nel caricamento iniziale dei vini:', error);
   }
 })();
 
 export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
   try {
-    console.log("Adding wine to Firestore:", wine);
-    const docRef = await addDoc(collection(db, 'wines'), wine);
-    const newWine = { ...wine, id: docRef.id };
-    console.log("Wine added with ID:", docRef.id);
+    console.log("wineService: Adding wine to Firestore:", wine);
+    
+    // Ensure all required fields are present
+    if (!wine.name) {
+      throw new Error("Wine name is required");
+    }
+    
+    const wineToAdd = {
+      ...wine,
+      // Set defaults for any missing fields
+      type: wine.type || "red",
+      year: wine.year || new Date().getFullYear(),
+      rating: wine.rating || 5,
+    };
+    
+    const docRef = await addDoc(collection(db, 'wines'), wineToAdd);
+    console.log("wineService: Wine added with ID:", docRef.id);
+    
+    const newWine = { ...wineToAdd, id: docRef.id } as Wine;
     wines.push(newWine);
+    
     return newWine;
   } catch (error) {
-    console.error('Errore nell\'aggiunta del vino a Firestore:', error);
+    console.error('wineService: Errore nell\'aggiunta del vino a Firestore:', error);
     throw error;
   }
 };
@@ -71,7 +88,7 @@ export const updateWine = async (id: string, updatedWine: Partial<Omit<Wine, 'id
       wines[index] = { ...wines[index], ...updatedWine };
     }
   } catch (error) {
-    console.error('Errore nell\'aggiornamento del vino in Firestore:', error);
+    console.error('wineService: Errore nell\'aggiornamento del vino in Firestore:', error);
     throw error;
   }
 };
@@ -83,7 +100,7 @@ export const deleteWine = async (id: string): Promise<void> => {
     
     wines = wines.filter(wine => wine.id !== id);
   } catch (error) {
-    console.error('Errore nell\'eliminazione del vino da Firestore:', error);
+    console.error('wineService: Errore nell\'eliminazione del vino da Firestore:', error);
     throw error;
   }
 };

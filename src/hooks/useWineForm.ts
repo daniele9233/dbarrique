@@ -42,6 +42,7 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const handleChange = (field: string, value: string | number | string[]) => {
+    console.log(`useWineForm: Updating field ${field} to`, value);
     setNewWine({
       ...newWine,
       [field]: value
@@ -94,7 +95,7 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
   };
   
   const validateForm = (): { isValid: boolean; message?: string } => {
-    if (!newWine.name) {
+    if (!newWine.name || newWine.name.trim() === "") {
       return { 
         isValid: false, 
         message: "Il nome del vino è obbligatorio." 
@@ -106,11 +107,12 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
   };
   
   const handleSubmit = async () => {
-    console.log("handleSubmit called with wine data:", newWine);
+    console.log("useWineForm: handleSubmit called with wine data:", newWine);
     
     const validation = validateForm();
     
     if (!validation.isValid) {
+      console.error("useWineForm: Validation failed:", validation.message);
       toast({
         title: "Errore",
         description: validation.message,
@@ -133,9 +135,9 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
         image: newWine.image || "https://images.unsplash.com/photo-1553361371-9fe24fca9c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
       };
       
-      console.log("Adding wine to Firestore:", wineToAdd);
+      console.log("useWineForm: Adding wine to Firestore:", wineToAdd);
       const addedWine = await addWine(wineToAdd);
-      console.log("Wine added to Firestore:", addedWine);
+      console.log("useWineForm: Wine added to Firestore:", addedWine);
       
       // Clear form
       resetForm();
@@ -146,16 +148,16 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
       });
       
       if (onComplete) {
-        console.log("Calling onComplete callback");
+        console.log("useWineForm: Calling onComplete callback");
         onComplete(addedWine);
       }
       
       if (onClose) {
-        console.log("Calling onClose callback");
+        console.log("useWineForm: Calling onClose callback");
         onClose();
       }
     } catch (error) {
-      console.error('Errore nell\'aggiunta del vino:', error);
+      console.error('useWineForm: Errore nell\'aggiunta del vino:', error);
       toast({
         title: "Errore",
         description: "Impossibile aggiungere il vino. Riprova più tardi.",
@@ -173,6 +175,6 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
     handleFileUpload,
     setIsBlend,
     handleSubmit,
-    isDisabled: !newWine.name,
+    isDisabled: !newWine.name || newWine.name.trim() === "",
   };
 };

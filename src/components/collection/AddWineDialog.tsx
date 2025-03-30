@@ -31,21 +31,28 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
   } = useWineForm(
     // On wine added callback
     (wine) => {
-      if (onWineAdded) onWineAdded(wine);
+      console.log("AddWineDialog: onComplete callback triggered with wine:", wine);
+      if (onWineAdded) {
+        console.log("AddWineDialog: Calling parent onWineAdded callback");
+        onWineAdded(wine);
+      }
     },
     // On close callback
-    () => onOpenChange(false)
+    () => {
+      console.log("AddWineDialog: onClose callback triggered");
+      onOpenChange(false);
+    }
   );
 
   // Log for debugging
-  console.log("Wine form state:", { 
+  console.log("AddWineDialog: Wine form state:", { 
     newWine, 
     isDisabled, 
     hasOnWineAdded: !!onWineAdded 
   });
 
   const onSubmitClick = () => {
-    console.log("Submit button clicked");
+    console.log("AddWineDialog: Submit button clicked");
     handleSubmit();
   };
 
@@ -97,6 +104,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
             onClick={onSubmitClick}
             className="bg-wine hover:bg-wine-light"
             disabled={isDisabled}
+            type="button"
           >
             Aggiungi alla Collezione
           </Button>
