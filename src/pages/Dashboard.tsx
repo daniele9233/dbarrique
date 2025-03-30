@@ -54,15 +54,11 @@ const Dashboard = () => {
       console.log("Dashboard: Updated wines list:", updatedWines.length);
       return updatedWines;
     });
-    
-    // Close the dialog
-    setIsAddWineDialogOpen(false);
-    
-    // Show a confirmation toast
-    toast({
-      title: "Vino Aggiunto",
-      description: `${newWine.name} è stato aggiunto alla tua collezione.`
-    });
+  };
+
+  const handleDialogOpenChange = (open: boolean) => {
+    console.log("Dashboard: Dialog openChange triggered", open);
+    setIsAddWineDialogOpen(open);
   };
 
   return (
@@ -84,10 +80,7 @@ const Dashboard = () => {
       
       <AddWineDialog 
         isOpen={isAddWineDialogOpen}
-        onOpenChange={(open) => {
-          console.log("Dashboard: Dialog openChange triggered", open);
-          setIsAddWineDialogOpen(open);
-        }}
+        onOpenChange={handleDialogOpenChange}
         onWineAdded={handleAddWineComplete}
       />
 

@@ -1,5 +1,5 @@
 
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useCallback } from 'react';
 import { WineFormData, WineFormCallbacks } from './types';
 import { useWineFormActions } from './useWineFormActions';
 

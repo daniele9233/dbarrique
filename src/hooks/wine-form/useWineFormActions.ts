@@ -1,5 +1,4 @@
-
-import { Dispatch, SetStateAction, useCallback } from 'react';
+import { Dispatch, SetStateAction, useCallback, useRef } from 'react';
 import { toast } from "@/hooks/use-toast";
 import { addWine } from "@/data/services/wineService";
 import { WineFormData, WineFormCallbacks } from './types';
@@ -13,8 +12,8 @@ export const useWineFormActions = (
   fileInputRef: React.RefObject<HTMLInputElement>,
   callbacks: WineFormCallbacks
 ) => {
-  // Destructure callbacks outside of hooks to ensure consistent order
-  const { onComplete, onClose } = callbacks;
+  const callbacksRef = useRef(callbacks);
+  callbacksRef.current = callbacks;
 
   const handleChange = useCallback((field: string, value: string | number | string[]) => {
     console.log(`useWineForm: Updating field ${field} to`, value);
@@ -140,6 +139,9 @@ export const useWineFormActions = (
         description: "Il nuovo vino è stato aggiunto alla tua collezione.",
       });
       
+      // Important: Get the latest callbacks from the ref
+      const { onComplete, onClose } = callbacksRef.current;
+      
       // Reset submission state now that everything is completed
       setIsSubmitting(false);
       
@@ -164,7 +166,7 @@ export const useWineFormActions = (
       // Make sure to reset submission state even in case of error
       setIsSubmitting(false);
     }
-  }, [newWine, isSubmitting, validateForm, resetForm, setIsSubmitting, onComplete, onClose]);
+  }, [newWine, isSubmitting, validateForm, resetForm, setIsSubmitting]);
 
   return {
     handleChange,
