@@ -78,12 +78,15 @@ export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
     
     console.log("wineService: Prepared wine object for Firestore:", wineToAdd);
     
-    // Aggiungi il vino a Firestore
+    // Aggiungi il vino a Firestore in modo sincrono
     const docRef = await addDoc(collection(db, 'wines'), wineToAdd);
     console.log("wineService: Wine added with ID:", docRef.id);
     
     // Crea l'oggetto vino completo con l'ID
-    const newWine = { ...wineToAdd, id: docRef.id } as Wine;
+    const newWine = { 
+      ...wineToAdd, 
+      id: docRef.id 
+    } as Wine;
     
     // Aggiorna la cache locale
     wines.push(newWine);

@@ -42,6 +42,12 @@ const Dashboard = () => {
   const handleAddWineComplete = (newWine: Wine) => {
     console.log("Dashboard: Wine added to collection:", newWine);
     
+    // Make sure newWine has an id before adding it to the local state
+    if (!newWine || !newWine.id) {
+      console.error("Dashboard: Cannot add wine without ID to local state");
+      return;
+    }
+    
     // Aggiungi il nuovo vino alla lista locale
     setLocalWines(prev => {
       const updatedWines = [...prev, newWine];

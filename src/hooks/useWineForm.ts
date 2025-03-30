@@ -140,6 +140,7 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
       
       const wineToAdd = {
         ...newWine,
+        type: newWine.type || "red", // Ensure type is set
         region: newWine.region || "Non specificata",
         winery: newWine.winery || "Non specificata",
         grape: grapeValue,
@@ -159,11 +160,13 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
         description: "Il nuovo vino è stato aggiunto alla tua collezione.",
       });
       
+      // Always call onComplete with the added wine if provided
       if (onComplete) {
         console.log("useWineForm: Calling onComplete callback with wine:", addedWine);
         onComplete(addedWine);
       }
       
+      // Always close the dialog if onClose is provided
       if (onClose) {
         console.log("useWineForm: Calling onClose callback");
         onClose();

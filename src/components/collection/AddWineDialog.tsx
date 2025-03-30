@@ -52,9 +52,9 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     hasOnWineAdded: !!onWineAdded 
   });
 
-  const onSubmitClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("AddWineDialog: Submit button clicked");
+    console.log("AddWineDialog: Form submitted");
     handleSubmit();
   };
 
@@ -71,10 +71,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={(e) => {
-          e.preventDefault();
-          handleSubmit();
-        }} className="space-y-4 py-4">
+        <form onSubmit={handleFormSubmit} className="space-y-4 py-4">
           <BasicInfoSection wineData={newWine} handleChange={handleChange} />
           
           <GrapeSection 
@@ -106,7 +103,6 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
               Annulla
             </Button>
             <Button
-              onClick={onSubmitClick}
               className="bg-wine hover:bg-wine-light"
               disabled={isDisabled}
               type="submit"
