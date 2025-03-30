@@ -11,7 +11,7 @@ import YearRatingSection from './wine-form/YearRatingSection';
 import CharacteristicsSection from './wine-form/CharacteristicsSection';
 import ImageUploadSection from './wine-form/ImageUploadSection';
 import { Wine } from '@/data/models/Wine';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 interface AddWineDialogProps {
   isOpen: boolean;
@@ -21,9 +21,6 @@ interface AddWineDialogProps {
 
 const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onWineAdded }) => {
   console.log("AddWineDialog: Rendering with props", { isOpen, hasOnWineAdded: !!onWineAdded });
-  
-  // Track if a submission was successful
-  const [wasSubmitted, setWasSubmitted] = useState(false);
   
   const {
     newWine,
@@ -37,38 +34,24 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     handleSubmit,
     isDisabled
   } = useWineForm(
-    // Callback for wine added
+    // Callback for when a wine is added successfully
     (wine: Wine) => {
-      console.log("AddWineDialog: onWineAdded callback triggered with wine:", wine);
-      setWasSubmitted(true);
+      console.log("AddWineDialog: Wine added successfully, triggering callback:", wine);
       if (onWineAdded) {
         onWineAdded(wine);
       }
     },
-    // Close callback
+    // Callback for dialog close
     () => {
       console.log("AddWineDialog: Close callback triggered");
-      setWasSubmitted(true);
       onOpenChange(false);
     }
   );
 
-  console.log("AddWineDialog: Wine form state:", { 
-    newWine, 
-    isDisabled, 
-    isSubmitting,
-    wasSubmitted,
-    hasOnWineAdded: !!onWineAdded 
-  });
-
-  // Effect to handle dialog closure after submission is completed
+  // Monitor isSubmitting for debugging
   useEffect(() => {
-    if (wasSubmitted && !isSubmitting) {
-      console.log("AddWineDialog: Submission completed and not submitting anymore, closing dialog");
-      onOpenChange(false);
-      setWasSubmitted(false);
-    }
-  }, [wasSubmitted, isSubmitting, onOpenChange]);
+    console.log("AddWineDialog: isSubmitting changed to:", isSubmitting);
+  }, [isSubmitting]);
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

@@ -1,4 +1,3 @@
-
 import { Dispatch, SetStateAction, useCallback, useRef } from 'react';
 import { toast } from "@/hooks/use-toast";
 import { addWine } from "@/data/services/wineService";
@@ -13,7 +12,7 @@ export const useWineFormActions = (
   fileInputRef: React.RefObject<HTMLInputElement>,
   callbacks: WineFormCallbacks
 ) => {
-  // Manteniamo una reference ai callbacks per evitare closure stale
+  // Keep a reference to callbacks to avoid stale closures
   const callbacksRef = useRef(callbacks);
   callbacksRef.current = callbacks;
 
@@ -142,30 +141,19 @@ export const useWineFormActions = (
         description: "Il nuovo vino è stato aggiunto alla tua collezione.",
       });
       
-      // CRITICAL: Store callback references and clear state FIRST
-      const onCompleteCallback = callbacksRef.current.onComplete;
-      const onCloseCallback = callbacksRef.current.onClose;
+      // Execute callbacks
+      if (callbacksRef.current.onComplete && addedWine) {
+        console.log("useWineForm: Executing onComplete callback with wine:", addedWine);
+        callbacksRef.current.onComplete(addedWine);
+      }
       
-      // Clear the submission state immediately
+      if (callbacksRef.current.onClose) {
+        console.log("useWineForm: Executing onClose callback");
+        callbacksRef.current.onClose();
+      }
+      
+      // Clear submission state
       setIsSubmitting(false);
-      
-      // Execute callbacks with a small delay to ensure state updates propagate
-      // Using regular setTimeout to avoid window reference issues
-      if (onCompleteCallback && addedWine) {
-        console.log("useWineForm: Scheduling onComplete callback");
-        setTimeout(() => {
-          console.log("useWineForm: Executing onComplete callback with wine:", addedWine);
-          onCompleteCallback(addedWine);
-        }, 10);
-      }
-      
-      if (onCloseCallback) {
-        console.log("useWineForm: Scheduling onClose callback");
-        setTimeout(() => {
-          console.log("useWineForm: Executing onClose callback");
-          onCloseCallback();
-        }, 20);
-      }
       
     } catch (error) {
       console.error('useWineForm: Error adding wine:', error);
@@ -175,7 +163,7 @@ export const useWineFormActions = (
         variant: "destructive"
       });
       
-      // Always reset submission state, even on error
+      // Reset submission state on error
       setIsSubmitting(false);
     }
   }, [newWine, isSubmitting, validateForm, resetForm, setIsSubmitting]);
