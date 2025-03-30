@@ -16,28 +16,28 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAddWineDialogOpen, setIsAddWineDialogOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchWines = async () => {
-      try {
-        console.log("Dashboard: Loading wines...");
-        setIsLoading(true);
-        const winesFromFirestore = await loadWinesFromFirestore();
-        console.log("Dashboard: Wines loaded:", winesFromFirestore.length);
-        setLocalWines(winesFromFirestore);
-      } catch (error) {
-        console.error('Errore nel caricamento dei vini:', error);
-        toast({
-          title: "Errore",
-          description: "Impossibile caricare i vini dal database.",
-          variant: "destructive"
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchWines();
+  const fetchWines = useCallback(async () => {
+    try {
+      console.log("Dashboard: Loading wines...");
+      setIsLoading(true);
+      const winesFromFirestore = await loadWinesFromFirestore();
+      console.log("Dashboard: Wines loaded:", winesFromFirestore.length);
+      setLocalWines(winesFromFirestore);
+    } catch (error) {
+      console.error('Errore nel caricamento dei vini:', error);
+      toast({
+        title: "Errore",
+        description: "Impossibile caricare i vini dal database.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchWines();
+  }, [fetchWines]);
 
   // Use useCallback to stabilize function reference
   const handleAddWineComplete = useCallback((newWine: Wine) => {

@@ -20,7 +20,7 @@ interface AddWineDialogProps {
 const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onWineAdded }) => {
   console.log("AddWineDialog: Rendering with props", { isOpen, hasOnWineAdded: !!onWineAdded });
   
-  // Use the hook with stable callbacks
+  // Use the hook with callback functions
   const {
     newWine,
     isBlend,
@@ -35,7 +35,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
   } = useWineForm(
     // Pass the callback functions directly
     onWineAdded,
-    // Provide the onClose callback that will be called after submission
+    // Provide the onClose callback
     () => {
       console.log("AddWineDialog: Close callback triggered");
       onOpenChange(false);

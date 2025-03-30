@@ -1,3 +1,4 @@
+
 import { Dispatch, SetStateAction, useCallback, useRef } from 'react';
 import { toast } from "@/hooks/use-toast";
 import { addWine } from "@/data/services/wineService";
@@ -108,6 +109,9 @@ export const useWineFormActions = (
       return;
     }
     
+    // Capture callbacks before starting the async operation
+    const currentCallbacks = { ...callbacksRef.current };
+    
     try {
       setIsSubmitting(true);
       console.log("useWineForm: Submitting form...");
@@ -139,23 +143,20 @@ export const useWineFormActions = (
         description: "Il nuovo vino è stato aggiunto alla tua collezione.",
       });
       
-      // Important: Get the latest callbacks from the ref to avoid stale closures
-      const { onComplete, onClose } = callbacksRef.current;
-      
-      // Reset submission state before calling callbacks
+      // Reset submission state BEFORE calling callbacks
       setIsSubmitting(false);
       
-      // Call onComplete callback if provided (with the added wine)
-      if (onComplete && addedWine) {
+      // IMPORTANT: Use the captured callbacks to avoid potential stale references
+      if (currentCallbacks.onComplete && addedWine) {
         console.log("useWineForm: Calling onComplete callback with wine:", addedWine);
-        onComplete(addedWine);
+        currentCallbacks.onComplete(addedWine);
       }
       
-      // Call onClose callback if provided (to close the dialog)
-      if (onClose) {
+      if (currentCallbacks.onClose) {
         console.log("useWineForm: Calling onClose callback");
-        onClose();
+        currentCallbacks.onClose();
       }
+      
     } catch (error) {
       console.error('useWineForm: Error adding wine:', error);
       toast({
