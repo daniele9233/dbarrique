@@ -34,7 +34,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     handleSubmit,
     isDisabled
   } = useWineForm(
-    // Callback wrapper per wine added
+    // Callback per wine added
     (wine: Wine) => {
       console.log("AddWineDialog: onWineAdded callback triggered with wine:", wine);
       if (onWineAdded) {
@@ -55,7 +55,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     hasOnWineAdded: !!onWineAdded 
   });
 
-  // Effect per forzare la chiusura del dialog se isSubmitting passa da true a false
+  // Effect per monitorare quando isSubmitting diventa false dopo essere stato true
   useEffect(() => {
     if (!isSubmitting && isOpen) {
       console.log("AddWineDialog: Submission completed, dialog can be closed");

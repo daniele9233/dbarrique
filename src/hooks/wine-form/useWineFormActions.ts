@@ -146,22 +146,22 @@ export const useWineFormActions = (
       const onComplete = callbacksRef.current.onComplete;
       const onClose = callbacksRef.current.onClose;
       
-      // Resettiamo lo stato di invio
+      // IMPORTANTE: Prima resettiamo lo stato di invio
       setIsSubmitting(false);
       
-      // Chiamiamo onComplete e onClose con un leggero ritardo per evitare problemi
+      // Poi chiamiamo i callback in modo asincrono
       if (onComplete && addedWine) {
         console.log("useWineForm: Calling onComplete callback with wine:", addedWine);
-        window.setTimeout(() => {
+        setTimeout(() => {
           onComplete(addedWine);
-        }, 100);
+        }, 50);
       }
       
       if (onClose) {
         console.log("useWineForm: Calling onClose callback");
-        window.setTimeout(() => {
+        setTimeout(() => {
           onClose();
-        }, 200);
+        }, 100);
       }
       
     } catch (error) {
