@@ -56,6 +56,7 @@ export const useWineFormActions = (
   }, [handleChange]);
   
   const resetForm = useCallback(() => {
+    console.log("useWineForm: Resetting form");
     setNewWine({
       name: "",
       region: "",
@@ -116,7 +117,7 @@ export const useWineFormActions = (
       
       // Define default values for optional fields
       const grapeValue = newWine.grape || "Non specificato";
-      const grapesArray = newWine.grapes || [];
+      const grapesArray = newWine.grapes.length > 0 ? newWine.grapes : [];
       
       const wineToAdd = {
         ...newWine,
@@ -141,27 +142,26 @@ export const useWineFormActions = (
         description: "Il nuovo vino è stato aggiunto alla tua collezione.",
       });
       
-      // Creiamo una copia delle callback per evitare riferimenti circolari
-      const onCompleteCallback = callbacksRef.current.onComplete;
-      const onCloseCallback = callbacksRef.current.onClose;
+      // Salviamo i callback in variabili locali prima di resettare isSubmitting
+      const onComplete = callbacksRef.current.onComplete;
+      const onClose = callbacksRef.current.onClose;
       
       // Resettiamo lo stato di invio
       setIsSubmitting(false);
       
-      // Chiamiamo onComplete in modo asincrono per evitare loop
-      if (onCompleteCallback && addedWine) {
+      // Chiamiamo onComplete e onClose con un leggero ritardo per evitare problemi
+      if (onComplete && addedWine) {
         console.log("useWineForm: Calling onComplete callback with wine:", addedWine);
-        setTimeout(() => {
-          onCompleteCallback(addedWine);
-        }, 50);
+        window.setTimeout(() => {
+          onComplete(addedWine);
+        }, 100);
       }
       
-      // Chiamiamo onClose in modo asincrono per garantire che il dialogo si chiuda
-      if (onCloseCallback) {
+      if (onClose) {
         console.log("useWineForm: Calling onClose callback");
-        setTimeout(() => {
-          onCloseCallback();
-        }, 100);
+        window.setTimeout(() => {
+          onClose();
+        }, 200);
       }
       
     } catch (error) {

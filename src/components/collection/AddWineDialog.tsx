@@ -11,6 +11,7 @@ import YearRatingSection from './wine-form/YearRatingSection';
 import CharacteristicsSection from './wine-form/CharacteristicsSection';
 import ImageUploadSection from './wine-form/ImageUploadSection';
 import { Wine } from '@/data/models/Wine';
+import { useEffect } from 'react';
 
 interface AddWineDialogProps {
   isOpen: boolean;
@@ -33,7 +34,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     handleSubmit,
     isDisabled
   } = useWineForm(
-    // Callback wrapper for wine added
+    // Callback wrapper per wine added
     (wine: Wine) => {
       console.log("AddWineDialog: onWineAdded callback triggered with wine:", wine);
       if (onWineAdded) {
@@ -53,6 +54,13 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     isSubmitting,
     hasOnWineAdded: !!onWineAdded 
   });
+
+  // Effect per forzare la chiusura del dialog se isSubmitting passa da true a false
+  useEffect(() => {
+    if (!isSubmitting && isOpen) {
+      console.log("AddWineDialog: Submission completed, dialog can be closed");
+    }
+  }, [isSubmitting, isOpen]);
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -125,7 +133,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
             </Button>
             <Button
               className="bg-wine hover:bg-wine-light"
-              disabled={isDisabled}
+              disabled={isDisabled || isSubmitting}
               type="submit"
             >
               {isSubmitting ? (

@@ -89,7 +89,8 @@ export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
     console.log("wineService: Prepared wine object for Firestore:", wineToAdd);
     
     // Add wine to Firestore
-    const docRef = await addDoc(collection(db, 'wines'), wineToAdd);
+    const winesCollection = collection(db, 'wines');
+    const docRef = await addDoc(winesCollection, wineToAdd);
     console.log("wineService: Wine added with ID:", docRef.id);
     
     // Create complete wine object with ID

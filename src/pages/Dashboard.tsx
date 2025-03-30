@@ -61,8 +61,15 @@ const Dashboard = () => {
       return updatedWines;
     });
     
-    // Chiudo il dialog dopo l'aggiunta del vino
-    setIsAddWineDialogOpen(false);
+    // Assicuriamoci che il dialog si chiuda correttamente
+    window.setTimeout(() => {
+      setIsAddWineDialogOpen(false);
+    }, 300);
+    
+    toast({
+      title: "Successo",
+      description: "Il vino è stato aggiunto alla tua collezione.",
+    });
   }, []);
 
   const handleDialogOpenChange = useCallback((open: boolean) => {
