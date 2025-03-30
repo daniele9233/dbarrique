@@ -20,7 +20,7 @@ interface AddWineDialogProps {
 const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onWineAdded }) => {
   console.log("AddWineDialog: Rendering with props", { isOpen, hasOnWineAdded: !!onWineAdded });
   
-  // Use the hook with callback functions
+  // Utilizziamo useWineForm passando direttamente le callback
   const {
     newWine,
     isBlend,
@@ -33,16 +33,16 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     handleSubmit,
     isDisabled
   } = useWineForm(
-    // Pass the callback functions directly
+    // Passiamo la callback onWineAdded
     onWineAdded,
-    // Provide the onClose callback
+    // Forniamo la callback onClose per chiudere il dialog
     () => {
       console.log("AddWineDialog: Close callback triggered");
       onOpenChange(false);
     }
   );
 
-  // Log for debugging
+  // Debug log
   console.log("AddWineDialog: Wine form state:", { 
     newWine, 
     isDisabled, 
@@ -56,7 +56,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     handleSubmit();
   };
 
-  // Create a function to handle the cancel button click
+  // Funzione per gestire l'annullamento
   const handleCancel = () => {
     console.log("AddWineDialog: Cancel button clicked");
     if (!isSubmitting) {
@@ -69,7 +69,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
       open={isOpen} 
       onOpenChange={(open) => {
         console.log("AddWineDialog: Dialog onOpenChange triggered", { open, isSubmitting });
-        // Prevent closing the dialog while submitting
+        // Impedisce la chiusura del dialog durante l'invio
         if (isSubmitting && !open) {
           console.log("AddWineDialog: Preventing dialog close during submission");
           return;
@@ -77,7 +77,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
         onOpenChange(open);
       }}
     >
-      <DialogContent className="bg-noir-light border-white/10 text-white">
+      <DialogContent className="bg-noir-light border-white/10 text-white max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-serif text-2xl flex items-center gap-2">
             <Grape className="h-6 w-6 text-wine" />
@@ -127,7 +127,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
             >
               {isSubmitting ? (
                 <>
-                  <span className="animate-spin mr-2">⏳</span>
+                  <span className="mr-2">⏳</span>
                   Aggiunta in corso...
                 </>
               ) : (

@@ -13,6 +13,7 @@ export const useWineFormActions = (
   fileInputRef: React.RefObject<HTMLInputElement>,
   callbacks: WineFormCallbacks
 ) => {
+  // Manteniamo una reference ai callbacks per evitare closure stale
   const callbacksRef = useRef(callbacks);
   callbacksRef.current = callbacks;
 
@@ -109,12 +110,13 @@ export const useWineFormActions = (
       return;
     }
     
-    // Capture callbacks before starting the async operation
-    const currentCallbacks = { ...callbacksRef.current };
-    
     try {
       setIsSubmitting(true);
       console.log("useWineForm: Submitting form...");
+      
+      // Cattura i callbacks prima di iniziare l'operazione asincrona
+      // Questo è cruciale per evitare reference stale durante l'operazione asincrona
+      const currentCallbacks = { ...callbacksRef.current };
       
       // Define default values for optional fields
       const grapeValue = newWine.grape || "Non specificato";
@@ -143,10 +145,10 @@ export const useWineFormActions = (
         description: "Il nuovo vino è stato aggiunto alla tua collezione.",
       });
       
-      // Reset submission state BEFORE calling callbacks
+      // IMPORTANTE: Reset dello stato di invio PRIMA di chiamare i callbacks
       setIsSubmitting(false);
       
-      // IMPORTANT: Use the captured callbacks to avoid potential stale references
+      // Utilizziamo i callbacks catturati all'inizio per evitare stale references
       if (currentCallbacks.onComplete && addedWine) {
         console.log("useWineForm: Calling onComplete callback with wine:", addedWine);
         currentCallbacks.onComplete(addedWine);
