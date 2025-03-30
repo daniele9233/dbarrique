@@ -118,7 +118,7 @@ export const useWineFormActions = (
       
       const wineToAdd = {
         ...newWine,
-        type: newWine.type || "red", // Ensure type is set
+        type: newWine.type || "red",
         region: newWine.region || "Non specificata",
         winery: newWine.winery || "Non specificata",
         grape: grapeValue,
@@ -139,19 +139,19 @@ export const useWineFormActions = (
         description: "Il nuovo vino è stato aggiunto alla tua collezione.",
       });
       
-      // Important: Get the latest callbacks from the ref
+      // Important: Get the latest callbacks from the ref to avoid stale closures
       const { onComplete, onClose } = callbacksRef.current;
       
-      // Reset submission state now that everything is completed
+      // Reset submission state before calling callbacks
       setIsSubmitting(false);
       
-      // Call callbacks AFTER resetting state to avoid state updates on unmounted components
+      // Call onComplete callback if provided (with the added wine)
       if (onComplete && addedWine) {
         console.log("useWineForm: Calling onComplete callback with wine:", addedWine);
         onComplete(addedWine);
       }
       
-      // Call onClose callback if provided
+      // Call onClose callback if provided (to close the dialog)
       if (onClose) {
         console.log("useWineForm: Calling onClose callback");
         onClose();

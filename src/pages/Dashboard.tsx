@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { toast } from "@/hooks/use-toast";
@@ -39,7 +39,8 @@ const Dashboard = () => {
     fetchWines();
   }, []);
 
-  const handleAddWineComplete = (newWine: Wine) => {
+  // Use useCallback to stabilize function reference
+  const handleAddWineComplete = useCallback((newWine: Wine) => {
     console.log("Dashboard: Wine added to collection:", newWine);
     
     // Make sure newWine has an id before adding it to the local state
@@ -54,12 +55,13 @@ const Dashboard = () => {
       console.log("Dashboard: Updated wines list:", updatedWines.length);
       return updatedWines;
     });
-  };
+  }, []);
 
-  const handleDialogOpenChange = (open: boolean) => {
+  // Use useCallback to stabilize function reference
+  const handleDialogOpenChange = useCallback((open: boolean) => {
     console.log("Dashboard: Dialog openChange triggered", open);
     setIsAddWineDialogOpen(open);
-  };
+  }, []);
 
   return (
     <div className="min-h-screen bg-noir text-white">
