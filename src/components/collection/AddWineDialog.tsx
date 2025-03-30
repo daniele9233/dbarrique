@@ -49,6 +49,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
   console.log("AddWineDialog: Wine form state:", { 
     newWine, 
     isDisabled, 
+    isSubmitting,
     hasOnWineAdded: !!onWineAdded 
   });
 
@@ -59,7 +60,13 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      // Prevent closing the dialog while submitting
+      if (isSubmitting && !open) {
+        return;
+      }
+      onOpenChange(open);
+    }}>
       <DialogContent className="bg-noir-light border-white/10 text-white">
         <DialogHeader>
           <DialogTitle className="font-serif text-2xl flex items-center gap-2">
@@ -96,9 +103,10 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
           <div className="flex justify-end gap-4 mt-4">
             <Button
               variant="outline"
-              onClick={() => onOpenChange(false)}
+              onClick={() => !isSubmitting && onOpenChange(false)}
               className="border-white/10 hover:bg-noir hover:text-white"
               type="button"
+              disabled={isSubmitting}
             >
               Annulla
             </Button>

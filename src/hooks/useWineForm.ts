@@ -152,21 +152,22 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
       const addedWine = await addWine(wineToAdd);
       console.log("useWineForm: Wine added to Firestore:", addedWine);
       
-      // Clear form
+      // Reset form
       resetForm();
       
+      // First call onComplete with the added wine if provided
+      if (onComplete && addedWine) {
+        console.log("useWineForm: Calling onComplete callback with wine:", addedWine);
+        onComplete(addedWine);
+      }
+      
+      // Show success message
       toast({
         title: "Successo",
         description: "Il nuovo vino è stato aggiunto alla tua collezione.",
       });
       
-      // Always call onComplete with the added wine if provided
-      if (onComplete) {
-        console.log("useWineForm: Calling onComplete callback with wine:", addedWine);
-        onComplete(addedWine);
-      }
-      
-      // Always close the dialog if onClose is provided
+      // Then close the dialog if onClose is provided
       if (onClose) {
         console.log("useWineForm: Calling onClose callback");
         onClose();
@@ -179,6 +180,7 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
         variant: "destructive"
       });
     } finally {
+      // Always reset submit state regardless of success or failure
       setIsSubmitting(false);
     }
   };
