@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import WineCard from '@/components/WineCard';
 import { Wine } from '@/data/models/Wine';
@@ -11,30 +12,31 @@ interface WineGridProps {
 const WineGrid: React.FC<WineGridProps> = ({ wines, resetAllFilters }) => {
   const [isLoading, setIsLoading] = useState(wines.length === 0 && globalWines.length === 0);
   const [localWines, setLocalWines] = useState<Wine[]>(
+    // Usa i vini in cache se disponibili
     wines.length > 0 ? wines : globalWines.length > 0 ? globalWines : []
   );
   
   useEffect(() => {
-    // If we have wines from props, use those
+    // Se abbiamo vini dai props, usiamo quelli
     if (wines.length > 0) {
       setLocalWines(wines);
       setIsLoading(false);
       return;
     }
 
-    // If we have cached wines, show them immediately
+    // Se abbiamo vini nella cache, li mostriamo subito
     if (globalWines.length > 0) {
       setLocalWines(globalWines);
       setIsLoading(false);
       
-      // Update in background
+      // Aggiorniamo in background
       loadWinesFromFirestore(false).then(freshWines => {
         setLocalWines(freshWines);
       }).catch(console.error);
       return;
     }
 
-    // Otherwise do a regular fetch
+    // Altrimenti facciamo il caricamento normale
     setIsLoading(true);
     loadWinesFromFirestore()
       .then(winesFromFirestore => {
@@ -49,7 +51,7 @@ const WineGrid: React.FC<WineGridProps> = ({ wines, resetAllFilters }) => {
   
   const displayWines = wines.length > 0 ? wines : localWines;
   
-  // Show spinner only if we genuinely have no wines to display
+  // Mostra spinner solo se non abbiamo vini da visualizzare
   if (isLoading && displayWines.length === 0) {
     return (
       <div className="flex justify-center items-center py-12">

@@ -6,7 +6,7 @@ import { defaultWines } from '../constants/wineConstants';
 // In-memory wine data with a timestamp for cache invalidation
 export let wines: Wine[] = [...defaultWines];
 let lastFetchTime = 0;
-const CACHE_VALIDITY_MS = 60000; // 1 minute cache validity
+const CACHE_VALIDITY_MS = 30000; // 30 secondi di validità della cache (ridotto per testing)
 
 export const loadWinesFromFirestore = async (forceRefresh = false): Promise<Wine[]> => {
   try {
@@ -64,7 +64,7 @@ export const loadWinesFromFirestore = async (forceRefresh = false): Promise<Wine
   }
 };
 
-// Initialize wines on import - but don't wait for the promise to resolve
+// Initialize wines on import - ma non aspettiamo che la promise si risolva
 loadWinesFromFirestore()
   .then(loadedWines => {
     wines = loadedWines;
@@ -116,7 +116,7 @@ export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
     } as Wine;
     
     // Update local cache
-    wines.push(newWine);
+    wines = [...wines, newWine];
     
     return newWine;
   } catch (error) {

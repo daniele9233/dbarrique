@@ -4,7 +4,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { toast } from "@/hooks/use-toast";
 import AddWineDialog from "@/components/collection/AddWineDialog";
-import { loadWinesFromFirestore } from "@/data/services/wineService";
+import { loadWinesFromFirestore, wines as cachedWines } from "@/data/services/wineService";
 import { Wine } from "@/data/models/Wine";
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import StatsCards from '@/components/dashboard/StatsCards';
@@ -12,12 +12,25 @@ import TopWinesTable from '@/components/dashboard/TopWinesTable';
 import LoadingSpinner from '@/components/dashboard/LoadingSpinner';
 
 const Dashboard = () => {
-  const [localWines, setLocalWines] = useState<Wine[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [localWines, setLocalWines] = useState<Wine[]>(cachedWines);
+  const [isLoading, setIsLoading] = useState(cachedWines.length === 0);
   const [isAddWineDialogOpen, setIsAddWineDialogOpen] = useState(false);
 
   const fetchWines = useCallback(async () => {
     try {
+      // Se abbiamo vini nella cache, li mostriamo subito
+      if (cachedWines.length > 0) {
+        setLocalWines(cachedWines);
+        
+        // Poi aggiorniamo in background
+        loadWinesFromFirestore(false).then(freshWines => {
+          setLocalWines(freshWines);
+          setIsLoading(false);
+        }).catch(console.error);
+        return;
+      }
+      
+      // Altrimenti facciamo il caricamento normale
       console.log("Dashboard: Loading wines...");
       setIsLoading(true);
       const winesFromFirestore = await loadWinesFromFirestore();
@@ -61,7 +74,7 @@ const Dashboard = () => {
       return updatedWines;
     });
     
-    // Ensure dialog is closed after adding wine
+    // Chiude esplicitamente il dialog dopo l'aggiunta del vino
     setIsAddWineDialogOpen(false);
   }, []);
 
@@ -77,7 +90,7 @@ const Dashboard = () => {
       <div className="pt-24 pb-16 px-4 md:px-8 max-w-7xl mx-auto">
         <DashboardHeader onAddWine={() => setIsAddWineDialogOpen(true)} />
         
-        {isLoading ? (
+        {isLoading && localWines.length === 0 ? (
           <LoadingSpinner />
         ) : (
           <>
