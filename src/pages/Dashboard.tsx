@@ -20,6 +20,7 @@ const Dashboard = () => {
     const fetchWines = async () => {
       try {
         console.log("Dashboard: Loading wines...");
+        setIsLoading(true);
         const winesFromFirestore = await loadWinesFromFirestore();
         console.log("Dashboard: Wines loaded:", winesFromFirestore.length);
         setLocalWines(winesFromFirestore);

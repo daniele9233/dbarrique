@@ -93,6 +93,9 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
       aroma: "Fruttato"
     });
     setIsBlend(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
   
   const validateForm = (): { isValid: boolean; message?: string } => {
