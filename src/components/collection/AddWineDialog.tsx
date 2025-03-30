@@ -82,7 +82,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
             Annulla
           </Button>
           <Button
-            onClick={handleSubmit}
+            onClick={() => handleSubmit()}
             className="bg-wine hover:bg-wine-light"
             disabled={isDisabled}
           >

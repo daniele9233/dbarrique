@@ -101,7 +101,7 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
       };
     }
     
-    // Rimuovere le validazioni per grape e grapes, non sono più obbligatori
+    // Il vitigno non è più obbligatorio
     return { isValid: true };
   };
   
@@ -169,7 +169,6 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
     handleFileUpload,
     setIsBlend,
     handleSubmit,
-    // Modifica qui: ora il bottone è disabilitato solo se il nome del vino non è specificato
     isDisabled: !newWine.name,
   };
 };
