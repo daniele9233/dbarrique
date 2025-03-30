@@ -11,7 +11,7 @@ import YearRatingSection from './wine-form/YearRatingSection';
 import CharacteristicsSection from './wine-form/CharacteristicsSection';
 import ImageUploadSection from './wine-form/ImageUploadSection';
 import { Wine } from '@/data/models/Wine';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 interface AddWineDialogProps {
   isOpen: boolean;
@@ -21,9 +21,6 @@ interface AddWineDialogProps {
 
 const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onWineAdded }) => {
   console.log("AddWineDialog: Rendering with props", { isOpen, hasOnWineAdded: !!onWineAdded });
-  
-  // Aggiungiamo uno stato locale per gestire meglio il processo di invio
-  const [submissionCompleted, setSubmissionCompleted] = useState(false);
   
   const {
     newWine,
@@ -37,33 +34,26 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     handleSubmit,
     isDisabled
   } = useWineForm(
-    // Callback per quando un vino viene aggiunto con successo
+    // Callback for when a wine is added successfully
     (wine: Wine) => {
       console.log("AddWineDialog: Wine added successfully, triggering callback:", wine);
-      setSubmissionCompleted(true);
       if (onWineAdded) {
         onWineAdded(wine);
       }
+      // Close the dialog after wine is added successfully
+      onOpenChange(false);
     },
-    // Callback per la chiusura della dialog
+    // Callback for the dialog close
     () => {
       console.log("AddWineDialog: Close callback triggered");
-      setSubmissionCompleted(true);
       onOpenChange(false);
     }
   );
 
-  // Monitoriamo isSubmitting e submissionCompleted per debugging
+  // Log changes to isSubmitting for debugging
   useEffect(() => {
     console.log("AddWineDialog: isSubmitting changed to:", isSubmitting);
-    
-    // Se abbiamo completato la sottomissione e non stiamo più inviando, chiudiamo la dialog
-    if (submissionCompleted && !isSubmitting) {
-      console.log("AddWineDialog: Submission completed, closing dialog");
-      onOpenChange(false);
-      setSubmissionCompleted(false); // Reset per il prossimo utilizzo
-    }
-  }, [isSubmitting, submissionCompleted, onOpenChange]);
+  }, [isSubmitting]);
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

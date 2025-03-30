@@ -60,6 +60,9 @@ const Dashboard = () => {
       console.log("Dashboard: Updated wines list:", updatedWines.length);
       return updatedWines;
     });
+    
+    // Ensure dialog is closed after adding wine
+    setIsAddWineDialogOpen(false);
   }, []);
 
   const handleDialogOpenChange = useCallback((open: boolean) => {
