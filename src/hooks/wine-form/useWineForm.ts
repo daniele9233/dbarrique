@@ -26,7 +26,6 @@ export const useWineForm = (onCompleteCallback?: (wine: any) => void, onCloseCal
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Create a stable callbacks object that won't change between renders
-  // using useMemo to prevent unnecessary re-renders
   const callbacks = useMemo<WineFormCallbacks>(() => ({
     onComplete: onCompleteCallback,
     onClose: onCloseCallback

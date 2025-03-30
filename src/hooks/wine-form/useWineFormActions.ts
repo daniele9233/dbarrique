@@ -13,7 +13,7 @@ export const useWineFormActions = (
   fileInputRef: React.RefObject<HTMLInputElement>,
   callbacks: WineFormCallbacks
 ) => {
-  // Destructure callbacks outside of any hooks to maintain hook order consistency
+  // Destructure callbacks outside of hooks to ensure consistent order
   const { onComplete, onClose } = callbacks;
 
   const handleChange = useCallback((field: string, value: string | number | string[]) => {
@@ -164,7 +164,7 @@ export const useWineFormActions = (
       // Make sure to reset submission state even in case of error
       setIsSubmitting(false);
     }
-  }, [newWine, isSubmitting, validateForm, resetForm, onComplete, onClose, setIsSubmitting]);
+  }, [newWine, isSubmitting, validateForm, resetForm, setIsSubmitting, onComplete, onClose]);
 
   return {
     handleChange,
