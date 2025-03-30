@@ -1,14 +1,22 @@
-
 import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { Wine } from '../models/Wine';
 import { defaultWines } from '../constants/wineConstants';
 
-// In-memory wine data
+// In-memory wine data with a timestamp for cache invalidation
 export let wines: Wine[] = [...defaultWines];
+let lastFetchTime = 0;
+const CACHE_VALIDITY_MS = 60000; // 1 minute cache validity
 
-export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
+export const loadWinesFromFirestore = async (forceRefresh = false): Promise<Wine[]> => {
   try {
+    const now = Date.now();
+    // Use cached wines if available and not expired
+    if (wines.length > 0 && !forceRefresh && now - lastFetchTime < CACHE_VALIDITY_MS) {
+      console.log("wineService: Using cached wines, count:", wines.length);
+      return wines;
+    }
+
     console.log("wineService: Loading wines from Firestore...");
     const winesCollection = collection(db, 'wines');
     const winesQuery = query(winesCollection, orderBy('name'));
@@ -23,6 +31,7 @@ export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
       }));
       
       wines = winesWithIds;
+      lastFetchTime = now;
       return winesWithIds;
     }
     
@@ -33,11 +42,18 @@ export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
     })) as Wine[];
     
     wines = wineList;
+    lastFetchTime = now;
     
     return wineList;
   } catch (error) {
     console.error('wineService: Errore nel caricamento dei vini da Firestore:', error);
-    // Return default wines with fake IDs in case of error
+    // Return cached wines in case of error if available
+    if (wines.length > 0) {
+      console.log("wineService: Returning cached wines due to error");
+      return wines;
+    }
+    
+    // Otherwise fall back to default wines
     const fallbackWines = defaultWines.map((wine, index) => ({
       ...wine,
       id: `default-${index}`
@@ -48,7 +64,7 @@ export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
   }
 };
 
-// Initialize wines on import
+// Initialize wines on import - but don't wait for the promise to resolve
 loadWinesFromFirestore()
   .then(loadedWines => {
     wines = loadedWines;

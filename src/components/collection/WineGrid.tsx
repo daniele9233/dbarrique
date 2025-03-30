@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import WineCard from '@/components/WineCard';
 import { Wine } from '@/data/models/Wine';
@@ -10,33 +9,47 @@ interface WineGridProps {
 }
 
 const WineGrid: React.FC<WineGridProps> = ({ wines, resetAllFilters }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [localWines, setLocalWines] = useState<Wine[]>(globalWines);
+  const [isLoading, setIsLoading] = useState(wines.length === 0 && globalWines.length === 0);
+  const [localWines, setLocalWines] = useState<Wine[]>(
+    wines.length > 0 ? wines : globalWines.length > 0 ? globalWines : []
+  );
   
   useEffect(() => {
-    // Se abbiamo già i vini globali, non carichiamo di nuovo
-    if (globalWines.length > 0) {
-      setLocalWines(globalWines);
+    // If we have wines from props, use those
+    if (wines.length > 0) {
+      setLocalWines(wines);
+      setIsLoading(false);
       return;
     }
 
-    setIsLoading(true);
-    const fetchWines = async () => {
-      try {
-        const winesFromFirestore = await loadWinesFromFirestore();
-        setLocalWines(winesFromFirestore);
-      } catch (error) {
-        console.error('Errore nel caricamento dei vini:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    // If we have cached wines, show them immediately
+    if (globalWines.length > 0) {
+      setLocalWines(globalWines);
+      setIsLoading(false);
+      
+      // Update in background
+      loadWinesFromFirestore(false).then(freshWines => {
+        setLocalWines(freshWines);
+      }).catch(console.error);
+      return;
+    }
 
-    fetchWines();
-  }, []);
+    // Otherwise do a regular fetch
+    setIsLoading(true);
+    loadWinesFromFirestore()
+      .then(winesFromFirestore => {
+        setLocalWines(winesFromFirestore);
+        setIsLoading(false);
+      })
+      .catch(error => {
+        console.error('Errore nel caricamento dei vini:', error);
+        setIsLoading(false);
+      });
+  }, [wines]);
   
-  const displayWines = wines.length > 0 || !isLoading ? wines : localWines;
+  const displayWines = wines.length > 0 ? wines : localWines;
   
+  // Show spinner only if we genuinely have no wines to display
   if (isLoading && displayWines.length === 0) {
     return (
       <div className="flex justify-center items-center py-12">

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { loadWinesFromFirestore, wines as globalWines } from '@/data/services/wineService';
 import { Wine } from '@/data/models/Wine';
@@ -9,12 +8,12 @@ import CollectionLoading from './collection/CollectionLoading';
 
 const WineCollection = ({ limit }: { limit?: number }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [wines, setWines] = useState<Wine[]>(globalWines);
+  const [wines, setWines] = useState<Wine[]>(globalWines.length > 0 ? globalWines : []);
   const [isLoading, setIsLoading] = useState(globalWines.length === 0);
   
   useEffect(() => {
-    // Se abbiamo già i vini globali, non carichiamo di nuovo
-    if (globalWines.length > 0) {
+    // Skip loading if we already have wines and we're showing a limited collection
+    if (limit && globalWines.length > 0) {
       setWines(globalWines);
       setIsLoading(false);
       return;
@@ -22,17 +21,28 @@ const WineCollection = ({ limit }: { limit?: number }) => {
 
     const fetchWines = async () => {
       try {
-        const winesFromFirestore = await loadWinesFromFirestore();
-        setWines(winesFromFirestore);
+        // If we already have cached wines, show them immediately
+        if (globalWines.length > 0) {
+          setWines(globalWines);
+          setIsLoading(false);
+          
+          // Then update in the background
+          const freshWines = await loadWinesFromFirestore(false);
+          setWines(freshWines);
+        } else {
+          // Otherwise wait for the fetch
+          const winesFromFirestore = await loadWinesFromFirestore();
+          setWines(winesFromFirestore);
+          setIsLoading(false);
+        }
       } catch (error) {
         console.error('Errore nel caricamento dei vini:', error);
-      } finally {
         setIsLoading(false);
       }
     };
 
     fetchWines();
-  }, []);
+  }, [limit]);
   
   const displayWines = limit ? wines.slice(0, limit) : wines;
   
@@ -44,7 +54,8 @@ const WineCollection = ({ limit }: { limit?: number }) => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + wines.length) % wines.length);
   };
   
-  if (isLoading) {
+  // Show loading state only if we have no wines to display
+  if (isLoading && wines.length === 0) {
     return (
       <CollectionLoading 
         title="The Collection" 
