@@ -38,7 +38,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
         onWineAdded(wine);
       }
     },
-    // On close callback
+    // On close callback - explicitly close the dialog
     () => {
       console.log("AddWineDialog: onClose callback triggered");
       onOpenChange(false);
@@ -60,13 +60,18 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-      // Prevent closing the dialog while submitting
-      if (isSubmitting && !open) {
-        return;
-      }
-      onOpenChange(open);
-    }}>
+    <Dialog 
+      open={isOpen} 
+      onOpenChange={(open) => {
+        console.log("AddWineDialog: Dialog onOpenChange triggered", { open, isSubmitting });
+        // Prevent closing the dialog while submitting
+        if (isSubmitting && !open) {
+          console.log("AddWineDialog: Preventing dialog close during submission");
+          return;
+        }
+        onOpenChange(open);
+      }}
+    >
       <DialogContent className="bg-noir-light border-white/10 text-white">
         <DialogHeader>
           <DialogTitle className="font-serif text-2xl flex items-center gap-2">

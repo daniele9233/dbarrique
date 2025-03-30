@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -48,17 +47,17 @@ const Dashboard = () => {
       return;
     }
     
-    // Aggiungi il nuovo vino alla lista locale
+    // Add the new wine to the local list
     setLocalWines(prev => {
       const updatedWines = [...prev, newWine];
       console.log("Dashboard: Updated wines list:", updatedWines.length);
       return updatedWines;
     });
     
-    // Chiudi il dialog
+    // Close the dialog
     setIsAddWineDialogOpen(false);
     
-    // Mostra un toast di conferma
+    // Show a confirmation toast
     toast({
       title: "Vino Aggiunto",
       description: `${newWine.name} è stato aggiunto alla tua collezione.`
@@ -84,7 +83,10 @@ const Dashboard = () => {
       
       <AddWineDialog 
         isOpen={isAddWineDialogOpen}
-        onOpenChange={setIsAddWineDialogOpen}
+        onOpenChange={(open) => {
+          console.log("Dashboard: Dialog openChange triggered", open);
+          setIsAddWineDialogOpen(open);
+        }}
         onWineAdded={handleAddWineComplete}
       />
 

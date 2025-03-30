@@ -1,4 +1,3 @@
-
 import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { Wine } from '../models/Wine';
@@ -57,7 +56,7 @@ export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
       throw new Error("Wine name is required");
     }
     
-    // Prepara l'oggetto vino con valori predefiniti per i campi mancanti
+    // Prepare wine object with default values for missing fields
     const wineToAdd = {
       ...wine,
       // Set defaults for any missing fields
@@ -78,22 +77,22 @@ export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
     
     console.log("wineService: Prepared wine object for Firestore:", wineToAdd);
     
-    // Aggiungi il vino a Firestore in modo sincrono
+    // Add wine to Firestore
     const docRef = await addDoc(collection(db, 'wines'), wineToAdd);
     console.log("wineService: Wine added with ID:", docRef.id);
     
-    // Crea l'oggetto vino completo con l'ID
+    // Create complete wine object with ID
     const newWine = { 
       ...wineToAdd, 
       id: docRef.id 
     } as Wine;
     
-    // Aggiorna la cache locale
+    // Update local cache
     wines.push(newWine);
     
     return newWine;
   } catch (error) {
-    console.error('wineService: Errore nell\'aggiunta del vino a Firestore:', error);
+    console.error('wineService: Error adding wine to Firestore:', error);
     throw error;
   }
 };

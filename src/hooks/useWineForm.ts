@@ -112,9 +112,9 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
   const handleSubmit = async () => {
     console.log("useWineForm: handleSubmit called with wine data:", newWine);
     
-    // Previeni invii multipli
+    // Prevent multiple submits
     if (isSubmitting) {
-      console.log("useWineForm: Già in fase di invio, ignorando la richiesta");
+      console.log("useWineForm: Already submitting, ignoring request");
       return;
     }
     
@@ -132,9 +132,9 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
     
     try {
       setIsSubmitting(true);
-      console.log("useWineForm: Invio form in corso...");
+      console.log("useWineForm: Submitting form...");
       
-      // Definisci i valori predefiniti per i campi non obbligatori
+      // Define default values for optional fields
       const grapeValue = isBlend ? "Blend" : newWine.grape || "Non specificato";
       const grapesArray = isBlend ? newWine.grapes : newWine.grape ? [newWine.grape] : [];
       
@@ -152,14 +152,8 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
       const addedWine = await addWine(wineToAdd);
       console.log("useWineForm: Wine added to Firestore:", addedWine);
       
-      // Reset form
+      // Reset form first
       resetForm();
-      
-      // First call onComplete with the added wine if provided
-      if (onComplete && addedWine) {
-        console.log("useWineForm: Calling onComplete callback with wine:", addedWine);
-        onComplete(addedWine);
-      }
       
       // Show success message
       toast({
@@ -167,20 +161,27 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
         description: "Il nuovo vino è stato aggiunto alla tua collezione.",
       });
       
-      // Then close the dialog if onClose is provided
+      // Call onComplete callback if provided
+      if (onComplete && addedWine) {
+        console.log("useWineForm: Calling onComplete callback with wine:", addedWine);
+        onComplete(addedWine);
+      }
+      
+      // Call onClose callback if provided
       if (onClose) {
         console.log("useWineForm: Calling onClose callback");
         onClose();
       }
     } catch (error) {
-      console.error('useWineForm: Errore nell\'aggiunta del vino:', error);
+      console.error('useWineForm: Error adding wine:', error);
       toast({
         title: "Errore",
         description: "Impossibile aggiungere il vino. Riprova più tardi.",
         variant: "destructive"
       });
     } finally {
-      // Always reset submit state regardless of success or failure
+      // Always reset submission state
+      console.log("useWineForm: Resetting submission state");
       setIsSubmitting(false);
     }
   };
