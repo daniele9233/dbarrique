@@ -9,17 +9,20 @@ export let wines: Wine[] = [...defaultWines];
 
 export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
   try {
+    console.log("Loading wines from Firestore...");
     const winesCollection = collection(db, 'wines');
     const winesQuery = query(winesCollection, orderBy('name'));
     const wineSnapshot = await getDocs(winesQuery);
     
     if (wineSnapshot.empty) {
+      console.log("No wines in Firestore, adding default wines...");
       for (const wine of defaultWines) {
         await addDoc(collection(db, 'wines'), wine);
       }
       return defaultWines;
     }
     
+    console.log(`Found ${wineSnapshot.docs.length} wines in Firestore`);
     const wineList = wineSnapshot.docs.map(doc => ({
       ...doc.data(),
       id: doc.id
@@ -46,8 +49,10 @@ export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
 
 export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
   try {
+    console.log("Adding wine to Firestore:", wine);
     const docRef = await addDoc(collection(db, 'wines'), wine);
     const newWine = { ...wine, id: docRef.id };
+    console.log("Wine added with ID:", docRef.id);
     wines.push(newWine);
     return newWine;
   } catch (error) {

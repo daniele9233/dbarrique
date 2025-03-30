@@ -106,6 +106,8 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
   };
   
   const handleSubmit = async () => {
+    console.log("handleSubmit called with wine data:", newWine);
+    
     const validation = validateForm();
     
     if (!validation.isValid) {
@@ -131,9 +133,9 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
         image: newWine.image || "https://images.unsplash.com/photo-1553361371-9fe24fca9c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
       };
       
-      console.log("Adding wine:", wineToAdd);
+      console.log("Adding wine to Firestore:", wineToAdd);
       const addedWine = await addWine(wineToAdd);
-      console.log("Wine added:", addedWine);
+      console.log("Wine added to Firestore:", addedWine);
       
       // Clear form
       resetForm();
@@ -144,10 +146,12 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
       });
       
       if (onComplete) {
+        console.log("Calling onComplete callback");
         onComplete(addedWine);
       }
       
       if (onClose) {
+        console.log("Calling onClose callback");
         onClose();
       }
     } catch (error) {

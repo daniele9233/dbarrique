@@ -19,7 +19,9 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchWines = async () => {
       try {
+        console.log("Dashboard: Loading wines...");
         const winesFromFirestore = await loadWinesFromFirestore();
+        console.log("Dashboard: Wines loaded:", winesFromFirestore.length);
         setLocalWines(winesFromFirestore);
       } catch (error) {
         console.error('Errore nel caricamento dei vini:', error);
@@ -37,7 +39,7 @@ const Dashboard = () => {
   }, []);
 
   const handleAddWineComplete = (newWine: Wine) => {
-    console.log("Wine added to collection:", newWine);
+    console.log("Dashboard: Wine added to collection:", newWine);
     setLocalWines(prev => [...prev, newWine]);
     setIsAddWineDialogOpen(false);
     toast({

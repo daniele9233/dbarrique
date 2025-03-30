@@ -37,6 +37,18 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     () => onOpenChange(false)
   );
 
+  // Log for debugging
+  console.log("Wine form state:", { 
+    newWine, 
+    isDisabled, 
+    hasOnWineAdded: !!onWineAdded 
+  });
+
+  const onSubmitClick = () => {
+    console.log("Submit button clicked");
+    handleSubmit();
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="bg-noir-light border-white/10 text-white">
@@ -82,7 +94,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
             Annulla
           </Button>
           <Button
-            onClick={() => handleSubmit()}
+            onClick={onSubmitClick}
             className="bg-wine hover:bg-wine-light"
             disabled={isDisabled}
           >
