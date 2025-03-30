@@ -132,7 +132,7 @@ export const useWineFormActions = (
       const addedWine = await addWine(wineToAdd);
       console.log("useWineForm: Wine added to Firestore:", addedWine);
       
-      // Reset form first
+      // Reset form
       resetForm();
       
       // Show success message
@@ -141,24 +141,26 @@ export const useWineFormActions = (
         description: "Il nuovo vino è stato aggiunto alla tua collezione.",
       });
       
-      // Gestione sicura dei callback
-      const currentCallbacks = { ...callbacksRef.current };
+      // Creiamo una copia delle callback per evitare riferimenti circolari
+      const onCompleteCallback = callbacksRef.current.onComplete;
+      const onCloseCallback = callbacksRef.current.onClose;
       
-      // IMPORTANTE: Reset dello stato di invio PRIMA di chiamare i callbacks
+      // Resettiamo lo stato di invio
       setIsSubmitting(false);
       
-      // Chiamiamo onComplete solo se abbiamo un vino aggiunto con successo
-      if (currentCallbacks.onComplete && addedWine) {
+      // Chiamiamo onComplete in modo asincrono per evitare loop
+      if (onCompleteCallback && addedWine) {
         console.log("useWineForm: Calling onComplete callback with wine:", addedWine);
         setTimeout(() => {
-          currentCallbacks.onComplete(addedWine);
-        }, 0);
+          onCompleteCallback(addedWine);
+        }, 50);
       }
       
-      if (currentCallbacks.onClose) {
+      // Chiamiamo onClose in modo asincrono per garantire che il dialogo si chiuda
+      if (onCloseCallback) {
         console.log("useWineForm: Calling onClose callback");
         setTimeout(() => {
-          currentCallbacks.onClose();
+          onCloseCallback();
         }, 100);
       }
       
@@ -169,7 +171,7 @@ export const useWineFormActions = (
         description: "Impossibile aggiungere il vino. Riprova più tardi.",
         variant: "destructive"
       });
-      // Make sure to reset submission state even in case of error
+      // Resettiamo lo stato anche in caso di errore
       setIsSubmitting(false);
     }
   }, [newWine, isSubmitting, validateForm, resetForm, setIsSubmitting]);

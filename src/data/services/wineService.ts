@@ -15,14 +15,13 @@ export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
     const wineSnapshot = await getDocs(winesQuery);
     
     if (wineSnapshot.empty) {
-      console.log("wineService: No wines in Firestore, adding default wines...");
-      // Add default wines one by one and collect their IDs
-      const winesWithIds: Wine[] = [];
-      for (const wine of defaultWines) {
-        const docRef = await addDoc(collection(db, 'wines'), wine);
-        winesWithIds.push({ ...wine, id: docRef.id });
-      }
-      console.log("wineService: Default wines added with IDs");
+      console.log("wineService: No wines in Firestore, using default wines...");
+      // Return default wines with fake IDs since we don't want to add them automatically
+      const winesWithIds = defaultWines.map((wine, index) => ({
+        ...wine,
+        id: `default-${index}`
+      }));
+      
       wines = winesWithIds;
       return winesWithIds;
     }
@@ -38,23 +37,26 @@ export const loadWinesFromFirestore = async (): Promise<Wine[]> => {
     return wineList;
   } catch (error) {
     console.error('wineService: Errore nel caricamento dei vini da Firestore:', error);
-    return defaultWines.map((wine, index) => ({
+    // Return default wines with fake IDs in case of error
+    const fallbackWines = defaultWines.map((wine, index) => ({
       ...wine,
       id: `default-${index}`
     }));
+    
+    wines = fallbackWines;
+    return fallbackWines;
   }
 };
 
 // Initialize wines on import
-(async () => {
-  try {
-    const loadedWines = await loadWinesFromFirestore();
+loadWinesFromFirestore()
+  .then(loadedWines => {
     wines = loadedWines;
     console.log("wineService: Initialized with", wines.length, "wines");
-  } catch (error) {
+  })
+  .catch(error => {
     console.error('wineService: Errore nel caricamento iniziale dei vini:', error);
-  }
-})();
+  });
 
 export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
   try {

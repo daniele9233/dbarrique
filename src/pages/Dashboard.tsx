@@ -21,16 +21,16 @@ const Dashboard = () => {
       console.log("Dashboard: Loading wines...");
       setIsLoading(true);
       const winesFromFirestore = await loadWinesFromFirestore();
-      console.log("Dashboard: Wines loaded:", winesFromFirestore.length);
+      console.log("Dashboard: Wines loaded successfully:", winesFromFirestore.length);
       setLocalWines(winesFromFirestore);
+      setIsLoading(false);
     } catch (error) {
-      console.error('Errore nel caricamento dei vini:', error);
+      console.error('Dashboard: Errore nel caricamento dei vini:', error);
       toast({
         title: "Errore",
         description: "Impossibile caricare i vini dal database.",
         variant: "destructive"
       });
-    } finally {
       setIsLoading(false);
     }
   }, []);

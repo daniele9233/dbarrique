@@ -21,7 +21,6 @@ interface AddWineDialogProps {
 const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onWineAdded }) => {
   console.log("AddWineDialog: Rendering with props", { isOpen, hasOnWineAdded: !!onWineAdded });
   
-  // Utilizziamo useWineForm passando direttamente le callback
   const {
     newWine,
     isBlend,
@@ -34,21 +33,20 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     handleSubmit,
     isDisabled
   } = useWineForm(
-    // Passiamo la callback onWineAdded
+    // Callback wrapper for wine added
     (wine: Wine) => {
       console.log("AddWineDialog: onWineAdded callback triggered with wine:", wine);
       if (onWineAdded) {
         onWineAdded(wine);
       }
     },
-    // Forniamo la callback onClose per chiudere il dialog
+    // Close callback
     () => {
       console.log("AddWineDialog: Close callback triggered");
       onOpenChange(false);
     }
   );
 
-  // Debug log
   console.log("AddWineDialog: Wine form state:", { 
     newWine, 
     isDisabled, 
@@ -62,7 +60,6 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     handleSubmit();
   };
 
-  // Funzione per gestire l'annullamento
   const handleCancel = () => {
     console.log("AddWineDialog: Cancel button clicked");
     if (!isSubmitting) {
