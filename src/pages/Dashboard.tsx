@@ -47,9 +47,9 @@ const Dashboard = () => {
       return;
     }
     
-    // Aggiungo il nuovo vino alla lista locale
+    // Add new wine to local list
     setLocalWines(prev => {
-      // Verifico se il vino è già nella lista
+      // Check if wine already exists
       const exists = prev.some(wine => wine.id === newWine.id);
       if (exists) {
         console.log("Dashboard: Wine already in list, not adding duplicate");
@@ -61,11 +61,7 @@ const Dashboard = () => {
       return updatedWines;
     });
     
-    // Assicuriamoci che il dialog si chiuda correttamente
-    window.setTimeout(() => {
-      setIsAddWineDialogOpen(false);
-    }, 300);
-    
+    // Show success toast
     toast({
       title: "Successo",
       description: "Il vino è stato aggiunto alla tua collezione.",

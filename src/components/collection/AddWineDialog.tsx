@@ -11,7 +11,7 @@ import YearRatingSection from './wine-form/YearRatingSection';
 import CharacteristicsSection from './wine-form/CharacteristicsSection';
 import ImageUploadSection from './wine-form/ImageUploadSection';
 import { Wine } from '@/data/models/Wine';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface AddWineDialogProps {
   isOpen: boolean;
@@ -21,6 +21,9 @@ interface AddWineDialogProps {
 
 const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onWineAdded }) => {
   console.log("AddWineDialog: Rendering with props", { isOpen, hasOnWineAdded: !!onWineAdded });
+  
+  // Track if a submission was successful
+  const [wasSubmitted, setWasSubmitted] = useState(false);
   
   const {
     newWine,
@@ -34,9 +37,10 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     handleSubmit,
     isDisabled
   } = useWineForm(
-    // Callback per wine added
+    // Callback for wine added
     (wine: Wine) => {
       console.log("AddWineDialog: onWineAdded callback triggered with wine:", wine);
+      setWasSubmitted(true);
       if (onWineAdded) {
         onWineAdded(wine);
       }
@@ -44,6 +48,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     // Close callback
     () => {
       console.log("AddWineDialog: Close callback triggered");
+      setWasSubmitted(true);
       onOpenChange(false);
     }
   );
@@ -52,15 +57,18 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     newWine, 
     isDisabled, 
     isSubmitting,
+    wasSubmitted,
     hasOnWineAdded: !!onWineAdded 
   });
 
-  // Effect per monitorare quando isSubmitting diventa false dopo essere stato true
+  // Effect to handle dialog closure after submission is completed
   useEffect(() => {
-    if (!isSubmitting && isOpen) {
-      console.log("AddWineDialog: Submission completed, dialog can be closed");
+    if (wasSubmitted && !isSubmitting) {
+      console.log("AddWineDialog: Submission completed and not submitting anymore, closing dialog");
+      onOpenChange(false);
+      setWasSubmitted(false);
     }
-  }, [isSubmitting, isOpen]);
+  }, [wasSubmitted, isSubmitting, onOpenChange]);
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -80,7 +88,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
       open={isOpen} 
       onOpenChange={(open) => {
         console.log("AddWineDialog: Dialog onOpenChange triggered", { open, isSubmitting });
-        // Impedisce la chiusura del dialog durante l'invio
+        // Prevent dialog closure during submission
         if (isSubmitting && !open) {
           console.log("AddWineDialog: Preventing dialog close during submission");
           return;
