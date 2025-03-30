@@ -46,7 +46,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
             <span>Aggiungi Nuovo Vino</span>
           </DialogTitle>
           <DialogDescription className="text-white/60">
-            Inserisci i dettagli del vino che desideri aggiungere alla tua collezione. I campi contrassegnati con * sono obbligatori.
+            Inserisci i dettagli del vino che desideri aggiungere alla tua collezione. Solo il nome del vino è obbligatorio.
           </DialogDescription>
         </DialogHeader>
         

@@ -101,20 +101,7 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
       };
     }
     
-    if (isBlend && newWine.grapes.length === 0) {
-      return { 
-        isValid: false, 
-        message: "Seleziona almeno un vitigno per il blend." 
-      };
-    }
-
-    if (!isBlend && !newWine.grape) {
-      return { 
-        isValid: false, 
-        message: "Seleziona un vitigno." 
-      };
-    }
-    
+    // Rimuovere le validazioni per grape e grapes, non sono più obbligatori
     return { isValid: true };
   };
   
@@ -131,14 +118,15 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
     }
     
     try {
-      const grapeValue = isBlend ? "Blend" : newWine.grape;
+      // Definisci i valori predefiniti per i campi non obbligatori
+      const grapeValue = isBlend ? "Blend" : newWine.grape || "Non specificato";
       const grapesArray = isBlend ? newWine.grapes : newWine.grape ? [newWine.grape] : [];
       
       const wineToAdd = {
         ...newWine,
         region: newWine.region || "Non specificata",
         winery: newWine.winery || "Non specificata",
-        grape: grapeValue || "Non specificato",
+        grape: grapeValue,
         grapes: grapesArray,
         image: newWine.image || "https://images.unsplash.com/photo-1553361371-9fe24fca9c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
       };
@@ -181,6 +169,7 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
     handleFileUpload,
     setIsBlend,
     handleSubmit,
-    isDisabled: !newWine.name || (isBlend && newWine.grapes.length === 0) || (!isBlend && !newWine.grape),
+    // Modifica qui: ora il bottone è disabilitato solo se il nome del vino non è specificato
+    isDisabled: !newWine.name,
   };
 };
