@@ -1,7 +1,7 @@
 
 import { useState, useRef, ChangeEvent } from 'react';
 import { toast } from "@/hooks/use-toast";
-import { addWine } from "@/data/WineData";
+import { addWine } from "@/data/services/wineService";
 
 export type WineFormData = {
   name: string;
