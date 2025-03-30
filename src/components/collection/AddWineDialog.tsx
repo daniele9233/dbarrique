@@ -21,6 +21,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
   const {
     newWine,
     isBlend,
+    isSubmitting,
     fileInputRef,
     handleChange,
     handleGrapeToggle,
@@ -51,7 +52,8 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     hasOnWineAdded: !!onWineAdded 
   });
 
-  const onSubmitClick = () => {
+  const onSubmitClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     console.log("AddWineDialog: Submit button clicked");
     handleSubmit();
   };
@@ -69,7 +71,10 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-4 py-4">
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit();
+        }} className="space-y-4 py-4">
           <BasicInfoSection wineData={newWine} handleChange={handleChange} />
           
           <GrapeSection 
@@ -90,25 +95,33 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
             handleChange={handleChange} 
             handleFileUpload={handleFileUpload} 
           />
-        </div>
-        
-        <div className="flex justify-end gap-4 mt-4">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            className="border-white/10 hover:bg-noir hover:text-white"
-          >
-            Annulla
-          </Button>
-          <Button
-            onClick={onSubmitClick}
-            className="bg-wine hover:bg-wine-light"
-            disabled={isDisabled}
-            type="button"
-          >
-            Aggiungi alla Collezione
-          </Button>
-        </div>
+          
+          <div className="flex justify-end gap-4 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              className="border-white/10 hover:bg-noir hover:text-white"
+              type="button"
+            >
+              Annulla
+            </Button>
+            <Button
+              onClick={onSubmitClick}
+              className="bg-wine hover:bg-wine-light"
+              disabled={isDisabled}
+              type="submit"
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="animate-spin mr-2">⏳</span>
+                  Aggiunta in corso...
+                </>
+              ) : (
+                "Aggiungi alla Collezione"
+              )}
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

@@ -40,8 +40,18 @@ const Dashboard = () => {
 
   const handleAddWineComplete = (newWine: Wine) => {
     console.log("Dashboard: Wine added to collection:", newWine);
-    setLocalWines(prev => [...prev, newWine]);
+    
+    // Aggiungi il nuovo vino alla lista locale
+    setLocalWines(prev => {
+      const updatedWines = [...prev, newWine];
+      console.log("Dashboard: Updated wines list:", updatedWines.length);
+      return updatedWines;
+    });
+    
+    // Chiudi il dialog
     setIsAddWineDialogOpen(false);
+    
+    // Mostra un toast di conferma
     toast({
       title: "Vino Aggiunto",
       description: `${newWine.name} è stato aggiunto alla tua collezione.`

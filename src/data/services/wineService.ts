@@ -57,18 +57,35 @@ export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
       throw new Error("Wine name is required");
     }
     
+    // Prepara l'oggetto vino con valori predefiniti per i campi mancanti
     const wineToAdd = {
       ...wine,
       // Set defaults for any missing fields
       type: wine.type || "red",
       year: wine.year || new Date().getFullYear(),
       rating: wine.rating || 5,
+      grape: wine.grape || "Non specificato",
+      grapes: Array.isArray(wine.grapes) ? wine.grapes : [],
+      body: wine.body || "Medio",
+      structure: wine.structure || "Equilibrato",
+      tannins: wine.tannins || "Equilibrato",
+      sweetness: wine.sweetness || "Secco",
+      aroma: wine.aroma || "Fruttato",
+      region: wine.region || "Non specificata",
+      winery: wine.winery || "Non specificata",
+      image: wine.image || "https://images.unsplash.com/photo-1553361371-9fe24fca9c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
     };
     
+    console.log("wineService: Prepared wine object for Firestore:", wineToAdd);
+    
+    // Aggiungi il vino a Firestore
     const docRef = await addDoc(collection(db, 'wines'), wineToAdd);
     console.log("wineService: Wine added with ID:", docRef.id);
     
+    // Crea l'oggetto vino completo con l'ID
     const newWine = { ...wineToAdd, id: docRef.id } as Wine;
+    
+    // Aggiorna la cache locale
     wines.push(newWine);
     
     return newWine;

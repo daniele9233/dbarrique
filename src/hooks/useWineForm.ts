@@ -38,6 +38,7 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
     aroma: "Fruttato"
   });
   
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isBlend, setIsBlend] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -102,12 +103,17 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
       };
     }
     
-    // Il vitigno non è più obbligatorio
     return { isValid: true };
   };
   
   const handleSubmit = async () => {
     console.log("useWineForm: handleSubmit called with wine data:", newWine);
+    
+    // Previeni invii multipli
+    if (isSubmitting) {
+      console.log("useWineForm: Già in fase di invio, ignorando la richiesta");
+      return;
+    }
     
     const validation = validateForm();
     
@@ -122,6 +128,9 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
     }
     
     try {
+      setIsSubmitting(true);
+      console.log("useWineForm: Invio form in corso...");
+      
       // Definisci i valori predefiniti per i campi non obbligatori
       const grapeValue = isBlend ? "Blend" : newWine.grape || "Non specificato";
       const grapesArray = isBlend ? newWine.grapes : newWine.grape ? [newWine.grape] : [];
@@ -148,7 +157,7 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
       });
       
       if (onComplete) {
-        console.log("useWineForm: Calling onComplete callback");
+        console.log("useWineForm: Calling onComplete callback with wine:", addedWine);
         onComplete(addedWine);
       }
       
@@ -163,18 +172,21 @@ export const useWineForm = (onComplete?: (wine: any) => void, onClose?: () => vo
         description: "Impossibile aggiungere il vino. Riprova più tardi.",
         variant: "destructive"
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
   return {
     newWine,
     isBlend,
+    isSubmitting,
     fileInputRef,
     handleChange,
     handleGrapeToggle,
     handleFileUpload,
     setIsBlend,
     handleSubmit,
-    isDisabled: !newWine.name || newWine.name.trim() === "",
+    isDisabled: !newWine.name || newWine.name.trim() === "" || isSubmitting,
   };
 };
