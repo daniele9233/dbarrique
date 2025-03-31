@@ -1,6 +1,7 @@
+
 import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import { getNetworkWines } from '@/data/NetworkWineData';
+import { getNetworkWines, NetworkWine } from '@/data/NetworkWineData';
 import { FilterOptions } from './NetworkFilter';
 
 interface WineNetworkProps {
