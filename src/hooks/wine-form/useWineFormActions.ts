@@ -1,4 +1,3 @@
-
 import { Dispatch, SetStateAction, useCallback, useRef } from 'react';
 import { toast } from "@/hooks/use-toast";
 import { addWine } from "@/data/services/wineService";
@@ -146,17 +145,11 @@ export const useWineFormActions = (
         description: "Il nuovo vino è stato aggiunto alla tua collezione.",
       });
       
-      // Reset form
-      resetForm();
-      
-      // Execute callbacks if available
+      // IMPORTANTE: Prima esegui tutti i callback, POI imposta isSubmitting a false
       if (callbacksRef.current.onComplete && addedWine) {
         console.log("useWineForm: Executing onComplete callback with wine:", addedWine);
         callbacksRef.current.onComplete(addedWine);
       }
-      
-      // Reset submission state AFTER all callbacks are executed
-      setIsSubmitting(false);
       
     } catch (error) {
       console.error('useWineForm: Error adding wine:', error);
@@ -165,8 +158,9 @@ export const useWineFormActions = (
         description: "Impossibile aggiungere il vino. Riprova più tardi.",
         variant: "destructive"
       });
-      
-      // Reset submission state on error
+    } finally {
+      // Assicuriamoci che isSubmitting sia sempre resettato, anche in caso di errore
+      console.log("useWineForm: Resetting isSubmitting state");
       setIsSubmitting(false);
     }
   }, [newWine, isSubmitting, validateForm, resetForm, setIsSubmitting]);

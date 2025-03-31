@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Plus } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -7,12 +7,15 @@ import SearchBar from '@/components/collection/SearchBar';
 import FilterSection from '@/components/collection/FilterSection';
 import WineGrid from '@/components/collection/WineGrid';
 import AddWineDialog from '@/components/collection/AddWineDialog';
-import { wines } from '@/data/services/wineService';
+import { wines, loadWinesFromFirestore } from '@/data/services/wineService';
+import { Wine } from '@/data/models/Wine';
+import { toast } from '@/hooks/use-toast';
 
 const Collection = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [isAddWineDialogOpen, setIsAddWineDialogOpen] = useState(false);
+  const [localWines, setLocalWines] = useState<Wine[]>(wines);
   
   // Filtri
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
@@ -70,7 +73,7 @@ const Collection = () => {
     );
   };
   
-  const filteredWines = wines.filter((wine) => {
+  const filteredWines = localWines.filter((wine) => {
     const matchesSearch = 
       wine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       wine.region.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -90,6 +93,28 @@ const Collection = () => {
            matchesBody && matchesStructure && matchesTannins && 
            matchesSweetness && matchesAroma;
   });
+
+  const handleWineAdded = useCallback((wine: Wine) => {
+    console.log("Collection: Wine added:", wine);
+    // Aggiorna la lista locale
+    setLocalWines(prev => [...prev, wine]);
+    
+    // Chiudi il dialog
+    setIsAddWineDialogOpen(false);
+    
+    // Aggiorna da Firestore per buona misura
+    loadWinesFromFirestore(true)
+      .then(updatedWines => {
+        setLocalWines(updatedWines);
+      })
+      .catch(error => {
+        console.error("Errore durante l'aggiornamento dei vini:", error);
+        toast({
+          title: "Attenzione",
+          description: "I nuovi vini sono stati aggiunti ma potrebbe essere necessario aggiornare la pagina per vederli tutti.",
+        });
+      });
+  }, []);
 
   const resetAllFilters = () => {
     setSearchTerm("");
@@ -187,6 +212,7 @@ const Collection = () => {
       <AddWineDialog 
         isOpen={isAddWineDialogOpen}
         onOpenChange={setIsAddWineDialogOpen}
+        onWineAdded={handleWineAdded}
       />
       
       <Footer />

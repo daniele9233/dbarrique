@@ -74,13 +74,14 @@ const Dashboard = () => {
       return updatedWines;
     });
     
-    // Chiude esplicitamente il dialog dopo l'aggiunta del vino
+    // Chiudi il dialog
     setIsAddWineDialogOpen(false);
-  }, []);
-
-  const handleDialogOpenChange = useCallback((open: boolean) => {
-    console.log("Dashboard: Dialog openChange triggered", open);
-    setIsAddWineDialogOpen(open);
+    
+    // Mostra toast di successo
+    toast({
+      title: "Successo",
+      description: "Il nuovo vino è stato aggiunto alla tua collezione.",
+    });
   }, []);
 
   return (
@@ -102,7 +103,7 @@ const Dashboard = () => {
       
       <AddWineDialog 
         isOpen={isAddWineDialogOpen}
-        onOpenChange={handleDialogOpenChange}
+        onOpenChange={setIsAddWineDialogOpen}
         onWineAdded={handleAddWineComplete}
       />
 

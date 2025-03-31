@@ -41,7 +41,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
       if (onWineAdded) {
         onWineAdded(wine);
       }
-      onOpenChange(false); // Close the dialog after successful submission
+      // Non chiudiamo qui il dialogo, sarà gestito nel componente padre quando riceve l'evento onWineAdded
     }
   );
 
@@ -49,6 +49,13 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
   useEffect(() => {
     console.log("AddWineDialog: isSubmitting changed to:", isSubmitting);
   }, [isSubmitting]);
+
+  // Chiudiamo il dialogo quando lo stato cambia
+  useEffect(() => {
+    if (!isOpen) {
+      console.log("AddWineDialog: Dialog was closed");
+    }
+  }, [isOpen]);
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
