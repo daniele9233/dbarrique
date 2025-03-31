@@ -1,6 +1,6 @@
 
 import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, orderBy, 
-  getDoc, where, onSnapshot, limit, enableNetwork, disableNetwork } from 'firebase/firestore';
+  getDoc, where, onSnapshot, limit, enableNetwork, disableNetwork, QuerySnapshot, DocumentData } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { Wine } from '../models/Wine';
 import { defaultWines } from '../constants/wines';
@@ -117,8 +117,8 @@ export const loadWinesFromFirestore = async (forceRefresh = false): Promise<Wine
         setTimeout(() => reject(new Error("Firestore query timeout")), 15000)
       );
       
-      // @ts-ignore - Type mismatch is okay here since we just need the first resolved value
-      const wineSnapshot = await Promise.race([fetchPromise, timeoutPromise]);
+      // Use Promise.race with proper typing
+      const wineSnapshot = await Promise.race([fetchPromise, timeoutPromise]) as QuerySnapshot<DocumentData>;
       
       if (wineSnapshot.empty) {
         console.log("wineService: No wines in Firestore, using default wines...");

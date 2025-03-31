@@ -1,6 +1,6 @@
 
 import { initializeApp } from 'firebase/app';
-import { getFirestore, enableIndexedDbPersistence, CACHE_SIZE_UNLIMITED } from 'firebase/firestore';
+import { getFirestore, enableIndexedDbPersistence, initializeFirestore, CACHE_SIZE_UNLIMITED, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -15,12 +15,17 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Get Firestore instance
-const db = getFirestore(app);
+// Initialize Firestore with persistence enabled
+// Use the new recommended API for persistence
+const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({
+    tabManager: persistentMultipleTabManager(),
+    cacheSizeBytes: CACHE_SIZE_UNLIMITED
+  })
+});
 
-// Enable offline persistence with unlimited cache size
-// This helps with connectivity issues by allowing the app to work offline
-// and sync when connection is restored
+// For backwards compatibility with existing code, also attempt to enable 
+// indexed DB persistence with the older API
 enableIndexedDbPersistence(db, {
   forceOwnership: true // Take ownership of the persistence layer forcefully
 }).catch((err) => {
@@ -30,12 +35,6 @@ enableIndexedDbPersistence(db, {
   } else if (err.code === 'unimplemented') {
     console.warn("The current browser doesn't support offline persistence.");
   }
-});
-
-// Configure Firestore settings for better performance and network resilience
-db.settings({
-  cacheSizeBytes: CACHE_SIZE_UNLIMITED,
-  ignoreUndefinedProperties: true
 });
 
 export { db };

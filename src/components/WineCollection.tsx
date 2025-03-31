@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { loadWinesFromFirestore, wines as globalWines } from '@/data/services/wineService';
 import { Wine } from '@/data/models/Wine';
@@ -82,7 +81,7 @@ const WineCollection = ({ limit }: { limit?: number }) => {
       )}
       
       {firestoreStatus.isOnline && firestoreStatus.retryCount > 0 && (
-        <Alert variant="warning" className="mb-4 bg-amber-100 border-amber-500">
+        <Alert className="mb-4 bg-amber-100 border-amber-500">
           <Wifi className="h-4 w-4 mr-2" />
           <AlertDescription>
             Connessione intermittente. Tentativo di riconnessione in corso ({firestoreStatus.retryCount}/5)...
