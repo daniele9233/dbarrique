@@ -48,9 +48,21 @@ const useFilteredWines = (options: FilterOptions): Wine[] => {
     const matchesSweetness = selectedSweetness ? wine.sweetness === selectedSweetness : true;
     const matchesAroma = selectedAroma ? wine.aroma === selectedAroma : true;
     
+    // Add the missing occasion and refinement filters
+    const matchesOccasions = selectedOccasions.length === 0 || 
+      (wine.pairing && selectedOccasions.some(occasion => wine.pairing?.toLowerCase().includes(occasion.toLowerCase())));
+    
+    const matchesRefinements = selectedRefinements.length === 0 ||
+      selectedRefinements.some(refinement => {
+        if (refinement === 'aged' && wine.storage) {
+          return wine.storage.toLowerCase().includes('aged') || wine.storage.toLowerCase().includes('invecchiato');
+        }
+        return false;
+      });
+    
     return matchesSearch && matchesRegion && matchesGrape && matchesYear && 
            matchesBody && matchesStructure && matchesTannins && 
-           matchesSweetness && matchesAroma;
+           matchesSweetness && matchesAroma && matchesOccasions && matchesRefinements;
   });
 };
 
