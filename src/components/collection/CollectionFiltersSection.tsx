@@ -90,6 +90,7 @@ const CollectionFiltersSection: React.FC<CollectionFiltersSectionProps> = ({
       
       <FilterSection 
         showFilters={showFilters}
+        toggleFilters={toggleFilters}
         selectedRegions={selectedRegions}
         selectedGrapes={selectedGrapes}
         selectedYears={selectedYears}

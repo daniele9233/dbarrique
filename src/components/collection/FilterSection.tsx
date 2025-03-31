@@ -36,6 +36,7 @@ interface FilterSectionProps {
 
 const FilterSection: React.FC<FilterSectionProps> = ({
   showFilters,
+  toggleFilters,  // We now include toggleFilters even though it's not being used
   selectedRegions,
   selectedGrapes,
   selectedYears,
