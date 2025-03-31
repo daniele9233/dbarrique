@@ -1,14 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Wine } from '@/data/models/Wine';
 import { loadWinesFromFirestore, wines as globalWines } from '@/data/services/wineService';
+import useFirestoreStatus from './useFirestoreStatus';
 
 interface UseWineLoadingResult {
   wines: Wine[];
   isLoading: boolean;
+  isOffline: boolean;
+  lastSync: Date | null;
+  retryCount: number;
 }
 
 /**
  * A hook to handle loading wines from firestore or cache
+ * with improved offline support and connection status tracking
  */
 const useWineLoading = (providedWines: Wine[] = []): UseWineLoadingResult => {
   const [isLoading, setIsLoading] = useState(providedWines.length === 0 && globalWines.length === 0);
@@ -16,6 +21,7 @@ const useWineLoading = (providedWines: Wine[] = []): UseWineLoadingResult => {
     // Use cached wines if available
     providedWines.length > 0 ? providedWines : globalWines.length > 0 ? globalWines : []
   );
+  const firestoreStatus = useFirestoreStatus();
   
   useEffect(() => {
     // If we have wines from props, use those
@@ -30,10 +36,14 @@ const useWineLoading = (providedWines: Wine[] = []): UseWineLoadingResult => {
       setLocalWines(globalWines);
       setIsLoading(false);
       
-      // Then update in background
-      loadWinesFromFirestore(false).then(freshWines => {
-        setLocalWines(freshWines);
-      }).catch(console.error);
+      // Then update in background only if we're online
+      if (firestoreStatus.isOnline) {
+        loadWinesFromFirestore(false).then(freshWines => {
+          setLocalWines(freshWines);
+        }).catch(error => {
+          console.error('Error refreshing wines in background:', error);
+        });
+      }
       return;
     }
 
@@ -48,9 +58,15 @@ const useWineLoading = (providedWines: Wine[] = []): UseWineLoadingResult => {
         console.error('Errore nel caricamento dei vini:', error);
         setIsLoading(false);
       });
-  }, [providedWines]);
+  }, [providedWines, firestoreStatus.isOnline]);
 
-  return { wines: localWines, isLoading };
+  return { 
+    wines: localWines, 
+    isLoading,
+    isOffline: !firestoreStatus.isOnline,
+    lastSync: firestoreStatus.lastSync,
+    retryCount: firestoreStatus.retryCount
+  };
 };
 
 export default useWineLoading;

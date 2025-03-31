@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { loadWinesFromFirestore, wines as globalWines } from '@/data/services/wineService';
 import { Wine } from '@/data/models/Wine';
@@ -5,11 +6,15 @@ import CollectionHeader from './collection/CollectionHeader';
 import WineGridDisplay from './collection/WineGridDisplay';
 import Pagination from './collection/Pagination';
 import CollectionLoading from './collection/CollectionLoading';
+import useFirestoreStatus from '@/hooks/useFirestoreStatus';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle, Wifi, WifiOff } from 'lucide-react';
 
 const WineCollection = ({ limit }: { limit?: number }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [wines, setWines] = useState<Wine[]>(globalWines.length > 0 ? globalWines : []);
   const [isLoading, setIsLoading] = useState(globalWines.length === 0);
+  const firestoreStatus = useFirestoreStatus();
   
   useEffect(() => {
     // Skip loading if we already have wines and we're showing a limited collection
@@ -67,6 +72,24 @@ const WineCollection = ({ limit }: { limit?: number }) => {
   
   return (
     <section className="section relative">
+      {!firestoreStatus.isOnline && (
+        <Alert variant="destructive" className="mb-4">
+          <WifiOff className="h-4 w-4 mr-2" />
+          <AlertDescription>
+            Modalità offline attiva. I dati visualizzati potrebbero non essere aggiornati.
+          </AlertDescription>
+        </Alert>
+      )}
+      
+      {firestoreStatus.isOnline && firestoreStatus.retryCount > 0 && (
+        <Alert variant="warning" className="mb-4 bg-amber-100 border-amber-500">
+          <Wifi className="h-4 w-4 mr-2" />
+          <AlertDescription>
+            Connessione intermittente. Tentativo di riconnessione in corso ({firestoreStatus.retryCount}/5)...
+          </AlertDescription>
+        </Alert>
+      )}
+      
       <CollectionHeader 
         title="The Collection" 
         subtitle="Premium Selection" 
@@ -88,6 +111,12 @@ const WineCollection = ({ limit }: { limit?: number }) => {
               onNext={nextSlide}
             />
           )}
+        </div>
+      )}
+      
+      {firestoreStatus.lastSync && (
+        <div className="text-xs text-gray-400 mt-4 text-right">
+          Ultimo aggiornamento: {firestoreStatus.lastSync.toLocaleTimeString()}
         </div>
       )}
     </section>

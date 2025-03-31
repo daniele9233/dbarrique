@@ -1,6 +1,6 @@
 
 import { initializeApp } from 'firebase/app';
-import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getFirestore, enableIndexedDbPersistence, CACHE_SIZE_UNLIMITED } from 'firebase/firestore';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -15,18 +15,27 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Get Firestore instance with additional options
+// Get Firestore instance
 const db = getFirestore(app);
 
-// Configure Firestore settings (if needed)
-// The experimentalForceLongPolling and experimentalAutoDetectLongPolling properties
-// can be applied using FirebaseFirestore.settings(), but they're not directly 
-// available in the latest Firebase SDK version. Instead, we use connection resilience
-// strategies in the wineService.ts file.
+// Enable offline persistence with unlimited cache size
+// This helps with connectivity issues by allowing the app to work offline
+// and sync when connection is restored
+enableIndexedDbPersistence(db, {
+  forceOwnership: true // Take ownership of the persistence layer forcefully
+}).catch((err) => {
+  console.error("Firestore persistence error:", err.code, err.message);
+  if (err.code === 'failed-precondition') {
+    console.warn("Multiple tabs open, persistence can only be enabled in one tab at a time.");
+  } else if (err.code === 'unimplemented') {
+    console.warn("The current browser doesn't support offline persistence.");
+  }
+});
 
-// In development environment, you might want to use the Firestore emulator
-// if (process.env.NODE_ENV === 'development') {
-//   connectFirestoreEmulator(db, '127.0.0.1', 8080);
-// }
+// Configure Firestore settings for better performance and network resilience
+db.settings({
+  cacheSizeBytes: CACHE_SIZE_UNLIMITED,
+  ignoreUndefinedProperties: true
+});
 
 export { db };

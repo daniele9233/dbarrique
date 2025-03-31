@@ -1,5 +1,6 @@
 
-import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, orderBy, 
+  getDoc, where, onSnapshot, limit, enableNetwork, disableNetwork } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { Wine } from '../models/Wine';
 import { defaultWines } from '../constants/wines';
@@ -7,28 +8,86 @@ import { defaultWines } from '../constants/wines';
 // In-memory wine data with a timestamp for cache invalidation
 export let wines: Wine[] = [...defaultWines];
 let lastFetchTime = 0;
-const CACHE_VALIDITY_MS = 300000; // 5 minutes of cache validity (increased from 1 minute)
-const MAX_RETRIES = 3;
-const RETRY_DELAY_MS = 1500;
+const CACHE_VALIDITY_MS = 600000; // 10 minutes of cache validity (increased from 5 minutes)
+const MAX_RETRIES = 5; // Increased from 3
+const RETRY_DELAY_MS = 2000; // Increased from 1500
+const MAX_BACKOFF_MS = 30000; // Maximum backoff delay
+let isOfflineMode = false;
 
-// Helper function to implement retry logic for Firestore operations
-const withRetry = async <T>(operation: () => Promise<T>, retries = MAX_RETRIES): Promise<T> => {
-  try {
-    return await operation();
-  } catch (error) {
-    if (retries > 0) {
-      console.log(`wineService: Operation failed, retrying... (${MAX_RETRIES - retries + 1}/${MAX_RETRIES})`);
-      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
-      return withRetry(operation, retries - 1);
+// Network status detection
+const goOffline = async () => {
+  if (!isOfflineMode) {
+    console.log("wineService: Switching to offline mode");
+    isOfflineMode = true;
+    try {
+      await disableNetwork(db);
+    } catch (error) {
+      console.error("wineService: Error disabling network:", error);
     }
-    throw error;
   }
+};
+
+const goOnline = async () => {
+  if (isOfflineMode) {
+    console.log("wineService: Switching to online mode");
+    isOfflineMode = false;
+    try {
+      await enableNetwork(db);
+    } catch (error) {
+      console.error("wineService: Error enabling network:", error);
+    }
+  }
+};
+
+// Listen for online/offline status changes
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => {
+    console.log("wineService: Browser reports online");
+    goOnline();
+  });
+  
+  window.addEventListener('offline', () => {
+    console.log("wineService: Browser reports offline");
+    goOffline();
+  });
+}
+
+// Helper function to implement exponential backoff retry logic for Firestore operations
+const withRetry = async <T>(operation: () => Promise<T>, retries = MAX_RETRIES): Promise<T> => {
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      return await operation();
+    } catch (error: any) {
+      // Check if it's the last retry
+      if (attempt === retries - 1) {
+        throw error;
+      }
+      
+      // Calculate backoff with exponential increase and some randomness
+      const delay = Math.min(
+        RETRY_DELAY_MS * Math.pow(2, attempt) + Math.random() * 1000,
+        MAX_BACKOFF_MS
+      );
+      
+      console.warn(`wineService: Operation failed, retrying in ${Math.round(delay)}ms... (${attempt + 1}/${retries})`);
+      console.error("wineService: Error details:", error.code, error.message);
+      
+      // If error suggests we're offline, switch to offline mode
+      if (error.code === 'unavailable' || error.code === 'failed-precondition' || 
+          error.message?.includes('network error') || error.message?.includes('aborted')) {
+        await goOffline();
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  throw new Error(`Failed after ${MAX_RETRIES} retries`);
 };
 
 export const loadWinesFromFirestore = async (forceRefresh = false): Promise<Wine[]> => {
   try {
     const now = Date.now();
-    // Use cached wines if available and not expired
+    // Use cached wines if available and not expired, unless force refresh is specified
     if (wines.length > 0 && !forceRefresh && now - lastFetchTime < CACHE_VALIDITY_MS) {
       console.log("wineService: Using cached wines, count:", wines.length);
       return wines;
@@ -36,11 +95,30 @@ export const loadWinesFromFirestore = async (forceRefresh = false): Promise<Wine
 
     console.log("wineService: Loading wines from Firestore...");
     
+    // If we're in offline mode and have wines cached, just return the cache
+    if (isOfflineMode && wines.length > 0) {
+      console.log("wineService: In offline mode, using cached wines");
+      return wines;
+    }
+    
     // Use retry logic for Firestore operation
     const wineList = await withRetry(async () => {
+      // Try to go online if we're fetching
+      if (isOfflineMode) {
+        await goOnline();
+      }
+      
       const winesCollection = collection(db, 'wines');
       const winesQuery = query(winesCollection, orderBy('name'));
-      const wineSnapshot = await getDocs(winesQuery);
+      
+      // Use getDocs with timeout
+      const fetchPromise = getDocs(winesQuery);
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("Firestore query timeout")), 15000)
+      );
+      
+      // @ts-ignore - Type mismatch is okay here since we just need the first resolved value
+      const wineSnapshot = await Promise.race([fetchPromise, timeoutPromise]);
       
       if (wineSnapshot.empty) {
         console.log("wineService: No wines in Firestore, using default wines...");
@@ -64,6 +142,10 @@ export const loadWinesFromFirestore = async (forceRefresh = false): Promise<Wine
     return wineList;
   } catch (error) {
     console.error('wineService: Error loading wines from Firestore:', error);
+    
+    // If we have any error, try to go offline mode
+    await goOffline();
+    
     // Return cached wines in case of error if available
     if (wines.length > 0) {
       console.log("wineService: Returning cached wines due to error");
