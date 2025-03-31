@@ -1,6 +1,5 @@
-
 import { useState } from 'react';
-import { uniqueGrapes, uniqueRegions, uniqueCharacteristics } from '@/data/NetworkWineData';
+import { getUniqueGrapes, getUniqueRegions, getUniqueCharacteristics } from '@/data/NetworkWineData';
 import { 
   Tabs, 
   TabsContent, 
@@ -39,6 +38,10 @@ const NetworkFilter: React.FC<NetworkFilterProps> = ({ onFilterChange, className
       aroma: []
     }
   });
+
+  const uniqueGrapes = getUniqueGrapes();
+  const uniqueRegions = getUniqueRegions();
+  const uniqueCharacteristics = getUniqueCharacteristics();
 
   const handleFilterChange = (category: keyof FilterOptions, value: string) => {
     const updatedFilters = { ...filters };

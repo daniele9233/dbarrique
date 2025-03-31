@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import { NetworkWine } from '@/data/NetworkWineData';
+import { getNetworkWines } from '@/data/NetworkWineData';
 import { FilterOptions } from './NetworkFilter';
 
 interface WineNetworkProps {
-  wines: NetworkWine[];
+  wines?: any[];
   filters: FilterOptions;
 }
 
@@ -35,7 +35,7 @@ interface SimulationLink extends d3.SimulationLinkDatum<SimulationNode> {
   strength?: number;
 }
 
-const WineNetwork: React.FC<WineNetworkProps> = ({ wines, filters }) => {
+const WineNetwork: React.FC<WineNetworkProps> = ({ filters }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -57,7 +57,9 @@ const WineNetwork: React.FC<WineNetworkProps> = ({ wines, filters }) => {
     };
   }, []);
 
-  const filteredWines = wines.filter(wine => {
+  const networkWines = getNetworkWines();
+
+  const filteredWines = networkWines.filter(wine => {
     const grapeMatch = filters.grapes.length === 0 || filters.grapes.includes(wine.grape);
     const regionMatch = filters.regions.length === 0 || filters.regions.includes(wine.region);
     

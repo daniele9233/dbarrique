@@ -1,162 +1,152 @@
-// Network node data for the wine relationship visualization
 
-export interface WineNode {
+import { Wine } from './models/Wine';
+
+export interface NetworkWine {
   id: string;
   name: string;
+  grape: string;
   region: string;
   year: number;
   rating: number;
-  type: string;
-  grape: string;
+  body: string;
+  structure: string;
+  tannins: string;
+  sweetness: string;
+  aroma: string;
+  radius: number;
+  color: string;
   image: string;
+  connections: string[];
 }
 
-export interface WineLink {
-  source: string;
-  target: string;
-  value: number;
-}
+// Sample network data
+const networkWinesData: NetworkWine[] = [
+  {
+    id: "wine1",
+    name: "Barolo Riserva",
+    grape: "Nebbiolo",
+    region: "Piemonte",
+    year: 2015,
+    rating: 8,
+    body: "Pieno",
+    structure: "Strutturato",
+    tannins: "Intensi",
+    sweetness: "Secco",
+    aroma: "Fruttato",
+    radius: 18,
+    color: "#9370DB",
+    image: "https://images.unsplash.com/photo-1474722883778-792e7990302f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3386&q=80",
+    connections: ["wine2", "wine4", "wine6"]
+  },
+  {
+    id: "wine2",
+    name: "Brunello di Montalcino",
+    grape: "Sangiovese",
+    region: "Toscana",
+    year: 2016,
+    rating: 7,
+    body: "Medio",
+    structure: "Bilanciato",
+    tannins: "Moderati",
+    sweetness: "Secco",
+    aroma: "Fruttato",
+    radius: 16,
+    color: "#8B4513",
+    image: "https://images.unsplash.com/photo-1544776193-3ca1ead30582?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+    connections: ["wine1", "wine3", "wine5"]
+  },
+  {
+    id: "wine3",
+    name: "Sassicaia",
+    grape: "Cabernet Sauvignon",
+    region: "Toscana",
+    year: 2017,
+    rating: 9,
+    body: "Pieno",
+    structure: "Strutturato",
+    tannins: "Pronunciati",
+    sweetness: "Secco",
+    aroma: "Speziato",
+    radius: 20,
+    color: "#4169E1",
+    image: "https://images.unsplash.com/photo-1615887495029-0cc5cea73e2a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+    connections: ["wine2", "wine4"]
+  },
+  {
+    id: "wine4",
+    name: "Amarone della Valpolicella",
+    grape: "Merlot",
+    region: "Veneto",
+    year: 2018,
+    rating: 6,
+    body: "Corposo",
+    structure: "Ricco",
+    tannins: "Vellutati",
+    sweetness: "Semi-secco",
+    aroma: "Floreale",
+    radius: 14,
+    color: "#3CB371",
+    image: "https://images.unsplash.com/photo-1615887377492-a34d560755c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1674&q=80",
+    connections: ["wine1", "wine3", "wine6"]
+  },
+  {
+    id: "wine5",
+    name: "Tignanello",
+    grape: "Syrah",
+    region: "Toscana",
+    year: 2019,
+    rating: 7,
+    body: "Medio",
+    structure: "Elegante",
+    tannins: "Morbidi",
+    sweetness: "Secco",
+    aroma: "Speziato",
+    radius: 16,
+    color: "#FF6347",
+    image: "https://images.unsplash.com/photo-1586370434639-0fe43b9afeaa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1674&q=80",
+    connections: ["wine2", "wine6"]
+  },
+  {
+    id: "wine6",
+    name: "Barbaresco",
+    grape: "Pinot Noir",
+    region: "Piemonte",
+    year: 2017,
+    rating: 5,
+    body: "Leggero",
+    structure: "Delicato",
+    tannins: "Leggeri",
+    sweetness: "Secco",
+    aroma: "Fruttato",
+    radius: 12,
+    color: "#FF69B4",
+    image: "https://images.unsplash.com/photo-1560148218-1a83060f7b32?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80",
+    connections: ["wine1", "wine4", "wine5"]
+  }
+];
 
-export interface WineNetworkData {
-  nodes: WineNode[];
-  links: WineLink[];
-}
+// Function to get network wines
+export const getNetworkWines = (): NetworkWine[] => {
+  return networkWinesData;
+};
 
-export const wineNetworkData: WineNetworkData = {
-  nodes: [
-    {
-      id: "1",
-      name: "Brunello di Montalcino",
-      region: "Toscana",
-      year: 2015,
-      rating: 9,
-      type: "red",
-      image: "https://images.unsplash.com/photo-1553361371-9fe24fca9c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
-      grape: "Sangiovese",
-      body: "Corposo",
-      structure: "Complesso",
-      tannins: "Intenso",
-      sweetness: "Secco",
-      aroma: "Fruttato",
-      description: "Vino prestigioso della Toscana, il Brunello è noto per la sua struttura complessa, i tannini maturi e le note di frutti rossi, spezie e tabacco. Ha un grande potenziale di invecchiamento.",
-      // Add the additional fields required by Wine type 
-      winery: "Biondi-Santi",
-      grapes: ["Sangiovese"],
-      pairing: "Selvaggina, formaggi stagionati",
-      storage: "15-20 anni in condizioni ottimali"
-    },
-    {
-      id: "2",
-      name: "Barolo",
-      region: "Piemonte",
-      year: 2016,
-      rating: 9,
-      type: "red",
-      image: "https://images.unsplash.com/photo-1569919659476-f0852f6834b7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1025&q=80",
-      grape: "Nebbiolo",
-      body: "Corposo",
-      structure: "Complesso",
-      tannins: "Intenso",
-      sweetness: "Secco",
-      aroma: "Speziato",
-      description: "Denominato 're dei vini e vino dei re', il Barolo è caratterizzato da tannini potenti, aromi di rosa, catrame e spezie. Richiede tempo per esprimere il suo potenziale.",
-      // Add the additional fields required by Wine type
-      winery: "Giacomo Conterno",
-      grapes: ["Nebbiolo"],
-      pairing: "Brasati, tartufi, formaggi stagionati",
-      storage: "15-30 anni in condizioni ottimali"
-    },
-    {
-      id: "3",
-      name: "Amarone della Valpolicella",
-      region: "Veneto",
-      year: 2017,
-      rating: 8,
-      type: "red",
-      image: "https://images.unsplash.com/photo-1598306442928-4d90f32c6866?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2068&q=80",
-      grape: "Blend",
-      body: "Corposo",
-      structure: "Complesso",
-      tannins: "Medio",
-      sweetness: "Secco",
-      aroma: "Fruttato",
-      description: "Vino potente ottenuto da uve appassite, l'Amarone presenta aromi di frutta secca, cioccolato e spezie, con un finale lungo e complesso.",
-      // Add the additional fields required by Wine type
-      winery: "Tommasi",
-      grapes: ["Corvina", "Rondinella", "Molinara"],
-      pairing: "Selvaggina, brasati, formaggi stagionati",
-      storage: "10-20 anni in condizioni ottimali"
-    },
-    {
-      id: "4",
-      name: "Chianti Classico Riserva",
-      region: "Toscana",
-      year: 2018,
-      rating: 7,
-      type: "red",
-      image: "https://images.unsplash.com/photo-1568213816046-0ee1c42bd559?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1372&q=80",
-      grape: "Sangiovese",
-      body: "Medio",
-      structure: "Equilibrato",
-      tannins: "Medio",
-      sweetness: "Secco",
-      aroma: "Fruttato",
-      description: "Un vino elegante con note di ciliegia, viola e erbe aromatiche. La Riserva ha un invecchiamento più lungo che ne aumenta la complessità.",
-      // Add the additional fields required by Wine type
-      winery: "Castello di Ama",
-      grapes: ["Sangiovese"],
-      pairing: "Carni rosse, pasta al ragù, formaggi",
-      storage: "7-12 anni in condizioni ottimali"
-    },
-    {
-      id: "5",
-      name: "Pinot Grigio",
-      region: "Alto Adige",
-      year: 2021,
-      rating: 6,
-      type: "red",
-      image: "https://images.unsplash.com/photo-1566200248748-627b549d68bb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1026&q=80",
-      grape: "Pinot Grigio",
-      body: "Leggero",
-      structure: "Semplice",
-      tannins: "Leggero",
-      sweetness: "Secco",
-      aroma: "Floreale",
-      description: "Vino bianco fresco e minerale con note di pera, mela e fiori bianchi. Facile da bere e versatile negli abbinamenti.",
-      // Add the additional fields required by Wine type
-      winery: "Elena Walch",
-      grapes: ["Pinot Grigio"],
-      pairing: "Pesce, antipasti, risotti",
-      storage: "2-3 anni in condizioni ottimali"
-    },
-    {
-      id: "6",
-      name: "Primitivo di Manduria",
-      region: "Puglia",
-      year: 2019,
-      rating: 7,
-      type: "red",
-      image: "https://images.unsplash.com/photo-1571867424488-4565932edb41?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
-      grape: "Primitivo",
-      body: "Corposo",
-      structure: "Robusto",
-      tannins: "Medio",
-      sweetness: "Secco",
-      aroma: "Fruttato",
-      description: "Vino intenso con aromi di frutta matura, prugna, spezie e pepe nero. Morbido al palato con una buona struttura.",
-      // Add the additional fields required by Wine type
-      winery: "San Marzano",
-      grapes: ["Primitivo"],
-      pairing: "Carne alla griglia, salumi, formaggi piccanti",
-      storage: "5-7 anni in condizioni ottimali"
-    }
-  ],
-  links: [
-    { source: "1", target: "2", value: 5 },
-    { source: "2", target: "3", value: 3 },
-    { source: "3", target: "4", value: 8 },
-    { source: "4", target: "5", value: 6 },
-    { source: "5", target: "6", value: 4 },
-    { source: "6", target: "1", value: 7 },
-  ]
+// Function to extract unique grape types from network data
+export const getUniqueGrapes = (): string[] => {
+  return [...new Set(networkWinesData.map(wine => wine.grape))];
+};
+
+// Function to extract unique regions from network data
+export const getUniqueRegions = (): string[] => {
+  return [...new Set(networkWinesData.map(wine => wine.region))];
+};
+
+// Function to extract unique characteristics from network data
+export const getUniqueCharacteristics = () => {
+  return {
+    body: [...new Set(networkWinesData.map(wine => wine.body))],
+    structure: [...new Set(networkWinesData.map(wine => wine.structure))],
+    tannins: [...new Set(networkWinesData.map(wine => wine.tannins))],
+    sweetness: [...new Set(networkWinesData.map(wine => wine.sweetness))],
+    aroma: [...new Set(networkWinesData.map(wine => wine.aroma))]
+  };
 };

@@ -4,7 +4,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import NetworkFilter, { FilterOptions } from '@/components/network/NetworkFilter';
 import WineNetwork from '@/components/network/WineNetwork';
-import { networkWines } from '@/data/NetworkWineData';
+import { getNetworkWines } from '@/data/NetworkWineData';
 import { Wine } from 'lucide-react';
 
 const WNetwork = () => {
@@ -21,6 +21,9 @@ const WNetwork = () => {
   });
   
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  
+  // Access the network wines
+  const networkWines = getNetworkWines();
 
   const handleFilterChange = (newFilters: FilterOptions) => {
     setFilters(newFilters);
@@ -64,7 +67,7 @@ const WNetwork = () => {
             isSidebarOpen ? 'md:ml-6' : 'ml-0'
           }`}>
             <div className="w-full h-full bg-noir-dark rounded-lg overflow-hidden border border-white/10">
-              <WineNetwork wines={networkWines} filters={filters} />
+              <WineNetwork filters={filters} />
             </div>
           </div>
         </div>
