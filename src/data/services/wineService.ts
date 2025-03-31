@@ -7,7 +7,7 @@ import { defaultWines } from '../constants/wines';
 // In-memory wine data with a timestamp for cache invalidation
 export let wines: Wine[] = [...defaultWines];
 let lastFetchTime = 0;
-const CACHE_VALIDITY_MS = 30000; // 30 secondi di validità della cache (ridotto per testing)
+const CACHE_VALIDITY_MS = 30000; // 30 seconds of cache validity (reduced for testing)
 
 export const loadWinesFromFirestore = async (forceRefresh = false): Promise<Wine[]> => {
   try {
@@ -47,7 +47,7 @@ export const loadWinesFromFirestore = async (forceRefresh = false): Promise<Wine
     
     return wineList;
   } catch (error) {
-    console.error('wineService: Errore nel caricamento dei vini da Firestore:', error);
+    console.error('wineService: Error loading wines from Firestore:', error);
     // Return cached wines in case of error if available
     if (wines.length > 0) {
       console.log("wineService: Returning cached wines due to error");
@@ -65,14 +65,14 @@ export const loadWinesFromFirestore = async (forceRefresh = false): Promise<Wine
   }
 };
 
-// Initialize wines on import - ma non aspettiamo che la promise si risolva
+// Initialize wines on import - but don't wait for the promise to resolve
 loadWinesFromFirestore()
   .then(loadedWines => {
     wines = loadedWines;
     console.log("wineService: Initialized with", wines.length, "wines");
   })
   .catch(error => {
-    console.error('wineService: Errore nel caricamento iniziale dei vini:', error);
+    console.error('wineService: Error during initial wine loading:', error);
   });
 
 export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
@@ -119,7 +119,7 @@ export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
       id: docRef.id 
     } as Wine;
     
-    // Update local cache
+    // Update local cache - create a new array reference
     wines = [...wines, newWine];
     
     return newWine;
@@ -136,10 +136,13 @@ export const updateWine = async (id: string, updatedWine: Partial<Omit<Wine, 'id
     
     const index = wines.findIndex(wine => wine.id === id);
     if (index !== -1) {
-      wines[index] = { ...wines[index], ...updatedWine };
+      // Create a new array reference to ensure reactivity
+      const newWines = [...wines];
+      newWines[index] = { ...newWines[index], ...updatedWine };
+      wines = newWines;
     }
   } catch (error) {
-    console.error('wineService: Errore nell\'aggiornamento del vino in Firestore:', error);
+    console.error('wineService: Error updating wine in Firestore:', error);
     throw error;
   }
 };
@@ -149,9 +152,10 @@ export const deleteWine = async (id: string): Promise<void> => {
     const wineRef = doc(db, 'wines', id);
     await deleteDoc(wineRef);
     
+    // Create a new array reference to ensure reactivity
     wines = wines.filter(wine => wine.id !== id);
   } catch (error) {
-    console.error('wineService: Errore nell\'eliminazione del vino da Firestore:', error);
+    console.error('wineService: Error deleting wine from Firestore:', error);
     throw error;
   }
 };

@@ -1,9 +1,9 @@
 
-import { useState, useRef, useMemo, useCallback } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { WineFormData, WineFormCallbacks } from './types';
 import { useWineFormActions } from './useWineFormActions';
 
-export const useWineForm = (onCompleteCallback?: (wine: any) => void, onCloseCallback?: () => void) => {
+export const useWineForm = (callbacks?: WineFormCallbacks) => {
   const [newWine, setNewWine] = useState<WineFormData>({
     name: "",
     region: "",
@@ -29,16 +29,17 @@ export const useWineForm = (onCompleteCallback?: (wine: any) => void, onCloseCal
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Create a stable callbacks object that won't change between renders
-  const callbacks = useMemo<WineFormCallbacks>(() => ({
-    onComplete: onCompleteCallback,
-    onClose: onCloseCallback
-  }), [onCompleteCallback, onCloseCallback]);
+  const stableCallbacks = useMemo<WineFormCallbacks>(() => ({
+    onComplete: callbacks?.onComplete,
+    onError: callbacks?.onError
+  }), [callbacks?.onComplete, callbacks?.onError]);
   
   const {
     handleChange,
     handleGrapeToggle,
     handleFileUpload,
     handleSubmit,
+    resetForm,
   } = useWineFormActions(
     newWine,
     isSubmitting,
@@ -46,7 +47,7 @@ export const useWineForm = (onCompleteCallback?: (wine: any) => void, onCloseCal
     setIsSubmitting,
     setIsBlend,
     fileInputRef,
-    callbacks
+    stableCallbacks
   );
   
   return {
@@ -59,6 +60,7 @@ export const useWineForm = (onCompleteCallback?: (wine: any) => void, onCloseCal
     handleFileUpload,
     setIsBlend,
     handleSubmit,
+    resetForm,
     isDisabled: !newWine.name || newWine.name.trim() === "" || isSubmitting,
   };
 };

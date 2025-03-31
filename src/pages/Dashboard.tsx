@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -18,19 +17,21 @@ const Dashboard = () => {
 
   const fetchWines = useCallback(async () => {
     try {
-      // Se abbiamo vini nella cache, li mostriamo subito
+      // If we have wines in the cache, show them immediately
       if (cachedWines.length > 0) {
         setLocalWines(cachedWines);
         setIsLoading(false);
         
-        // Poi aggiorniamo in background
+        // Then update in the background
         loadWinesFromFirestore(false).then(freshWines => {
           setLocalWines(freshWines);
-        }).catch(console.error);
+        }).catch(error => {
+          console.error("Dashboard: Error loading wines in background:", error);
+        });
         return;
       }
       
-      // Altrimenti facciamo il caricamento normale
+      // Otherwise do a normal load
       console.log("Dashboard: Loading wines...");
       setIsLoading(true);
       const winesFromFirestore = await loadWinesFromFirestore();
@@ -38,7 +39,7 @@ const Dashboard = () => {
       setLocalWines(winesFromFirestore);
       setIsLoading(false);
     } catch (error) {
-      console.error('Dashboard: Errore nel caricamento dei vini:', error);
+      console.error('Dashboard: Error loading wines:', error);
       toast({
         title: "Errore",
         description: "Impossibile caricare i vini dal database.",
@@ -74,14 +75,8 @@ const Dashboard = () => {
       return updatedWines;
     });
     
-    // Chiudi il dialog
-    setIsAddWineDialogOpen(false);
-    
-    // Mostra toast di successo
-    toast({
-      title: "Successo",
-      description: "Il nuovo vino è stato aggiunto alla tua collezione.",
-    });
+    // Close the dialog - this is now handled in the AddWineDialog component
+    // Dialog will be closed by the component itself
   }, []);
 
   return (

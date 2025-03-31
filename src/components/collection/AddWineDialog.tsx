@@ -12,7 +12,8 @@ import CharacteristicsSection from './wine-form/CharacteristicsSection';
 import ImageUploadSection from './wine-form/ImageUploadSection';
 import DescriptionSection from '@/components/wine-card/wine-edit-form/DescriptionSection';
 import { Wine } from '@/data/models/Wine';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { toast } from "@/hooks/use-toast";
 
 interface AddWineDialogProps {
   isOpen: boolean;
@@ -21,7 +22,12 @@ interface AddWineDialogProps {
 }
 
 const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onWineAdded }) => {
-  console.log("AddWineDialog: Rendering with props", { isOpen, hasOnWineAdded: !!onWineAdded });
+  const [internalIsOpen, setInternalIsOpen] = useState(isOpen);
+  
+  // Synchronize external and internal open states
+  useEffect(() => {
+    setInternalIsOpen(isOpen);
+  }, [isOpen]);
   
   const {
     newWine,
@@ -33,29 +39,40 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     handleFileUpload,
     setIsBlend,
     handleSubmit,
+    resetForm,
     isDisabled
-  } = useWineForm(
-    // Callback for when a wine is added successfully
-    (wine: Wine) => {
-      console.log("AddWineDialog: Wine added successfully, triggering callback:", wine);
+  } = useWineForm({
+    onComplete: (wine: Wine) => {
+      console.log("AddWineDialog: Wine added successfully:", wine);
+      
       if (onWineAdded) {
         onWineAdded(wine);
       }
-      // Non chiudiamo qui il dialogo, sarà gestito nel componente padre quando riceve l'evento onWineAdded
+      
+      // Reset the form
+      resetForm();
+      
+      // Close the dialog with a small delay to ensure UI updates
+      setTimeout(() => {
+        setInternalIsOpen(false);
+        onOpenChange(false);
+      }, 300);
+      
+      toast({
+        title: "Successo",
+        description: "Il nuovo vino è stato aggiunto alla tua collezione.",
+      });
+    },
+    onError: (error: Error) => {
+      console.error("AddWineDialog: Error adding wine:", error);
+      
+      toast({
+        title: "Errore",
+        description: "Impossibile aggiungere il vino. Riprova più tardi.",
+        variant: "destructive"
+      });
     }
-  );
-
-  // Log changes to isSubmitting for debugging
-  useEffect(() => {
-    console.log("AddWineDialog: isSubmitting changed to:", isSubmitting);
-  }, [isSubmitting]);
-
-  // Chiudiamo il dialogo quando lo stato cambia
-  useEffect(() => {
-    if (!isOpen) {
-      console.log("AddWineDialog: Dialog was closed");
-    }
-  }, [isOpen]);
+  });
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -66,22 +83,34 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
   const handleCancel = () => {
     console.log("AddWineDialog: Cancel button clicked");
     if (!isSubmitting) {
+      resetForm();
+      setInternalIsOpen(false);
       onOpenChange(false);
+    }
+  };
+  
+  // Handle dialog close attempts
+  const handleOpenChange = (open: boolean) => {
+    if (isSubmitting && !open) {
+      // Prevent closing during submission
+      console.log("AddWineDialog: Preventing close during submission");
+      return;
+    }
+    
+    // Allow closing
+    setInternalIsOpen(open);
+    onOpenChange(open);
+    
+    // Reset form when closing
+    if (!open) {
+      resetForm();
     }
   };
 
   return (
     <Dialog 
-      open={isOpen} 
-      onOpenChange={(open) => {
-        console.log("AddWineDialog: Dialog onOpenChange triggered", { open, isSubmitting });
-        // Prevent dialog closure during submission
-        if (isSubmitting && !open) {
-          console.log("AddWineDialog: Preventing dialog close during submission");
-          return;
-        }
-        onOpenChange(open);
-      }}
+      open={internalIsOpen} 
+      onOpenChange={handleOpenChange}
     >
       <DialogContent className="bg-noir-light border-white/10 text-white max-h-[90vh] overflow-y-auto">
         <DialogHeader>

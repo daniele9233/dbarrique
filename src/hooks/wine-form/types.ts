@@ -23,5 +23,5 @@ export interface WineFormData {
 
 export interface WineFormCallbacks {
   onComplete?: (wine: Wine) => void;
-  onClose?: () => void;
+  onError?: (error: Error) => void;
 }

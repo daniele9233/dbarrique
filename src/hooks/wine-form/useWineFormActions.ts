@@ -1,3 +1,4 @@
+
 import { Dispatch, SetStateAction, useCallback, useRef } from 'react';
 import { toast } from "@/hooks/use-toast";
 import { addWine } from "@/data/services/wineService";
@@ -139,13 +140,6 @@ export const useWineFormActions = (
       const addedWine = await addWine(wineToAdd);
       console.log("useWineForm: Wine added to Firestore:", addedWine);
       
-      // Show success message
-      toast({
-        title: "Successo",
-        description: "Il nuovo vino è stato aggiunto alla tua collezione.",
-      });
-      
-      // IMPORTANTE: Prima esegui tutti i callback, POI imposta isSubmitting a false
       if (callbacksRef.current.onComplete && addedWine) {
         console.log("useWineForm: Executing onComplete callback with wine:", addedWine);
         callbacksRef.current.onComplete(addedWine);
@@ -153,22 +147,29 @@ export const useWineFormActions = (
       
     } catch (error) {
       console.error('useWineForm: Error adding wine:', error);
+      
+      // Call error callback if provided
+      if (callbacksRef.current.onError) {
+        callbacksRef.current.onError(error instanceof Error ? error : new Error(String(error)));
+      }
+      
       toast({
         title: "Errore",
         description: "Impossibile aggiungere il vino. Riprova più tardi.",
         variant: "destructive"
       });
     } finally {
-      // Assicuriamoci che isSubmitting sia sempre resettato, anche in caso di errore
+      // Always reset the submitting state, even in case of error
       console.log("useWineForm: Resetting isSubmitting state");
       setIsSubmitting(false);
     }
-  }, [newWine, isSubmitting, validateForm, resetForm, setIsSubmitting]);
+  }, [newWine, isSubmitting, validateForm, setIsSubmitting]);
 
   return {
     handleChange,
     handleGrapeToggle,
     handleFileUpload,
     handleSubmit,
+    resetForm,
   };
 };
