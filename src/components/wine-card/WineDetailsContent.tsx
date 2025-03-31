@@ -1,27 +1,8 @@
-
-import { Wine } from '@/data/models/Wine';
+import { EditedWine } from './useWineCardState';
 import { Star } from 'lucide-react';
 
 interface WineDetailsContentProps {
-  wine: {
-    name: string;
-    region: string;
-    winery?: string;
-    year: number;
-    rating: number;
-    type: Wine['type'];
-    grape: string;
-    grapes?: string[];
-    body: string;
-    structure: string;
-    tannins: string;
-    sweetness: string;
-    aroma: string;
-    image: string;
-    description: string;
-    pairing: string;
-    storage: string;
-  };
+  wine: EditedWine;
   isEditMode: boolean;
 }
 

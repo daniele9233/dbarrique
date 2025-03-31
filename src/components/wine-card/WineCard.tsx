@@ -15,7 +15,7 @@ const WineCard = (wine: Wine) => {
     id, 
     name, 
     region, 
-    winery = "", 
+    winery, 
     year, 
     rating, 
     type, 

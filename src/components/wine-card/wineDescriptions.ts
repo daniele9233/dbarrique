@@ -1,5 +1,5 @@
 
-type WineType = "red" | "white" | "rosé" | "sparkling";
+import { WineType } from '@/data/models/Wine';
 
 interface WineDescriptions {
   description: string;

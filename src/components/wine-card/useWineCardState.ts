@@ -1,9 +1,28 @@
-
 import { useState, ChangeEvent } from 'react';
-import { Wine } from '@/data/models/Wine';
+import { Wine, WineType } from '@/data/models/Wine';
 import { toast } from "@/hooks/use-toast";
 import { updateWine } from "@/data/services/wineService";
 import { generateWineDescription } from './wineDescriptions';
+
+export interface EditedWine {
+  name: string;
+  region: string;
+  winery: string;
+  year: number;
+  rating: number;
+  type: WineType;
+  image: string;
+  grape: string;
+  grapes: string[];
+  body: string;
+  structure: string;
+  tannins: string;
+  sweetness: string;
+  aroma: string;
+  description: string;
+  pairing: string;
+  storage: string;
+}
 
 export const useWineCardState = (wine: Wine) => {
   const { id, type, region, grape, grapes = [] } = wine;
@@ -13,8 +32,9 @@ export const useWineCardState = (wine: Wine) => {
   
   const wineDescriptions = generateWineDescription(type, region);
   
-  const [editedWine, setEditedWine] = useState({
+  const [editedWine, setEditedWine] = useState<EditedWine>({
     ...wine,
+    winery: wine.winery || "",
     grapes: grapes || (grape !== "Blend" ? [grape] : []),
     description: wine.description || wineDescriptions.description,
     pairing: wine.pairing || wineDescriptions.pairing,
@@ -99,6 +119,7 @@ export const useWineCardState = (wine: Wine) => {
     
     setEditedWine({ 
       ...wine,
+      winery: wine.winery || "",
       grapes: grapes || (grape !== "Blend" ? [grape] : []),
       description: wine.description || resetDescriptions.description,
       pairing: wine.pairing || resetDescriptions.pairing,

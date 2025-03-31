@@ -1,13 +1,13 @@
 
 import { collection, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/config/firebase';
-import { Wine } from '@/data/models/Wine';
+import { Wine, WineCreationData } from '@/data/models/Wine';
 import { 
   addWineToCache, updateWineInCache, removeWineFromCache 
 } from './wineCache';
 import { withRetry } from './wineConnection';
 
-export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
+export const addWine = async (wine: WineCreationData): Promise<Wine> => {
   try {
     console.log("wineService: Adding wine to Firestore:", wine);
     
@@ -63,7 +63,7 @@ export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
   }
 };
 
-export const updateWine = async (id: string, updatedWine: Partial<Omit<Wine, 'id'>>): Promise<void> => {
+export const updateWine = async (id: string, updatedWine: Partial<WineCreationData>): Promise<void> => {
   try {
     await withRetry(async () => {
       const wineRef = doc(db, 'wines', id);

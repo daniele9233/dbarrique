@@ -1,4 +1,3 @@
-
 import { ChangeEvent, RefObject } from 'react';
 import WinerySection from './wine-edit-form/WinerySection';
 import GrapeSelectionSection from './wine-edit-form/GrapeSelectionSection';
@@ -7,28 +6,10 @@ import DescriptionSection from './wine-edit-form/DescriptionSection';
 import PairingStorageSection from './wine-edit-form/PairingStorageSection';
 import ImageUploadSection from './wine-edit-form/ImageUploadSection';
 import FormActions from './wine-edit-form/FormActions';
-import { Wine } from '@/data/models/Wine';
+import { EditedWine } from './useWineCardState';
 
 interface WineEditFormProps {
-  editedWine: {
-    name: string;
-    region: string;
-    winery: string;
-    year: number;
-    rating: number;
-    type: Wine['type'];
-    image: string;
-    grape: string;
-    grapes: string[];
-    body: string;
-    structure: string;
-    tannins: string;
-    sweetness: string;
-    aroma: string;
-    description: string;
-    pairing: string;
-    storage: string;
-  };
+  editedWine: EditedWine;
   isBlend: boolean;
   fileInputRef: RefObject<HTMLInputElement>;
   handleEditField: (field: string, value: string | number | string[]) => void;

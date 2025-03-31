@@ -1,4 +1,3 @@
-
 import { Wine } from '@/data/models/Wine';
 
 interface FilterOptions {
@@ -48,7 +47,6 @@ const useFilteredWines = (options: FilterOptions): Wine[] => {
     const matchesSweetness = selectedSweetness ? wine.sweetness === selectedSweetness : true;
     const matchesAroma = selectedAroma ? wine.aroma === selectedAroma : true;
     
-    // Add the missing occasion and refinement filters
     const matchesOccasions = selectedOccasions.length === 0 || 
       (wine.pairing && selectedOccasions.some(occasion => wine.pairing?.toLowerCase().includes(occasion.toLowerCase())));
     
