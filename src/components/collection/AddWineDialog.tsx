@@ -10,6 +10,7 @@ import GrapeSection from './wine-form/GrapeSection';
 import YearRatingSection from './wine-form/YearRatingSection';
 import CharacteristicsSection from './wine-form/CharacteristicsSection';
 import ImageUploadSection from './wine-form/ImageUploadSection';
+import DescriptionSection from '@/components/wine-card/wine-edit-form/DescriptionSection';
 import { Wine } from '@/data/models/Wine';
 import { useEffect } from 'react';
 
@@ -40,6 +41,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
       if (onWineAdded) {
         onWineAdded(wine);
       }
+      onOpenChange(false); // Close the dialog after successful submission
     }
   );
 
@@ -50,7 +52,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("AddWineDialog: Form submitted");
+    console.log("AddWineDialog: Form submitted", newWine);
     handleSubmit();
   };
 
@@ -100,6 +102,12 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
           
           <CharacteristicsSection wineData={newWine} handleChange={handleChange} />
           
+          <DescriptionSection 
+            description={newWine.description || ''}
+            onChange={(value) => handleChange('description', value)}
+            placeholder="Descrivi le caratteristiche del vino..."
+          />
+          
           <ImageUploadSection 
             wineData={newWine} 
             fileInputRef={fileInputRef} 
@@ -118,7 +126,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
               Annulla
             </Button>
             <Button
-              className="bg-wine hover:bg-wine-light"
+              className="bg-wine hover:bg-wine-light text-white"
               disabled={isDisabled || isSubmitting}
               type="submit"
             >

@@ -70,7 +70,8 @@ export const useWineFormActions = (
       structure: "Equilibrato",
       tannins: "Equilibrato",
       sweetness: "Secco",
-      aroma: "Fruttato"
+      aroma: "Fruttato",
+      description: ""
     });
     setIsBlend(false);
     if (fileInputRef.current) {
@@ -125,6 +126,9 @@ export const useWineFormActions = (
         winery: newWine.winery || "Non specificata",
         grape: grapeValue,
         grapes: grapesArray,
+        description: newWine.description || "",
+        pairing: newWine.pairing || "",
+        storage: newWine.storage || "",
         image: newWine.image || "https://images.unsplash.com/photo-1553361371-9fe24fca9c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
       };
       
@@ -132,25 +136,19 @@ export const useWineFormActions = (
       const addedWine = await addWine(wineToAdd);
       console.log("useWineForm: Wine added to Firestore:", addedWine);
       
-      // Execute callbacks if available
-      if (callbacksRef.current.onComplete && addedWine) {
-        console.log("useWineForm: Executing onComplete callback with wine:", addedWine);
-        callbacksRef.current.onComplete(addedWine);
-      }
-      
-      // Reset form
-      resetForm();
-      
       // Show success message
       toast({
         title: "Successo",
         description: "Il nuovo vino è stato aggiunto alla tua collezione.",
       });
       
-      // Finalize modal closing if needed
-      if (callbacksRef.current.onClose) {
-        console.log("useWineForm: Executing onClose callback");
-        callbacksRef.current.onClose();
+      // Reset form
+      resetForm();
+      
+      // Execute callbacks if available
+      if (callbacksRef.current.onComplete && addedWine) {
+        console.log("useWineForm: Executing onComplete callback with wine:", addedWine);
+        callbacksRef.current.onComplete(addedWine);
       }
       
       // Reset submission state AFTER all callbacks are executed

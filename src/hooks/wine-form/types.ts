@@ -1,11 +1,13 @@
 
-export type WineFormData = {
+import { Wine } from "@/data/models/Wine";
+
+export interface WineFormData {
   name: string;
   region: string;
   winery: string;
   year: number;
   rating: number;
-  type: "red" | "white" | "rosé" | "sparkling";
+  type: Wine['type'];
   image: string;
   grape: string;
   grapes: string[];
@@ -14,9 +16,12 @@ export type WineFormData = {
   tannins: string;
   sweetness: string;
   aroma: string;
-};
+  description?: string;
+  pairing?: string;
+  storage?: string;
+}
 
-export type WineFormCallbacks = {
-  onComplete?: (wine: any) => void;
+export interface WineFormCallbacks {
+  onComplete?: (wine: Wine) => void;
   onClose?: () => void;
-};
+}

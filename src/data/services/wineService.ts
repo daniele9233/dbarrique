@@ -100,6 +100,9 @@ export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
       aroma: wine.aroma || "Fruttato",
       region: wine.region || "Non specificata",
       winery: wine.winery || "Non specificata",
+      description: wine.description || "",
+      pairing: wine.pairing || "",
+      storage: wine.storage || "",
       image: wine.image || "https://images.unsplash.com/photo-1553361371-9fe24fca9c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
     };
     
