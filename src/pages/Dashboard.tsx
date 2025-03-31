@@ -32,10 +32,8 @@ const Dashboard = () => {
       }
       
       // Otherwise do a normal load
-      console.log("Dashboard: Loading wines...");
       setIsLoading(true);
       const winesFromFirestore = await loadWinesFromFirestore();
-      console.log("Dashboard: Wines loaded successfully:", winesFromFirestore.length);
       setLocalWines(winesFromFirestore);
       setIsLoading(false);
     } catch (error) {
@@ -54,29 +52,28 @@ const Dashboard = () => {
   }, [fetchWines]);
 
   const handleAddWineComplete = useCallback((newWine: Wine) => {
-    console.log("Dashboard: Wine added to collection:", newWine);
-    
-    if (!newWine || !newWine.id) {
-      console.error("Dashboard: Cannot add wine without ID to local state");
-      return;
-    }
-    
     // Add new wine to local list
     setLocalWines(prev => {
       // Check if wine already exists
-      const exists = prev.some(wine => wine.id === newWine.id);
-      if (exists) {
-        console.log("Dashboard: Wine already in list, not adding duplicate");
+      if (prev.some(wine => wine.id === newWine.id)) {
         return prev;
       }
-      
-      const updatedWines = [...prev, newWine];
-      console.log("Dashboard: Updated wines list:", updatedWines.length);
-      return updatedWines;
+      return [...prev, newWine];
     });
     
-    // Close the dialog - this is now handled in the AddWineDialog component
-    // Dialog will be closed by the component itself
+    // Show success message
+    toast({
+      title: "Vino aggiunto",
+      description: `${newWine.name} è stato aggiunto alla collezione.`
+    });
+    
+    // Close dialog
+    setIsAddWineDialogOpen(false);
+    
+    // Refresh list from Firestore
+    loadWinesFromFirestore(true)
+      .then(setLocalWines)
+      .catch(console.error);
   }, []);
 
   return (

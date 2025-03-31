@@ -1,8 +1,8 @@
-
 import { useEffect, useState } from 'react';
-import WineCard from '@/components/WineCard';
 import { Wine } from '@/data/models/Wine';
 import { loadWinesFromFirestore, wines as globalWines } from '@/data/services/wineService';
+import WineGridDisplay from './WineGridDisplay';
+import WineCard from '@/components/WineCard';
 
 interface WineGridProps {
   wines: Wine[];
@@ -12,31 +12,31 @@ interface WineGridProps {
 const WineGrid: React.FC<WineGridProps> = ({ wines, resetAllFilters }) => {
   const [isLoading, setIsLoading] = useState(wines.length === 0 && globalWines.length === 0);
   const [localWines, setLocalWines] = useState<Wine[]>(
-    // Usa i vini in cache se disponibili
+    // Use cached wines if available
     wines.length > 0 ? wines : globalWines.length > 0 ? globalWines : []
   );
   
   useEffect(() => {
-    // Se abbiamo vini dai props, usiamo quelli
+    // If we have wines from props, use those
     if (wines.length > 0) {
       setLocalWines(wines);
       setIsLoading(false);
       return;
     }
 
-    // Se abbiamo vini nella cache, li mostriamo subito
+    // If we have wines in the cache, show them immediately
     if (globalWines.length > 0) {
       setLocalWines(globalWines);
       setIsLoading(false);
       
-      // Aggiorniamo in background
+      // Then update in background
       loadWinesFromFirestore(false).then(freshWines => {
         setLocalWines(freshWines);
       }).catch(console.error);
       return;
     }
 
-    // Altrimenti facciamo il caricamento normale
+    // Otherwise do a normal load
     setIsLoading(true);
     loadWinesFromFirestore()
       .then(winesFromFirestore => {
@@ -51,7 +51,7 @@ const WineGrid: React.FC<WineGridProps> = ({ wines, resetAllFilters }) => {
   
   const displayWines = wines.length > 0 ? wines : localWines;
   
-  // Mostra spinner solo se non abbiamo vini da visualizzare
+  // Show spinner only if we have no wines to display
   if (isLoading && displayWines.length === 0) {
     return (
       <div className="flex justify-center items-center py-12">

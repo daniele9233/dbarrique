@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { Plus } from 'lucide-react';
 import Navbar from '@/components/Navbar';
@@ -96,23 +95,25 @@ const Collection = () => {
 
   const handleWineAdded = useCallback((wine: Wine) => {
     console.log("Collection: Wine added:", wine);
-    // Aggiorna la lista locale
-    setLocalWines(prev => [...prev, wine]);
     
-    // Chiudi il dialog
+    setLocalWines(prev => {
+      if (prev.some(w => w.id === wine.id)) {
+        return prev;
+      }
+      return [...prev, wine];
+    });
+    
     setIsAddWineDialogOpen(false);
     
-    // Aggiorna da Firestore per buona misura
+    toast({
+      title: "Vino aggiunto",
+      description: `${wine.name} è stato aggiunto alla collezione.`
+    });
+    
     loadWinesFromFirestore(true)
-      .then(updatedWines => {
-        setLocalWines(updatedWines);
-      })
+      .then(setLocalWines)
       .catch(error => {
         console.error("Errore durante l'aggiornamento dei vini:", error);
-        toast({
-          title: "Attenzione",
-          description: "I nuovi vini sono stati aggiunti ma potrebbe essere necessario aggiornare la pagina per vederli tutti.",
-        });
       });
   }, []);
 

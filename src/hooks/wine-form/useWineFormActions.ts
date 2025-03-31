@@ -1,9 +1,8 @@
 
-import { Dispatch, SetStateAction, useCallback, useRef } from 'react';
+import { Dispatch, SetStateAction, useCallback } from 'react';
 import { toast } from "@/hooks/use-toast";
 import { addWine } from "@/data/services/wineService";
 import { WineFormData, WineFormCallbacks } from './types';
-import { Wine } from '@/data/models/Wine';
 
 export const useWineFormActions = (
   newWine: WineFormData,
@@ -14,12 +13,7 @@ export const useWineFormActions = (
   fileInputRef: React.RefObject<HTMLInputElement>,
   callbacks: WineFormCallbacks
 ) => {
-  // Keep a reference to callbacks to avoid stale closures
-  const callbacksRef = useRef(callbacks);
-  callbacksRef.current = callbacks;
-
   const handleChange = useCallback((field: string, value: string | number | string[]) => {
-    console.log(`useWineForm: Updating field ${field} to`, value);
     setNewWine(prev => ({
       ...prev,
       [field]: value
@@ -57,7 +51,6 @@ export const useWineFormActions = (
   }, [handleChange]);
   
   const resetForm = useCallback(() => {
-    console.log("useWineForm: Resetting form");
     setNewWine({
       name: "",
       region: "",
@@ -83,33 +76,14 @@ export const useWineFormActions = (
     }
   }, [setNewWine, setIsBlend, fileInputRef]);
   
-  const validateForm = useCallback((): { isValid: boolean; message?: string } => {
-    if (!newWine.name || newWine.name.trim() === "") {
-      return { 
-        isValid: false, 
-        message: "Il nome del vino è obbligatorio." 
-      };
-    }
-    
-    return { isValid: true };
-  }, [newWine.name]);
-  
   const handleSubmit = useCallback(async () => {
-    console.log("useWineForm: handleSubmit called with wine data:", newWine);
+    if (isSubmitting) return;
     
-    // Prevent multiple submits
-    if (isSubmitting) {
-      console.log("useWineForm: Already submitting, ignoring request");
-      return;
-    }
-    
-    const validation = validateForm();
-    
-    if (!validation.isValid) {
-      console.error("useWineForm: Validation failed:", validation.message);
+    // Validate form
+    if (!newWine.name || newWine.name.trim() === "") {
       toast({
         title: "Errore",
-        description: validation.message,
+        description: "Il nome del vino è obbligatorio.",
         variant: "destructive"
       });
       return;
@@ -117,53 +91,56 @@ export const useWineFormActions = (
     
     try {
       setIsSubmitting(true);
-      console.log("useWineForm: Submitting form...");
       
-      // Define default values for optional fields
-      const grapeValue = newWine.grape || "Non specificato";
-      const grapesArray = newWine.grapes.length > 0 ? newWine.grapes : [];
-      
+      // Prepare data
       const wineToAdd = {
         ...newWine,
         type: newWine.type || "red",
         region: newWine.region || "Non specificata",
         winery: newWine.winery || "Non specificata",
-        grape: grapeValue,
-        grapes: grapesArray,
+        grape: newWine.grape || "Non specificato",
+        grapes: newWine.grapes.length > 0 ? newWine.grapes : [],
         description: newWine.description || "",
         pairing: newWine.pairing || "",
         storage: newWine.storage || "",
         image: newWine.image || "https://images.unsplash.com/photo-1553361371-9fe24fca9c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
       };
       
-      console.log("useWineForm: Adding wine to Firestore:", wineToAdd);
+      // Add wine to Firestore
       const addedWine = await addWine(wineToAdd);
-      console.log("useWineForm: Wine added to Firestore:", addedWine);
       
-      if (callbacksRef.current.onComplete && addedWine) {
-        console.log("useWineForm: Executing onComplete callback with wine:", addedWine);
-        callbacksRef.current.onComplete(addedWine);
+      if (addedWine) {
+        toast({
+          title: "Successo",
+          description: "Vino aggiunto alla collezione con successo."
+        });
+        
+        // Call completion callback if provided
+        if (callbacks.onComplete) {
+          callbacks.onComplete(addedWine);
+        }
+        
+        // Reset the form
+        resetForm();
       }
-      
     } catch (error) {
-      console.error('useWineForm: Error adding wine:', error);
+      const errorMsg = error instanceof Error ? error.message : "Errore sconosciuto";
       
-      // Call error callback if provided
-      if (callbacksRef.current.onError) {
-        callbacksRef.current.onError(error instanceof Error ? error : new Error(String(error)));
-      }
-      
+      console.error('Errore durante l\'aggiunta del vino:', error);
       toast({
         title: "Errore",
-        description: "Impossibile aggiungere il vino. Riprova più tardi.",
+        description: `Impossibile aggiungere il vino: ${errorMsg}`,
         variant: "destructive"
       });
+      
+      // Call error callback if provided
+      if (callbacks.onError) {
+        callbacks.onError(error instanceof Error ? error : new Error(String(error)));
+      }
     } finally {
-      // Always reset the submitting state, even in case of error
-      console.log("useWineForm: Resetting isSubmitting state");
       setIsSubmitting(false);
     }
-  }, [newWine, isSubmitting, validateForm, setIsSubmitting]);
+  }, [newWine, isSubmitting, resetForm, callbacks, setIsSubmitting]);
 
   return {
     handleChange,
