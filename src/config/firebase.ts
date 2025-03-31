@@ -12,14 +12,17 @@ const firebaseConfig = {
   appId: "1:555848456578:web:7e8ee9a1d1f4f5c6a2b3c4"
 };
 
-// Initialize Firebase with additional options
-const app = initializeApp(firebaseConfig, {
-  experimentalForceLongPolling: true, // This can help with connection issues
-  experimentalAutoDetectLongPolling: true
-});
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
-// Get Firestore instance
+// Get Firestore instance with additional options
 const db = getFirestore(app);
+
+// Configure Firestore settings (if needed)
+// The experimentalForceLongPolling and experimentalAutoDetectLongPolling properties
+// can be applied using FirebaseFirestore.settings(), but they're not directly 
+// available in the latest Firebase SDK version. Instead, we use connection resilience
+// strategies in the wineService.ts file.
 
 // In development environment, you might want to use the Firestore emulator
 // if (process.env.NODE_ENV === 'development') {

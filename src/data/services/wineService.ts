@@ -1,5 +1,5 @@
 
-import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, orderBy, connectFirestoreEmulator } from 'firebase/firestore';
+import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { Wine } from '../models/Wine';
 import { defaultWines } from '../constants/wines';
@@ -7,7 +7,7 @@ import { defaultWines } from '../constants/wines';
 // In-memory wine data with a timestamp for cache invalidation
 export let wines: Wine[] = [...defaultWines];
 let lastFetchTime = 0;
-const CACHE_VALIDITY_MS = 60000; // 1 minute of cache validity
+const CACHE_VALIDITY_MS = 300000; // 5 minutes of cache validity (increased from 1 minute)
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 1500;
 
