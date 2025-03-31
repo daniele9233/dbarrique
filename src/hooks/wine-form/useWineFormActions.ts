@@ -3,6 +3,7 @@ import { Dispatch, SetStateAction, useCallback, useRef } from 'react';
 import { toast } from "@/hooks/use-toast";
 import { addWine } from "@/data/services/wineService";
 import { WineFormData, WineFormCallbacks } from './types';
+import { Wine } from '@/data/models/Wine';
 
 export const useWineFormActions = (
   newWine: WineFormData,
