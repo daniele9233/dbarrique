@@ -18,7 +18,10 @@ export const useWineForm = (onCompleteCallback?: (wine: any) => void, onCloseCal
     structure: "Equilibrato",
     tannins: "Equilibrato",
     sweetness: "Secco",
-    aroma: "Fruttato"
+    aroma: "Fruttato",
+    description: "",
+    pairing: "",
+    storage: ""
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);

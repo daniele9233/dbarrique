@@ -15,7 +15,7 @@ export interface Wine {
   tannins: string;
   sweetness: string;
   aroma: string;
-  description?: string;
+  description: string;
   pairing?: string;
   storage?: string;
 }

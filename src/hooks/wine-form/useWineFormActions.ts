@@ -1,3 +1,4 @@
+
 import { Dispatch, SetStateAction, useCallback, useRef } from 'react';
 import { toast } from "@/hooks/use-toast";
 import { addWine } from "@/data/services/wineService";
@@ -71,7 +72,9 @@ export const useWineFormActions = (
       tannins: "Equilibrato",
       sweetness: "Secco",
       aroma: "Fruttato",
-      description: ""
+      description: "",
+      pairing: "",
+      storage: ""
     });
     setIsBlend(false);
     if (fileInputRef.current) {

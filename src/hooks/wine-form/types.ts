@@ -16,7 +16,7 @@ export interface WineFormData {
   tannins: string;
   sweetness: string;
   aroma: string;
-  description?: string;
+  description: string;
   pairing?: string;
   storage?: string;
 }

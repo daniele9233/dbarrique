@@ -15,7 +15,7 @@ const DescriptionSection = ({ description, onChange, placeholder = "Inserisci un
         Descrizione
       </Label>
       <Textarea 
-        value={description}
+        value={description || ""}
         onChange={(e) => onChange(e.target.value)}
         className="bg-noir border-white/20 text-white h-24"
         placeholder={placeholder}
