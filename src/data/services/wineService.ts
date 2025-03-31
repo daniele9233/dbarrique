@@ -1,5 +1,5 @@
 
-import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, orderBy, connectFirestoreEmulator } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { Wine } from '../models/Wine';
 import { defaultWines } from '../constants/wines';
@@ -7,7 +7,23 @@ import { defaultWines } from '../constants/wines';
 // In-memory wine data with a timestamp for cache invalidation
 export let wines: Wine[] = [...defaultWines];
 let lastFetchTime = 0;
-const CACHE_VALIDITY_MS = 30000; // 30 seconds of cache validity (reduced for testing)
+const CACHE_VALIDITY_MS = 60000; // 1 minute of cache validity
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 1500;
+
+// Helper function to implement retry logic for Firestore operations
+const withRetry = async <T>(operation: () => Promise<T>, retries = MAX_RETRIES): Promise<T> => {
+  try {
+    return await operation();
+  } catch (error) {
+    if (retries > 0) {
+      console.log(`wineService: Operation failed, retrying... (${MAX_RETRIES - retries + 1}/${MAX_RETRIES})`);
+      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+      return withRetry(operation, retries - 1);
+    }
+    throw error;
+  }
+};
 
 export const loadWinesFromFirestore = async (forceRefresh = false): Promise<Wine[]> => {
   try {
@@ -19,28 +35,28 @@ export const loadWinesFromFirestore = async (forceRefresh = false): Promise<Wine
     }
 
     console.log("wineService: Loading wines from Firestore...");
-    const winesCollection = collection(db, 'wines');
-    const winesQuery = query(winesCollection, orderBy('name'));
-    const wineSnapshot = await getDocs(winesQuery);
     
-    if (wineSnapshot.empty) {
-      console.log("wineService: No wines in Firestore, using default wines...");
-      // Return default wines with fake IDs since we don't want to add them automatically
-      const winesWithIds = defaultWines.map((wine, index) => ({
-        ...wine,
-        id: `default-${index}`
-      }));
+    // Use retry logic for Firestore operation
+    const wineList = await withRetry(async () => {
+      const winesCollection = collection(db, 'wines');
+      const winesQuery = query(winesCollection, orderBy('name'));
+      const wineSnapshot = await getDocs(winesQuery);
       
-      wines = winesWithIds;
-      lastFetchTime = now;
-      return winesWithIds;
-    }
-    
-    console.log(`wineService: Found ${wineSnapshot.docs.length} wines in Firestore`);
-    const wineList = wineSnapshot.docs.map(doc => ({
-      ...doc.data(),
-      id: doc.id
-    })) as Wine[];
+      if (wineSnapshot.empty) {
+        console.log("wineService: No wines in Firestore, using default wines...");
+        // Return default wines with fake IDs since we don't want to add them automatically
+        return defaultWines.map((wine, index) => ({
+          ...wine,
+          id: `default-${index}`
+        }));
+      }
+      
+      console.log(`wineService: Found ${wineSnapshot.docs.length} wines in Firestore`);
+      return wineSnapshot.docs.map(doc => ({
+        ...doc.data(),
+        id: doc.id
+      })) as Wine[];
+    });
     
     wines = wineList;
     lastFetchTime = now;
@@ -65,7 +81,7 @@ export const loadWinesFromFirestore = async (forceRefresh = false): Promise<Wine
   }
 };
 
-// Initialize wines on import - but don't wait for the promise to resolve
+// Initialize wines on import with proper error handling
 loadWinesFromFirestore()
   .then(loadedWines => {
     wines = loadedWines;
@@ -73,6 +89,11 @@ loadWinesFromFirestore()
   })
   .catch(error => {
     console.error('wineService: Error during initial wine loading:', error);
+    console.log('wineService: Using default wines as fallback');
+    wines = defaultWines.map((wine, index) => ({
+      ...wine, 
+      id: `default-${index}`
+    }));
   });
 
 export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
@@ -108,16 +129,18 @@ export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
     
     console.log("wineService: Prepared wine object for Firestore:", wineToAdd);
     
-    // Add wine to Firestore
-    const winesCollection = collection(db, 'wines');
-    const docRef = await addDoc(winesCollection, wineToAdd);
-    console.log("wineService: Wine added with ID:", docRef.id);
-    
-    // Create complete wine object with ID
-    const newWine = { 
-      ...wineToAdd, 
-      id: docRef.id 
-    } as Wine;
+    // Add wine to Firestore with retries
+    const newWine = await withRetry(async () => {
+      const winesCollection = collection(db, 'wines');
+      const docRef = await addDoc(winesCollection, wineToAdd);
+      console.log("wineService: Wine added with ID:", docRef.id);
+      
+      // Create complete wine object with ID
+      return { 
+        ...wineToAdd, 
+        id: docRef.id 
+      } as Wine;
+    });
     
     // Update local cache - create a new array reference
     wines = [...wines, newWine];
@@ -131,8 +154,10 @@ export const addWine = async (wine: Omit<Wine, 'id'>): Promise<Wine> => {
 
 export const updateWine = async (id: string, updatedWine: Partial<Omit<Wine, 'id'>>): Promise<void> => {
   try {
-    const wineRef = doc(db, 'wines', id);
-    await updateDoc(wineRef, updatedWine);
+    await withRetry(async () => {
+      const wineRef = doc(db, 'wines', id);
+      await updateDoc(wineRef, updatedWine);
+    });
     
     const index = wines.findIndex(wine => wine.id === id);
     if (index !== -1) {
@@ -149,8 +174,10 @@ export const updateWine = async (id: string, updatedWine: Partial<Omit<Wine, 'id
 
 export const deleteWine = async (id: string): Promise<void> => {
   try {
-    const wineRef = doc(db, 'wines', id);
-    await deleteDoc(wineRef);
+    await withRetry(async () => {
+      const wineRef = doc(db, 'wines', id);
+      await deleteDoc(wineRef);
+    });
     
     // Create a new array reference to ensure reactivity
     wines = wines.filter(wine => wine.id !== id);
