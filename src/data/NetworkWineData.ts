@@ -47,7 +47,8 @@ const generateMoreWines = (): NetworkWine[] => {
       structure: "Strutturato",
       tannins: "Tannico",
       sweetness: "Secco",
-      aroma: "Fruttato"
+      aroma: "Fruttato",
+      description: "Elegante vino toscano con note di ciliegia matura e spezie. Corposo e strutturato con tannini vellutati."
     },
     {
       id: "11",
@@ -62,7 +63,8 @@ const generateMoreWines = (): NetworkWine[] => {
       structure: "Strutturato",
       tannins: "Equilibrato",
       sweetness: "Amabile",
-      aroma: "Speziato"
+      aroma: "Speziato",
+      description: "Vino veneto ricco e complesso, ottenuto da uve appassite. Note di frutta secca, cioccolato e spezie."
     },
     {
       id: "12",
@@ -77,7 +79,8 @@ const generateMoreWines = (): NetworkWine[] => {
       structure: "Equilibrato",
       tannins: "Equilibrato",
       sweetness: "Secco",
-      aroma: "Evoluto"
+      aroma: "Evoluto",
+      description: "Classico vino spagnolo con note di frutta rossa matura, vaniglia e spezie. Equilibrato e versatile."
     },
     {
       id: "13",
@@ -92,7 +95,8 @@ const generateMoreWines = (): NetworkWine[] => {
       structure: "Elegante",
       tannins: "Equilibrato",
       sweetness: "Secco",
-      aroma: "Fruttato"
+      aroma: "Fruttato",
+      description: "Vino toscano tradizionale con vivaci note di ciliegia, lampone e un tocco di erbe aromatiche."
     },
     {
       id: "14",
@@ -107,7 +111,8 @@ const generateMoreWines = (): NetworkWine[] => {
       structure: "Strutturato",
       tannins: "Tannico",
       sweetness: "Secco",
-      aroma: "Fruttato"
+      aroma: "Fruttato",
+      description: "Vino argentino intenso con note di mora, prugna e cioccolato. Ricco e vellutato al palato."
     },
     {
       id: "15",
@@ -122,7 +127,8 @@ const generateMoreWines = (): NetworkWine[] => {
       structure: "Elegante",
       tannins: "Morbido",
       sweetness: "Secco",
-      aroma: "Fruttato"
+      aroma: "Fruttato",
+      description: "Elegante vino della Borgogna con delicate note di fragola, ciliegia e un tocco di terra bagnata."
     }
   ];
 

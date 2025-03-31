@@ -16,7 +16,8 @@ export const defaultWines = [
     structure: "Strutturato",
     tannins: "Tannico",
     sweetness: "Secco",
-    aroma: "Fruttato"
+    aroma: "Fruttato",
+    description: "Un vino di eccezionale eleganza, con aromi complessi di frutti neri, tabacco e spezie. Tannini setosi e un finale persistente."
   },
   {
     id: "2",
@@ -31,7 +32,8 @@ export const defaultWines = [
     structure: "Strutturato",
     tannins: "Tannico",
     sweetness: "Secco",
-    aroma: "Evoluto"
+    aroma: "Evoluto",
+    description: "Vino piemontese classico con note di rosa, tar e frutti rossi. Tannini importanti e lunga persistenza."
   },
   {
     id: "4",
@@ -46,7 +48,8 @@ export const defaultWines = [
     structure: "Equilibrato",
     tannins: "Equilibrato",
     sweetness: "Secco",
-    aroma: "Fruttato"
+    aroma: "Fruttato",
+    description: "Blend prestigioso dalla Napa Valley con aromi di cassis, mirtillo e vaniglia. Struttura imponente ma equilibrata."
   },
   {
     id: "7",
@@ -61,7 +64,8 @@ export const defaultWines = [
     structure: "Equilibrato",
     tannins: "Equilibrato",
     sweetness: "Secco",
-    aroma: "Fruttato"
+    aroma: "Fruttato",
+    description: "Il celebre Super Tuscan con note di frutti di bosco, erbe mediterranee e spezie. Elegante e raffinato."
   },
   {
     id: "8",
@@ -76,7 +80,8 @@ export const defaultWines = [
     structure: "Strutturato",
     tannins: "Tannico",
     sweetness: "Secco",
-    aroma: "Speziato"
+    aroma: "Speziato",
+    description: "Iconico vino australiano con intense note di frutti scuri, cioccolato, liquirizia e spezie orientali."
   },
   {
     id: "9",
@@ -91,7 +96,8 @@ export const defaultWines = [
     structure: "Strutturato",
     tannins: "Tannico",
     sweetness: "Secco",
-    aroma: "Fruttato"
+    aroma: "Fruttato",
+    description: "Prestigioso vino toscano con aromi di ciliegia, prugna, tabacco e terra. Struttura importante e grande longevità."
   },
   {
     id: "10",
@@ -106,7 +112,8 @@ export const defaultWines = [
     structure: "Strutturato",
     tannins: "Tannico",
     sweetness: "Secco",
-    aroma: "Fruttato"
+    aroma: "Fruttato",
+    description: "Uno dei primi Super Tuscan, con note di frutta rossa, spezie e un tocco di vaniglia. Elegante e complesso."
   },
   {
     id: "11",
@@ -121,7 +128,8 @@ export const defaultWines = [
     structure: "Strutturato",
     tannins: "Equilibrato",
     sweetness: "Amabile",
-    aroma: "Speziato"
+    aroma: "Speziato",
+    description: "Lussuoso vino veneto con note di frutta passa, spezie dolci e un tocco di cacao. Ricco e vellutato."
   },
   {
     id: "12",
@@ -136,7 +144,8 @@ export const defaultWines = [
     structure: "Equilibrato",
     tannins: "Equilibrato",
     sweetness: "Secco",
-    aroma: "Evoluto"
+    aroma: "Evoluto",
+    description: "Classico vino spagnolo con note di frutta rossa, vaniglia, cuoio e un tocco di tabacco. Elegante e versatile."
   },
   {
     id: "13",
@@ -151,7 +160,8 @@ export const defaultWines = [
     structure: "Elegante",
     tannins: "Equilibrato",
     sweetness: "Secco",
-    aroma: "Fruttato"
+    aroma: "Fruttato",
+    description: "Tradizionale vino toscano con vivaci note di ciliegia, violetta e un tocco di spezie. Fresco e versatile."
   },
   {
     id: "14",
@@ -166,7 +176,8 @@ export const defaultWines = [
     structure: "Strutturato",
     tannins: "Tannico",
     sweetness: "Secco",
-    aroma: "Fruttato"
+    aroma: "Fruttato",
+    description: "Vino argentino potente con aromi di prugna, mora, cioccolato e un tocco di spezie dolci. Ricco e intenso."
   },
   {
     id: "15",
@@ -181,7 +192,8 @@ export const defaultWines = [
     structure: "Elegante",
     tannins: "Morbido",
     sweetness: "Secco",
-    aroma: "Fruttato"
+    aroma: "Fruttato",
+    description: "Delicato vino della Borgogna con aromi di fragola, ciliegia, sottobosco e un tocco di funghi. Sottile e raffinato."
   },
   {
     id: "16",
@@ -196,7 +208,8 @@ export const defaultWines = [
     structure: "Strutturato",
     tannins: "Tannico",
     sweetness: "Secco",
-    aroma: "Evoluto"
+    aroma: "Evoluto",
+    description: "Prestigioso vino di Bordeaux con complesse note di cassis, cedro, tabacco e grafite. Elegante e potente, con grande potenziale di invecchiamento."
   },
   {
     id: "17",
@@ -211,7 +224,8 @@ export const defaultWines = [
     structure: "Elegante",
     tannins: "Tannico",
     sweetness: "Secco",
-    aroma: "Evoluto"
+    aroma: "Evoluto",
+    description: "Elegante vino piemontese con aromi di rosa, ciliegia, tartufo e un tocco di liquirizia. Più accessibile del Barolo in gioventù."
   },
   {
     id: "18",
@@ -226,7 +240,8 @@ export const defaultWines = [
     structure: "Strutturato",
     tannins: "Tannico",
     sweetness: "Secco",
-    aroma: "Speziato"
+    aroma: "Speziato",
+    description: "Potente vino australiano con abbondanti note di frutta nera, pepe nero, cioccolato e un tocco di eucalipto. Intenso e concentrato."
   }
 ];
 
