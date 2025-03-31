@@ -1,6 +1,6 @@
 
 import * as d3 from 'd3';
-import { SimulationNode } from '../types';
+import { SimulationNode, SimulationLink } from '../types';
 
 /**
  * Sets up node interactions: hover effects, tooltips, and click handling
