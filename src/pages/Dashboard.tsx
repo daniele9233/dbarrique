@@ -4,7 +4,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { toast } from "@/hooks/use-toast";
 import AddWineDialog from "@/components/collection/AddWineDialog";
-import { loadWinesFromFirestore, wines as cachedWines } from "@/data/services/wineService";
+import { loadWinesFromFirestore, wines as cachedWines, addWine } from "@/data/services/wineService";
 import { Wine } from "@/data/models/Wine";
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import StatsCards from '@/components/dashboard/StatsCards';
