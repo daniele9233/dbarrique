@@ -40,18 +40,24 @@ export const addWine = async (wine: WineCreationData): Promise<Wine> => {
     
     console.log("wineService: Prepared wine object for Firestore:", wineToAdd);
     
-    // Add wine to Firestore with retries
-    const newWine = await withRetry(async () => {
-      const winesCollection = collection(db, 'wines');
-      const docRef = await addDoc(winesCollection, wineToAdd);
-      console.log("wineService: Wine added with ID:", docRef.id);
-      
-      // Create complete wine object with ID
-      return { 
-        ...wineToAdd, 
-        id: docRef.id 
-      } as Wine;
-    });
+    // Add wine to Firestore with retries and timeout
+    const newWine = await Promise.race([
+      withRetry(async () => {
+        const winesCollection = collection(db, 'wines');
+        const docRef = await addDoc(winesCollection, wineToAdd);
+        console.log("wineService: Wine added with ID:", docRef.id);
+        
+        // Create complete wine object with ID
+        return { 
+          ...wineToAdd, 
+          id: docRef.id 
+        } as Wine;
+      }),
+      // Add a global timeout to prevent infinite waiting
+      new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error("Operation timed out after 30 seconds")), 30000)
+      )
+    ]);
     
     // Update local cache
     addWineToCache(newWine);

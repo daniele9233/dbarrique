@@ -12,7 +12,7 @@ import CharacteristicsSection from './wine-form/CharacteristicsSection';
 import ImageUploadSection from './wine-form/ImageUploadSection';
 import DescriptionSection from '@/components/wine-card/wine-edit-form/DescriptionSection';
 import { Wine } from '@/data/models/Wine';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { toast } from "@/hooks/use-toast";
 
 interface AddWineDialogProps {
@@ -29,6 +29,35 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     setInternalIsOpen(isOpen);
   }, [isOpen]);
   
+  const handleWineComplete = useCallback((wine: Wine) => {
+    console.log("AddWineDialog: Wine added successfully:", wine);
+    
+    if (onWineAdded) {
+      onWineAdded(wine);
+    }
+    
+    // Close the dialog immediately instead of with timeout
+    setInternalIsOpen(false);
+    onOpenChange(false);
+    
+    toast({
+      title: "Successo",
+      description: "Il nuovo vino è stato aggiunto alla tua collezione.",
+    });
+  }, [onWineAdded, onOpenChange]);
+  
+  const handleWineError = useCallback((error: Error) => {
+    console.error("AddWineDialog: Error adding wine:", error);
+    
+    toast({
+      title: "Errore",
+      description: "Impossibile aggiungere il vino. Riprova più tardi.",
+      variant: "destructive"
+    });
+    
+    // Also ensure dialog stays open on error so user can try again
+  }, []);
+  
   const {
     newWine,
     isBlend,
@@ -42,33 +71,8 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     resetForm,
     isDisabled
   } = useWineForm({
-    onComplete: (wine: Wine) => {
-      console.log("AddWineDialog: Wine added successfully:", wine);
-      
-      if (onWineAdded) {
-        onWineAdded(wine);
-      }
-      
-      // Close the dialog with a small delay to ensure UI updates
-      setTimeout(() => {
-        setInternalIsOpen(false);
-        onOpenChange(false);
-      }, 300);
-      
-      toast({
-        title: "Successo",
-        description: "Il nuovo vino è stato aggiunto alla tua collezione.",
-      });
-    },
-    onError: (error: Error) => {
-      console.error("AddWineDialog: Error adding wine:", error);
-      
-      toast({
-        title: "Errore",
-        description: "Impossibile aggiungere il vino. Riprova più tardi.",
-        variant: "destructive"
-      });
-    }
+    onComplete: handleWineComplete,
+    onError: handleWineError
   });
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {

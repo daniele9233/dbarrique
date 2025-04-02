@@ -1,4 +1,3 @@
-
 import { Dispatch, SetStateAction, useCallback } from 'react';
 import { toast } from "@/hooks/use-toast";
 import { addWine } from "@/data/services/wine/wineOperations";
@@ -77,7 +76,10 @@ export const useWineFormActions = (
   }, [setNewWine, setIsBlend, fileInputRef]);
   
   const handleSubmit = useCallback(async () => {
-    if (isSubmitting) return;
+    if (isSubmitting) {
+      console.log("useWineFormActions: Already submitting, ignoring additional submit request");
+      return;
+    }
     
     // Validate form
     if (!newWine.name || newWine.name.trim() === "") {
@@ -109,8 +111,19 @@ export const useWineFormActions = (
       
       console.log("useWineFormActions: Chiamando addWine con", wineToAdd);
       
-      // Add wine to Firestore
-      const addedWine = await addWine(wineToAdd);
+      // Add wine to Firestore with a timeout
+      const addWinePromise = addWine(wineToAdd);
+      
+      // Add a timeout to prevent infinite waiting
+      const timeoutPromise = new Promise((_, reject) => {
+        const timeoutId = setTimeout(() => {
+          reject(new Error("Operazione interrotta dopo 15 secondi"));
+        }, 15000);
+        return () => clearTimeout(timeoutId);
+      });
+      
+      // Race the promises
+      const addedWine = await Promise.race([addWinePromise, timeoutPromise]);
       
       console.log("useWineFormActions: Vino aggiunto con successo", addedWine);
       
@@ -124,9 +137,6 @@ export const useWineFormActions = (
         if (callbacks.onComplete) {
           callbacks.onComplete(addedWine);
         }
-        
-        // Reset the form
-        resetForm();
       }
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : "Errore sconosciuto";
@@ -145,6 +155,10 @@ export const useWineFormActions = (
     } finally {
       console.log("useWineFormActions: Fine dell'operazione, resetting isSubmitting");
       setIsSubmitting(false);
+      
+      // Reset form regardless of success or failure
+      // This ensures the form won't stay in a submitting state if there's an error
+      resetForm();
     }
   }, [newWine, isSubmitting, resetForm, callbacks, setIsSubmitting]);
 
