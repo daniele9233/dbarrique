@@ -49,9 +49,6 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
         onWineAdded(wine);
       }
       
-      // Reset the form
-      resetForm();
-      
       // Close the dialog with a small delay to ensure UI updates
       setTimeout(() => {
         setInternalIsOpen(false);
