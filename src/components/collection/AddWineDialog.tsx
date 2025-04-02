@@ -12,7 +12,7 @@ import CharacteristicsSection from './wine-form/CharacteristicsSection';
 import ImageUploadSection from './wine-form/ImageUploadSection';
 import DescriptionSection from '@/components/wine-card/wine-edit-form/DescriptionSection';
 import { Wine } from '@/data/models/Wine';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { toast } from "@/hooks/use-toast";
 
 interface AddWineDialogProps {
@@ -22,24 +22,33 @@ interface AddWineDialogProps {
 }
 
 const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onWineAdded }) => {
+  // Create a ref to store original isOpen state to avoid re-renders
+  const dialogOpenRef = useRef(isOpen);
   const [internalIsOpen, setInternalIsOpen] = useState(isOpen);
   
   // Synchronize external and internal open states
   useEffect(() => {
-    setInternalIsOpen(isOpen);
+    if (isOpen !== dialogOpenRef.current) {
+      dialogOpenRef.current = isOpen;
+      setInternalIsOpen(isOpen);
+    }
   }, [isOpen]);
   
   const handleWineComplete = useCallback((wine: Wine) => {
     console.log("AddWineDialog: Wine added successfully:", wine);
     
+    // First, mark as completed to prevent any state issues
+    setInternalIsOpen(false);
+    
+    // Notify parent of success
     if (onWineAdded) {
       onWineAdded(wine);
     }
     
-    // Close the dialog immediately instead of with timeout
-    setInternalIsOpen(false);
+    // Close the dialog immediately
     onOpenChange(false);
     
+    // Show success toast
     toast({
       title: "Successo",
       description: "Il nuovo vino è stato aggiunto alla tua collezione.",
@@ -49,13 +58,12 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
   const handleWineError = useCallback((error: Error) => {
     console.error("AddWineDialog: Error adding wine:", error);
     
+    // Show error toast
     toast({
       title: "Errore",
       description: "Impossibile aggiungere il vino. Riprova più tardi.",
       variant: "destructive"
     });
-    
-    // Also ensure dialog stays open on error so user can try again
   }, []);
   
   const {
@@ -87,6 +95,11 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
       resetForm();
       setInternalIsOpen(false);
       onOpenChange(false);
+    } else {
+      toast({
+        title: "In attesa",
+        description: "Attendi il completamento dell'operazione...",
+      });
     }
   };
   
@@ -95,6 +108,10 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
     if (isSubmitting && !open) {
       // Prevent closing during submission
       console.log("AddWineDialog: Preventing close during submission");
+      toast({
+        title: "In attesa",
+        description: "Attendi il completamento dell'operazione...",
+      });
       return;
     }
     

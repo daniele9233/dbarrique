@@ -1,3 +1,4 @@
+
 import { Dispatch, SetStateAction, useCallback } from 'react';
 import { toast } from "@/hooks/use-toast";
 import { addWine } from "@/data/services/wine/wineOperations";
@@ -91,9 +92,27 @@ export const useWineFormActions = (
       return;
     }
     
+    let submissionTimeout: NodeJS.Timeout | null = null;
+    
     try {
       setIsSubmitting(true);
       console.log("useWineFormActions: Inizio aggiunta del vino", newWine);
+      
+      // Set a UI timeout to ensure we don't get stuck in loading state
+      submissionTimeout = setTimeout(() => {
+        console.log("useWineFormActions: UI timeout triggered");
+        setIsSubmitting(false);
+        toast({
+          title: "Errore",
+          description: "L'operazione sta impiegando troppo tempo. Riprova più tardi.",
+          variant: "destructive"
+        });
+        // Call error callback if provided
+        if (callbacks.onError) {
+          callbacks.onError(new Error("UI timeout"));
+        }
+        resetForm();
+      }, 20000); // 20 seconds UI timeout
       
       // Prepare data
       const wineToAdd = {
@@ -111,19 +130,14 @@ export const useWineFormActions = (
       
       console.log("useWineFormActions: Chiamando addWine con", wineToAdd);
       
-      // Add wine to Firestore with a timeout
-      const addWinePromise = addWine(wineToAdd);
+      // Add wine to Firestore
+      const addedWine = await addWine(wineToAdd);
       
-      // Add a timeout to prevent infinite waiting
-      const timeoutPromise = new Promise((_, reject) => {
-        const timeoutId = setTimeout(() => {
-          reject(new Error("Operazione interrotta dopo 15 secondi"));
-        }, 15000);
-        return () => clearTimeout(timeoutId);
-      });
-      
-      // Race the promises
-      const addedWine = await Promise.race([addWinePromise, timeoutPromise]);
+      // Clear the UI timeout since operation completed
+      if (submissionTimeout) {
+        clearTimeout(submissionTimeout);
+        submissionTimeout = null;
+      }
       
       console.log("useWineFormActions: Vino aggiunto con successo", addedWine);
       
@@ -133,6 +147,12 @@ export const useWineFormActions = (
           description: "Vino aggiunto alla collezione con successo."
         });
         
+        // Reset form immediately to avoid state issues
+        resetForm();
+        
+        // Reset submitting state
+        setIsSubmitting(false);
+        
         // Call completion callback if provided
         if (callbacks.onComplete) {
           callbacks.onComplete(addedWine);
@@ -141,6 +161,12 @@ export const useWineFormActions = (
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : "Errore sconosciuto";
       
+      // Clear the UI timeout since operation errored
+      if (submissionTimeout) {
+        clearTimeout(submissionTimeout);
+        submissionTimeout = null;
+      }
+      
       console.error('Errore durante l\'aggiunta del vino:', error);
       toast({
         title: "Errore",
@@ -148,17 +174,16 @@ export const useWineFormActions = (
         variant: "destructive"
       });
       
+      // Reset submitting state
+      setIsSubmitting(false);
+      
+      // Reset form
+      resetForm();
+      
       // Call error callback if provided
       if (callbacks.onError) {
         callbacks.onError(error instanceof Error ? error : new Error(String(error)));
       }
-    } finally {
-      console.log("useWineFormActions: Fine dell'operazione, resetting isSubmitting");
-      setIsSubmitting(false);
-      
-      // Reset form regardless of success or failure
-      // This ensures the form won't stay in a submitting state if there's an error
-      resetForm();
     }
   }, [newWine, isSubmitting, resetForm, callbacks, setIsSubmitting]);
 

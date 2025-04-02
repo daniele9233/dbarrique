@@ -5,7 +5,10 @@ import { Wine, WineCreationData } from '@/data/models/Wine';
 import { 
   addWineToCache, updateWineInCache, removeWineFromCache 
 } from './wineCache';
-import { withRetry } from './wineConnection';
+import { withRetry, goOffline } from './wineConnection';
+
+// Reduced timeout to prevent long waits
+const OPERATION_TIMEOUT = 15000; // 15 seconds instead of 30
 
 export const addWine = async (wine: WineCreationData): Promise<Wine> => {
   try {
@@ -40,29 +43,62 @@ export const addWine = async (wine: WineCreationData): Promise<Wine> => {
     
     console.log("wineService: Prepared wine object for Firestore:", wineToAdd);
     
-    // Add wine to Firestore with retries and timeout
-    const newWine = await Promise.race([
-      withRetry(async () => {
-        const winesCollection = collection(db, 'wines');
-        const docRef = await addDoc(winesCollection, wineToAdd);
-        console.log("wineService: Wine added with ID:", docRef.id);
+    // Create a controller to manage the timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, OPERATION_TIMEOUT);
+    
+    try {
+      // Try to add the wine to Firestore
+      const winesCollection = collection(db, 'wines');
+      const docRef = await addDoc(winesCollection, wineToAdd);
+      
+      // Clear the timeout since operation succeeded
+      clearTimeout(timeoutId);
+      
+      console.log("wineService: Wine added with ID:", docRef.id);
+      
+      // Create complete wine object with ID
+      const newWine = { 
+        ...wineToAdd, 
+        id: docRef.id 
+      } as Wine;
+      
+      // Update local cache
+      addWineToCache(newWine);
+      
+      return newWine;
+    } catch (error) {
+      // Clear timeout
+      clearTimeout(timeoutId);
+      
+      // If aborted due to timeout
+      if (error.name === 'AbortError' || controller.signal.aborted) {
+        throw new Error("Operation timed out after " + (OPERATION_TIMEOUT/1000) + " seconds");
+      }
+      
+      // For network errors, try to switch to offline mode
+      if (error.code === 'unavailable' || error.code === 'failed-precondition' || 
+          error.message?.includes('network') || error.message?.includes('timeout')) {
+        console.log("wineService: Network issue detected, switching to offline mode");
+        await goOffline();
         
-        // Create complete wine object with ID
-        return { 
-          ...wineToAdd, 
-          id: docRef.id 
-        } as Wine;
-      }),
-      // Add a global timeout to prevent infinite waiting
-      new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error("Operation timed out after 30 seconds")), 30000)
-      )
-    ]);
-    
-    // Update local cache
-    addWineToCache(newWine);
-    
-    return newWine;
+        // Create a temporary ID for offline mode
+        const tempId = 'temp_' + Date.now();
+        console.log("wineService: Created temporary ID for offline wine:", tempId);
+        
+        // Create wine with temporary ID and add to cache
+        const offlineWine = { ...wineToAdd, id: tempId } as Wine;
+        addWineToCache(offlineWine);
+        
+        // Return the offline wine
+        return offlineWine;
+      }
+      
+      // Rethrow other errors
+      throw error;
+    }
   } catch (error) {
     console.error('wineService: Error adding wine to Firestore:', error);
     throw error;
