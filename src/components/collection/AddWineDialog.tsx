@@ -1,5 +1,5 @@
 
-import { useWineForm } from '@/hooks/wine-form';
+import { useWineForm } from '@/hooks/useWineForm';
 import { Grape, Loader } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
