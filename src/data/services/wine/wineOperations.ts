@@ -7,8 +7,8 @@ import {
 } from './wineCache';
 import { withRetry, goOffline } from './wineConnection';
 
-// Reduced timeout to prevent long waits
-const OPERATION_TIMEOUT = 15000; // 15 seconds instead of 30
+// Set a reasonable timeout for operations
+const OPERATION_TIMEOUT = 10000; // 10 seconds max wait time
 
 export const addWine = async (wine: WineCreationData): Promise<Wine> => {
   try {
@@ -43,16 +43,21 @@ export const addWine = async (wine: WineCreationData): Promise<Wine> => {
     
     console.log("wineService: Prepared wine object for Firestore:", wineToAdd);
     
-    // Create a controller to manage the timeout
+    // Use AbortController for timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
       controller.abort();
     }, OPERATION_TIMEOUT);
     
     try {
-      // Try to add the wine to Firestore
+      // Try to add the wine to Firestore with timeout
       const winesCollection = collection(db, 'wines');
-      const docRef = await addDoc(winesCollection, wineToAdd);
+      const docRef = await Promise.race([
+        addDoc(winesCollection, wineToAdd),
+        new Promise<never>((_, reject) => 
+          setTimeout(() => reject(new Error("Operation timed out")), OPERATION_TIMEOUT)
+        )
+      ]);
       
       // Clear the timeout since operation succeeded
       clearTimeout(timeoutId);
@@ -69,13 +74,26 @@ export const addWine = async (wine: WineCreationData): Promise<Wine> => {
       addWineToCache(newWine);
       
       return newWine;
-    } catch (error) {
+    } catch (error: any) {
       // Clear timeout
       clearTimeout(timeoutId);
       
-      // If aborted due to timeout
-      if (error.name === 'AbortError' || controller.signal.aborted) {
-        throw new Error("Operation timed out after " + (OPERATION_TIMEOUT/1000) + " seconds");
+      console.error("wineService: Error during add operation:", error);
+      
+      // Handle timeout errors
+      if (error.name === 'AbortError' || error.message === "Operation timed out" || controller.signal.aborted) {
+        console.log("wineService: Operation timed out, falling back to offline mode");
+        
+        // For timeouts, try to switch to offline mode with a temporary ID
+        const tempId = 'temp_' + Date.now();
+        console.log("wineService: Created temporary ID for offline wine:", tempId);
+        
+        // Create wine with temporary ID and add to cache
+        const offlineWine = { ...wineToAdd, id: tempId } as Wine;
+        addWineToCache(offlineWine);
+        
+        await goOffline();
+        return offlineWine;
       }
       
       // For network errors, try to switch to offline mode

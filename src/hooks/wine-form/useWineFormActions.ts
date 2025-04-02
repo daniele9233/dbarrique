@@ -111,8 +111,7 @@ export const useWineFormActions = (
         if (callbacks.onError) {
           callbacks.onError(new Error("UI timeout"));
         }
-        resetForm();
-      }, 20000); // 20 seconds UI timeout
+      }, 15000); // 15 seconds UI timeout
       
       // Prepare data
       const wineToAdd = {
@@ -141,17 +140,17 @@ export const useWineFormActions = (
       
       console.log("useWineFormActions: Vino aggiunto con successo", addedWine);
       
+      // Update UI state
+      setIsSubmitting(false);
+      
       if (addedWine) {
         toast({
           title: "Successo",
-          description: "Vino aggiunto alla collezione con successo."
+          description: `${addedWine.name} è stato aggiunto alla collezione con successo.`
         });
         
-        // Reset form immediately to avoid state issues
+        // Reset form
         resetForm();
-        
-        // Reset submitting state
-        setIsSubmitting(false);
         
         // Call completion callback if provided
         if (callbacks.onComplete) {
@@ -159,26 +158,23 @@ export const useWineFormActions = (
         }
       }
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : "Errore sconosciuto";
+      console.error('Errore durante l\'aggiunta del vino:', error);
       
-      // Clear the UI timeout since operation errored
+      // Clear the UI timeout
       if (submissionTimeout) {
         clearTimeout(submissionTimeout);
         submissionTimeout = null;
       }
       
-      console.error('Errore durante l\'aggiunta del vino:', error);
+      // Always ensure we reset the submitting state
+      setIsSubmitting(false);
+      
+      const errorMsg = error instanceof Error ? error.message : "Errore sconosciuto";
       toast({
         title: "Errore",
         description: `Impossibile aggiungere il vino: ${errorMsg}`,
         variant: "destructive"
       });
-      
-      // Reset submitting state
-      setIsSubmitting(false);
-      
-      // Reset form
-      resetForm();
       
       // Call error callback if provided
       if (callbacks.onError) {

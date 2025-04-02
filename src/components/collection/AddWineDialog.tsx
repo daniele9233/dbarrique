@@ -37,7 +37,7 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
   const handleWineComplete = useCallback((wine: Wine) => {
     console.log("AddWineDialog: Wine added successfully:", wine);
     
-    // First, mark as completed to prevent any state issues
+    // Prevent any state issues by ensuring state updates are triggered properly
     setInternalIsOpen(false);
     
     // Notify parent of success
@@ -57,6 +57,9 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
   
   const handleWineError = useCallback((error: Error) => {
     console.error("AddWineDialog: Error adding wine:", error);
+    
+    // Make sure dialog stays open on error
+    setInternalIsOpen(true);
     
     // Show error toast
     toast({
@@ -115,14 +118,14 @@ const AddWineDialog: React.FC<AddWineDialogProps> = ({ isOpen, onOpenChange, onW
       return;
     }
     
-    // Allow closing
-    setInternalIsOpen(open);
-    onOpenChange(open);
-    
-    // Reset form when closing
-    if (!open) {
+    // Only reset form when dialog is actually closing
+    if (!open && internalIsOpen) {
       resetForm();
     }
+    
+    // Update open state
+    setInternalIsOpen(open);
+    onOpenChange(open);
   };
 
   return (
