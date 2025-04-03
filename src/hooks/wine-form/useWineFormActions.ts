@@ -3,6 +3,7 @@ import { Dispatch, SetStateAction, useCallback } from 'react';
 import { toast } from "@/hooks/use-toast";
 import { addWine } from "@/data/services/wine/wineOperations";
 import { WineFormData, WineFormCallbacks } from './types';
+import { WineCreationData } from '@/data/models/Wine';
 
 // Small utility function to handle UI toasts for form errors
 const showErrorToast = (message: string): void => {
@@ -107,7 +108,8 @@ export const useWineFormActions = (
   }, [newWine.name]);
   
   // Prepare wine data with defaults for missing fields
-  const prepareWineData = useCallback((): WineFormData => {
+  const prepareWineData = useCallback((): WineCreationData => {
+    // Ensure all required fields have values to satisfy the WineCreationData type
     return {
       ...newWine,
       type: newWine.type || "red",
@@ -116,10 +118,10 @@ export const useWineFormActions = (
       grape: newWine.grape || "Non specificato",
       grapes: newWine.grapes.length > 0 ? newWine.grapes : [],
       description: newWine.description || "",
-      pairing: newWine.pairing || "",
-      storage: newWine.storage || "",
+      pairing: newWine.pairing || "", // Ensure this is never undefined
+      storage: newWine.storage || "", // Ensure this is never undefined
       image: newWine.image || "https://images.unsplash.com/photo-1553361371-9fe24fca9c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
-    };
+    } as WineCreationData;
   }, [newWine]);
   
   // Set up UI timeout to prevent getting stuck in loading state
@@ -141,7 +143,7 @@ export const useWineFormActions = (
   
   // Handle the actual wine submission
   const performWineSubmission = useCallback(async (
-    wineToAdd: WineFormData,
+    wineToAdd: WineCreationData,
     uiTimeoutId: NodeJS.Timeout,
     setIsSubmitting: Dispatch<SetStateAction<boolean>>,
     callbacks: WineFormCallbacks,

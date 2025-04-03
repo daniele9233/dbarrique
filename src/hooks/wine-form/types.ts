@@ -18,8 +18,8 @@ export interface WineFormData {
   sweetness: string;
   aroma: string;
   description: string;
-  pairing?: string;
-  storage?: string;
+  pairing: string; // Making sure this is not optional to match WineCreationData
+  storage: string; // Making sure this is not optional to match WineCreationData
 }
 
 export interface WineFormCallbacks {
