@@ -42,14 +42,16 @@ export const useWineFormActions = (
     const reader = new FileReader();
     reader.onload = (e) => {
       if (e.target?.result) {
+        // Aggiorna solo l'immagine senza inviare il form
         handleChange('image', e.target.result as string);
         toast({
           title: "Immagine caricata",
-          description: "L'immagine del vino è stata caricata con successo.",
+          description: "L'immagine del vino è stata caricata con successo. Clicca 'Aggiungi alla Collezione' per completare l'operazione.",
         });
       }
     };
     reader.readAsDataURL(file);
+    // Rimuoviamo qualsiasi logica che potrebbe inviare automaticamente il form
   }, [handleChange]);
   
   const resetForm = useCallback(() => {

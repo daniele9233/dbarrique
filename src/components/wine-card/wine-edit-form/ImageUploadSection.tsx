@@ -35,12 +35,18 @@ const ImageUploadSection = ({
           variant="outline" 
           size="icon"
           className="bg-noir border-white/20 hover:bg-wine/20"
+          type="button"
         >
           <Upload className="h-4 w-4" />
         </Button>
       </div>
-      <div className="bg-noir-dark mt-2 h-40 rounded-lg overflow-hidden">
-        <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+      <div className="mt-2">
+        <div className="bg-noir-dark h-40 rounded-lg overflow-hidden">
+          <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+        </div>
+        {imageUrl && (
+          <p className="text-xs text-white/60 mt-1">Immagine caricata. Per salvare le modifiche, clicca sul pulsante "Salva Modifiche".</p>
+        )}
       </div>
     </div>
   );

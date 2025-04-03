@@ -35,6 +35,7 @@ const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
           variant="outline"
           className="border-white/10 hover:bg-wine hover:text-white"
           onClick={() => fileInputRef.current?.click()}
+          type="button"
         >
           <Upload className="h-4 w-4 mr-2" />
           Carica
@@ -49,12 +50,15 @@ const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
       </div>
       
       {wineData.image && (
-        <div className="mt-2 h-40 rounded-md overflow-hidden bg-noir-dark">
-          <img 
-            src={wineData.image.toString()} 
-            alt="Anteprima vino" 
-            className="w-full h-full object-cover"
-          />
+        <div className="mt-2">
+          <div className="h-40 rounded-md overflow-hidden bg-noir-dark">
+            <img 
+              src={wineData.image.toString()} 
+              alt="Anteprima vino" 
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <p className="text-xs text-white/60 mt-1">Immagine caricata. Per salvare il vino, clicca sul pulsante "Aggiungi alla Collezione".</p>
         </div>
       )}
     </div>
