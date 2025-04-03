@@ -183,6 +183,22 @@ export const useWineFormActions = (
       // Always ensure we reset the submitting state
       setIsSubmitting(false);
       
+      // Il vino potrebbe essere stato aggiunto in modalità offline
+      // Controlliamo se l'errore contiene un vino temporaneo
+      if (error instanceof Error && 'id' in (error as any)) {
+        const offlineWine = (error as any);
+        if (offlineWine.id && offlineWine.id.startsWith('temp_')) {
+          console.log("useWineFormActions: Vino aggiunto in modalità offline", offlineWine);
+          showSuccessToast(offlineWine.name);
+          resetFormFn();
+          
+          if (callbacks.onComplete) {
+            callbacks.onComplete(offlineWine);
+          }
+          return;
+        }
+      }
+      
       const errorMsg = error instanceof Error ? error.message : "Errore sconosciuto";
       showErrorToast(`Impossibile aggiungere il vino: ${errorMsg}`);
       
