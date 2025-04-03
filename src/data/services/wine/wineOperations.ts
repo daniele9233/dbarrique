@@ -7,8 +7,8 @@ import {
 } from './wineCache';
 import { withRetry, goOffline } from './wineConnection';
 
-// Set a reasonable timeout for operations
-const OPERATION_TIMEOUT = 10000; // 10 seconds max wait time
+// Set a more reasonable timeout for operations (reduced from 10s to 6s)
+const OPERATION_TIMEOUT = 6000; // 6 seconds max wait time
 
 export const addWine = async (wine: WineCreationData): Promise<Wine> => {
   try {
@@ -42,6 +42,9 @@ export const addWine = async (wine: WineCreationData): Promise<Wine> => {
     };
     
     console.log("wineService: Prepared wine object for Firestore:", wineToAdd);
+    
+    // Create temporary ID in advance to optimize flow
+    const tempId = 'temp_' + Date.now();
     
     // Use AbortController for timeout
     const controller = new AbortController();
@@ -84,9 +87,8 @@ export const addWine = async (wine: WineCreationData): Promise<Wine> => {
       if (error.name === 'AbortError' || error.message === "Operation timed out" || controller.signal.aborted) {
         console.log("wineService: Operation timed out, falling back to offline mode");
         
-        // For timeouts, try to switch to offline mode with a temporary ID
-        const tempId = 'temp_' + Date.now();
-        console.log("wineService: Created temporary ID for offline wine:", tempId);
+        // For timeouts, switch to offline mode with a temporary ID
+        console.log("wineService: Using temporary ID for offline wine:", tempId);
         
         // Create wine with temporary ID and add to cache
         const offlineWine = { ...wineToAdd, id: tempId } as Wine;
@@ -102,9 +104,8 @@ export const addWine = async (wine: WineCreationData): Promise<Wine> => {
         console.log("wineService: Network issue detected, switching to offline mode");
         await goOffline();
         
-        // Create a temporary ID for offline mode
-        const tempId = 'temp_' + Date.now();
-        console.log("wineService: Created temporary ID for offline wine:", tempId);
+        // Use the temporary ID created earlier
+        console.log("wineService: Using temporary ID for offline wine:", tempId);
         
         // Create wine with temporary ID and add to cache
         const offlineWine = { ...wineToAdd, id: tempId } as Wine;
