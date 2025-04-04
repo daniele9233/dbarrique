@@ -5,7 +5,7 @@ import { addWine } from "@/data/services/wine/wineOperations";
 import { WineFormCallbacks } from '../types';
 import { showSuccessToast, showErrorToast } from './formUtils';
 
-// Ridotto il timeout UI da 15 secondi a 8 secondi per dare un feedback più rapido
+// Ulteriormente ridotto il timeout UI da 8 secondi a 5 secondi per dare un feedback più rapido
 export const setupUITimeout = (
   setIsSubmitting: Dispatch<SetStateAction<boolean>>,
   callbacks: WineFormCallbacks
@@ -18,7 +18,7 @@ export const setupUITimeout = (
     if (callbacks.onError) {
       callbacks.onError(new Error("UI timeout"));
     }
-  }, 8000); // Ridotto da 15000 a 8000 ms
+  }, 5000); // Ridotto da 8000 a 5000 ms per una UX più reattiva
 };
 
 export const performWineSubmission = async (
@@ -34,12 +34,12 @@ export const performWineSubmission = async (
     // Ottimizzato con Promise.race per evitare blocchi
     const addWinePromise = addWine(wineToAdd);
     
-    // Utilizziamo Promise.race per evitare attese troppo lunghe
+    // Utilizziamo Promise.race con un timeout più breve (4 secondi invece di 6)
     const addedWine = await Promise.race([
       addWinePromise,
-      // Aggiungiamo un timeout di 6 secondi anche qui come fallback
+      // Ridotto il timeout locale a 4 secondi per una risposta più rapida
       new Promise<Wine>((_, reject) => 
-        setTimeout(() => reject(new Error("Timeout locale durante l'aggiunta del vino")), 6000)
+        setTimeout(() => reject(new Error("Timeout locale durante l'aggiunta del vino")), 4000)
       )
     ]);
     
@@ -83,14 +83,7 @@ export const performWineSubmission = async (
       console.log("useWineFormActions: Timeout locale durante l'aggiunta del vino, tentiamo comunque di completare l'operazione");
       
       try {
-        // Tentiamo di registrare comunque il vino (questa operazione avverrà dietro le quinte)
-        addWine(wineToAdd).then(wine => {
-          console.log("useWineFormActions: Vino aggiunto con successo dopo il timeout locale:", wine);
-        }).catch(err => {
-          console.error("useWineFormActions: Impossibile aggiungere il vino dopo il timeout:", err);
-        });
-        
-        // Nel frattempo, mostriamo all'utente un messaggio di successo
+        // Creiamo immediatamente un vino temporaneo per una UX più reattiva
         const tempWine = { ...wineToAdd, id: 'temp_' + Date.now() } as Wine;
         showSuccessToast(tempWine.name);
         resetFormFn();
@@ -98,6 +91,14 @@ export const performWineSubmission = async (
         if (callbacks.onComplete) {
           callbacks.onComplete(tempWine);
         }
+        
+        // Tentiamo di registrare comunque il vino (questa operazione avverrà dietro le quinte)
+        addWine(wineToAdd).then(wine => {
+          console.log("useWineFormActions: Vino aggiunto con successo dopo il timeout locale:", wine);
+        }).catch(err => {
+          console.error("useWineFormActions: Impossibile aggiungere il vino dopo il timeout:", err);
+        });
+        
         return;
       } catch (offlineError) {
         console.error("useWineFormActions: Errore durante il fallback offline:", offlineError);

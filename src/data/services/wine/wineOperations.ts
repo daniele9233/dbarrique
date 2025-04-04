@@ -1,4 +1,3 @@
-
 import { collection, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { Wine, WineCreationData } from '@/data/models/Wine';
@@ -7,8 +6,8 @@ import {
 } from './wineCache';
 import { withRetry, goOffline } from './wineConnection';
 
-// Set a more reasonable timeout for operations (reduced from 10s to 6s)
-const OPERATION_TIMEOUT = 6000; // 6 seconds max wait time
+// Ridotto ulteriormente il timeout per operazioni (da 6s a 4s)
+const OPERATION_TIMEOUT = 4000; // 4 secondi max di attesa
 
 export const addWine = async (wine: WineCreationData): Promise<Wine> => {
   try {
@@ -46,6 +45,10 @@ export const addWine = async (wine: WineCreationData): Promise<Wine> => {
     // Create temporary ID in advance to optimize flow
     const tempId = 'temp_' + Date.now();
     
+    // Aggiungiamo immediatamente il vino alla cache locale per una UX più reattiva
+    const tempWine = { ...wineToAdd, id: tempId } as Wine;
+    addWineToCache(tempWine);
+    
     // Use AbortController for timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
@@ -73,7 +76,8 @@ export const addWine = async (wine: WineCreationData): Promise<Wine> => {
         id: docRef.id 
       } as Wine;
       
-      // Update local cache
+      // Rimuoviamo il vino temporaneo e aggiungiamo quello effettivo
+      removeWineFromCache(tempId);
       addWineToCache(newWine);
       
       return newWine;
@@ -87,15 +91,11 @@ export const addWine = async (wine: WineCreationData): Promise<Wine> => {
       if (error.name === 'AbortError' || error.message === "Operation timed out" || controller.signal.aborted) {
         console.log("wineService: Operation timed out, falling back to offline mode");
         
-        // For timeouts, switch to offline mode with a temporary ID
+        // Il vino temporaneo è già stato aggiunto alla cache
         console.log("wineService: Using temporary ID for offline wine:", tempId);
         
-        // Create wine with temporary ID and add to cache
-        const offlineWine = { ...wineToAdd, id: tempId } as Wine;
-        addWineToCache(offlineWine);
-        
         await goOffline();
-        return offlineWine;
+        return tempWine;
       }
       
       // For network errors, try to switch to offline mode
@@ -104,15 +104,11 @@ export const addWine = async (wine: WineCreationData): Promise<Wine> => {
         console.log("wineService: Network issue detected, switching to offline mode");
         await goOffline();
         
-        // Use the temporary ID created earlier
+        // Il vino temporaneo è già stato aggiunto alla cache
         console.log("wineService: Using temporary ID for offline wine:", tempId);
         
-        // Create wine with temporary ID and add to cache
-        const offlineWine = { ...wineToAdd, id: tempId } as Wine;
-        addWineToCache(offlineWine);
-        
         // Return the offline wine
-        return offlineWine;
+        return tempWine;
       }
       
       // Rethrow other errors
