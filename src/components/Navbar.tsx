@@ -1,10 +1,11 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Wine, BarChart3, Grid3X3, Network, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useMobile } from '@/hooks/use-mobile';
 
 const navItems = [
   { name: 'Home', href: '/', icon: Wine },
@@ -17,7 +18,7 @@ const navItems = [
 const Navbar = () => {
   const location = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
-  const isMobile = useIsMobile();
+  const isMobile = useMobile();
 
   useEffect(() => {
     const handleScroll = () => {

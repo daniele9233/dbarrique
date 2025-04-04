@@ -7,7 +7,7 @@ import WorldWineSearchHeader from '@/components/search/WorldWineSearchHeader';
 import SearchResults from '@/components/search/SearchResults';
 import { WineSearchOptions, searchWines, addVivinoWineToCollection } from '@/data/services/wine/wineSearchService';
 import { Wine } from '@/data/models/Wine';
-import LoadingSpinner from '@/components/collection/LoadingSpinner';
+import { LoadingSpinner } from '@/components/collection/LoadingSpinner';
 import GlobalWineSearchBar from '@/components/search/GlobalWineSearchBar';
 
 const WorldWineSearch = () => {
