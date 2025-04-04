@@ -1,101 +1,111 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Wine, BarChart3, Grid3X3, Network, Search } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useMobile } from '@/hooks/use-mobile';
-
-const navItems = [
-  { name: 'Home', href: '/', icon: Wine },
-  { name: 'Collection', href: '/collection', icon: Grid3X3 },
-  { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
-  { name: 'Network', href: '/network', icon: Network },
-  { name: 'Global Search', href: '/search', icon: Search }
-];
+import { Grape, Menu, X } from 'lucide-react';
 
 const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-  const [isScrolled, setIsScrolled] = useState(false);
-  const isMobile = useMobile();
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setScrolled(window.scrollY > 20);
     };
-
+    
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Define navigation items with active state
-  const NavItems = () => (
-    <>
-      {navItems.map((item) => {
-        const isActive = location.pathname === item.href;
-        const ItemIcon = item.icon;
-        
-        return (
-          <Link
-            key={item.name}
-            to={item.href}
-            className={cn(
-              "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
-              isActive
-                ? "text-white bg-noir-light"
-                : "text-white/60 hover:text-white hover:bg-noir-light/50"
-            )}
-          >
-            <ItemIcon className="mr-2 h-4 w-4" />
-            {item.name}
-          </Link>
-        );
-      })}
-    </>
-  );
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  const links = [
+    { name: 'Home', path: '/' },
+    { name: 'Dashboard', path: '/dashboard' },
+    { name: 'Collection', path: '/collection' },
+    { name: 'WNetwork', path: '/wnetwork' },
+  ];
+
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
 
   return (
-    <header
-      className={cn(
-        "fixed top-0 w-full z-50 transition-all duration-200",
-        isScrolled ? "bg-noir shadow-md" : "bg-transparent"
-      )}
+    <header 
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled ? 'bg-noir-dark/90 backdrop-blur-md py-3 shadow-md' : 'bg-transparent py-6'
+      }`}
     >
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link to="/" className="flex items-center">
-          <span className="text-wine text-2xl font-bold">D</span>
-          <span className="text-white font-light">Barrique</span>
+      <div className="container mx-auto flex items-center justify-between px-4">
+        <Link 
+          to="/" 
+          className="flex items-center space-x-2 text-white"
+          onClick={() => setIsOpen(false)}
+        >
+          <Grape className="h-8 w-8 text-wine" />
+          <span className="font-serif text-xl"><span className="text-white">D</span><span className="text-wine">Barrique</span></span>
         </Link>
-
-        {isMobile ? (
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-white">
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="bg-noir border-white/10 p-0">
-              <div className="flex flex-col space-y-3 py-4 px-6">
-                <div className="flex items-center justify-between mb-4">
-                  <Link to="/" className="flex items-center">
-                    <span className="text-wine text-2xl font-bold">D</span>
-                    <span className="text-white font-light">Barrique</span>
-                  </Link>
-                </div>
-                <NavItems />
-              </div>
-            </SheetContent>
-          </Sheet>
-        ) : (
-          <nav className="flex items-center space-x-1">
-            <NavItems />
-          </nav>
-        )}
+        
+        <nav className="hidden md:block">
+          <ul className="flex space-x-8">
+            {links.map((link) => (
+              <li key={link.path}>
+                <Link
+                  to={link.path}
+                  className={`text-sm font-medium tracking-wider uppercase transition-all duration-300 ${
+                    isActive(link.path)
+                      ? 'text-wine'
+                      : 'text-white hover:text-wine'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        
+        <button 
+          onClick={() => setIsOpen(!isOpen)}
+          className="block md:hidden text-white"
+          aria-label="Toggle menu"
+        >
+          {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+      </div>
+      
+      {/* Mobile Menu */}
+      <div 
+        className={`fixed inset-0 bg-noir-dark z-40 md:hidden transition-transform duration-500 ease-wine-bounce ${
+          isOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <div className="flex flex-col h-full justify-center items-center space-y-8 p-8">
+          {links.map((link) => (
+            <Link
+              key={link.path}
+              to={link.path}
+              onClick={() => setIsOpen(false)}
+              className={`text-2xl font-serif tracking-wider ${
+                isActive(link.path)
+                  ? 'text-wine'
+                  : 'text-white hover:text-wine'
+              } transition-colors duration-300`}
+            >
+              {link.name}
+            </Link>
+          ))}
+        </div>
       </div>
     </header>
   );
