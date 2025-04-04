@@ -51,7 +51,6 @@ export const useWineFormActions = (
       }
     };
     reader.readAsDataURL(file);
-    // Rimuoviamo qualsiasi logica che potrebbe inviare automaticamente il form
   }, [handleChange]);
   
   const resetForm = useCallback(() => {
