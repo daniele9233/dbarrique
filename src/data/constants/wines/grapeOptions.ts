@@ -1,5 +1,6 @@
 
 export const grapes = [
+  // Famous Italian Red Varieties
   "Aglianico",
   "Barbera",
   "Cabernet Sauvignon",
@@ -26,6 +27,35 @@ export const grapes = [
   "Syrah",
   "Teroldego",
   
+  // Additional Famous Italian Red Varieties
+  "Ciliegiolo",
+  "Croatina",
+  "Frappato",
+  "Gaglioppo",
+  "Nerello Mascalese",
+  "Refosco",
+  "Schioppettino",
+  
+  // Famous Italian White Varieties
+  "Arneis",
+  "Catarratto",
+  "Cortese",
+  "Falanghina",
+  "Fiano",
+  "Garganega",
+  "Glera",
+  "Greco",
+  "Grillo",
+  "Malvasia Bianca",
+  "Pecorino",
+  "Pinot Grigio",
+  "Ribolla Gialla",
+  "Trebbiano",
+  "Verdicchio",
+  "Vermentino",
+  "Vernaccia",
+  
+  // Famous International Red Varieties
   "Cabernet Franc",
   "Carignan",
   "Carménère",
@@ -37,5 +67,39 @@ export const grapes = [
   "Petite Sirah",
   "Tempranillo",
   "Zinfandel",
+  
+  // Additional Famous International Red Varieties
+  "Cinsault",
+  "Grenache Noir",
+  "Mencia",
+  "Pinotage",
+  "Tannat",
+  "Touriga Nacional",
+  
+  // Famous International White Varieties
+  "Albariño",
+  "Chardonnay",
+  "Chenin Blanc",
+  "Gewürztraminer",
+  "Grüner Veltliner",
+  "Marsanne",
+  "Muscadet",
+  "Pinot Blanc",
+  "Riesling",
+  "Roussanne",
+  "Sauvignon Blanc",
+  "Sémillon",
+  "Torrontés",
+  "Verdejo",
+  "Viognier",
+  
+  // Unique and Special Varieties
+  "Aleatico",
+  "Brachetto",
+  "Fumin",
+  "Petit Manseng",
+  "Viura",
+  
+  // Blend designation
   "Blend"
 ];

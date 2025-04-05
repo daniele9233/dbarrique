@@ -28,15 +28,19 @@ const WNetwork = () => {
   };
 
   const legendItems = [
-    { color: "#4169E1", label: "Cabernet Sauvignon" },
     { color: "#9370DB", label: "Nebbiolo" },
+    { color: "#8B4513", label: "Sangiovese" },
+    { color: "#4169E1", label: "Cabernet Sauvignon" },
     { color: "#3CB371", label: "Merlot" },
     { color: "#FF6347", label: "Syrah" },
-    { color: "#8B4513", label: "Sangiovese" },
-    { color: "#FF69B4", label: "Pinot Noir" }
+    { color: "#FF69B4", label: "Pinot Noir" },
+    { color: "#800000", label: "Primitivo" },
+    { color: "#A0522D", label: "Aglianico" },
+    { color: "#FFD700", label: "Chardonnay" },
+    { color: "#7FFF00", label: "Sauvignon Blanc" }
   ];
 
-  const legendDescription = "Le dimensioni delle bolle rappresentano il rating del vino. Le linee collegano vini che condividono caratteristiche simili.";
+  const legendDescription = "Le dimensioni delle bolle rappresentano il rating del vino. Le linee collegano vini che condividono caratteristiche simili. I colori indicano il vitigno principale.";
 
   return (
     <div className="min-h-screen flex flex-col bg-noir">
@@ -46,7 +50,7 @@ const WNetwork = () => {
         {/* Header */}
         <NetworkHeader 
           title="Wine Network" 
-          description="Esplora le relazioni tra i vini in base alle loro caratteristiche e vitigni."
+          description="Esplora le relazioni tra i vini in base alle loro caratteristiche e vitigni di tutto il mondo."
         />
         
         {/* Main content area with sidebar and network */}
