@@ -1,20 +1,42 @@
 
 import React from 'react';
 import { useFilterContext } from './FilterContext';
-import { getUniqueRegions } from '@/data/NetworkWineData';
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+// List of all Italian regions
+const italianRegions = [
+  "Abruzzo",
+  "Basilicata", 
+  "Calabria", 
+  "Campania",
+  "Emilia-Romagna", 
+  "Friuli-Venezia Giulia", 
+  "Lazio", 
+  "Liguria", 
+  "Lombardia", 
+  "Marche", 
+  "Molise", 
+  "Piemonte", 
+  "Puglia", 
+  "Sardegna", 
+  "Sicilia", 
+  "Toscana", 
+  "Trentino-Alto Adige", 
+  "Umbria", 
+  "Valle d'Aosta", 
+  "Veneto"
+];
+
 const RegionFilter: React.FC = () => {
   const { filters, setFilters } = useFilterContext();
-  const uniqueRegions = getUniqueRegions().sort((a, b) => a.localeCompare(b));
   const [searchTerm, setSearchTerm] = React.useState('');
   
-  const filteredRegions = uniqueRegions.filter(region => 
-    region.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredRegions = italianRegions
+    .filter(region => region.toLowerCase().includes(searchTerm.toLowerCase()))
+    .sort((a, b) => a.localeCompare(b));
 
   const handleChange = (value: string) => {
     const updatedFilters = { ...filters };
@@ -41,7 +63,7 @@ const RegionFilter: React.FC = () => {
       </div>
       
       <ScrollArea className="flex-1">
-        <div className="space-y-2 pr-3">
+        <div className="space-y-2 pr-3 pb-4">
           {filteredRegions.length > 0 ? (
             filteredRegions.map(region => (
               <div key={region} className="flex items-center">

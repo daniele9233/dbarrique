@@ -44,7 +44,7 @@ const GrapeFilter: React.FC = () => {
       </div>
       
       <ScrollArea className="flex-1">
-        <div className="space-y-2 pr-3">
+        <div className="space-y-2 pr-3 pb-4">
           {filteredGrapes.length > 0 ? (
             filteredGrapes.map(grape => (
               <div key={grape} className="flex items-center">
