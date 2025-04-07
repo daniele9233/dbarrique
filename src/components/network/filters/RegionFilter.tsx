@@ -40,8 +40,8 @@ const RegionFilter: React.FC = () => {
         />
       </div>
       
-      <ScrollArea className="flex-1 h-full pr-4">
-        <div className="space-y-2">
+      <ScrollArea className="flex-1">
+        <div className="space-y-2 pr-3">
           {filteredRegions.length > 0 ? (
             filteredRegions.map(region => (
               <div key={region} className="flex items-center">

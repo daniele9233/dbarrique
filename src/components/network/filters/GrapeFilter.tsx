@@ -1,7 +1,6 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useFilterContext } from './FilterContext';
-import { getUniqueGrapes } from '@/data/NetworkWineData';
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -44,8 +43,8 @@ const GrapeFilter: React.FC = () => {
         />
       </div>
       
-      <ScrollArea className="flex-1 h-full pr-4">
-        <div className="space-y-2">
+      <ScrollArea className="flex-1">
+        <div className="space-y-2 pr-3">
           {filteredGrapes.length > 0 ? (
             filteredGrapes.map(grape => (
               <div key={grape} className="flex items-center">
