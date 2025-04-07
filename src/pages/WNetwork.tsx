@@ -56,7 +56,7 @@ const WNetwork = () => {
         {/* Main content area with sidebar and network */}
         <div className="relative flex max-w-7xl mx-auto px-4 h-[calc(100vh-300px)] min-h-[500px]">
           {/* Sidebar */}
-          <div className={`absolute md:relative z-10 transition-all duration-300 ${
+          <div className={`absolute md:relative z-10 h-full transition-all duration-300 ${
             isSidebarOpen ? 'left-0' : '-left-64'
           }`}>
             <NetworkFilter 
