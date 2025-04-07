@@ -54,7 +54,7 @@ const WNetwork = () => {
         />
         
         {/* Main content area with sidebar and network */}
-        <div className="relative flex max-w-7xl mx-auto px-4 h-[calc(100vh-300px)] min-h-[500px]">
+        <div className="relative flex max-w-7xl mx-auto px-4 h-[calc(100vh-300px)] min-h-[600px]">
           {/* Sidebar */}
           <div className={`absolute md:relative z-10 h-full transition-all duration-300 ${
             isSidebarOpen ? 'left-0' : '-left-64'
@@ -79,7 +79,7 @@ const WNetwork = () => {
         </div>
         
         {/* Legend */}
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4 mt-4">
           <NetworkLegend 
             items={legendItems}
             description={legendDescription}
