@@ -82,15 +82,15 @@ const NetworkFilter: React.FC<NetworkFilterProps> = ({ onFilterChange, className
           </TabsList>
           
           <div className="flex-1 overflow-hidden flex flex-col">
-            <TabsContent value="grapes" className="flex-1 overflow-y-auto pr-2 h-full">
+            <TabsContent value="grapes" className="flex-1 overflow-y-auto h-full m-0 pt-0 pb-1">
               <GrapeFilter />
             </TabsContent>
             
-            <TabsContent value="regions" className="flex-1 overflow-y-auto pr-2 h-full">
+            <TabsContent value="regions" className="flex-1 overflow-y-auto h-full m-0 pt-0 pb-1">
               <RegionFilter />
             </TabsContent>
             
-            <TabsContent value="characteristics" className="flex-1 overflow-y-auto pr-2 h-full">
+            <TabsContent value="characteristics" className="flex-1 overflow-y-auto h-full m-0 pt-0 pb-1">
               <CharacteristicsFilter />
             </TabsContent>
           </div>
