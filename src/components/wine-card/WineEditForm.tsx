@@ -1,10 +1,11 @@
+
 import { ChangeEvent, RefObject } from 'react';
 import WinerySection from './wine-edit-form/WinerySection';
 import GrapeSelectionSection from './wine-edit-form/GrapeSelectionSection';
 import WineCharacteristicsSection from './wine-edit-form/WineCharacteristicsSection';
 import DescriptionSection from './wine-edit-form/DescriptionSection';
 import PairingStorageSection from './wine-edit-form/PairingStorageSection';
-import ImageUploadSection from './wine-edit-form/ImageUploadSection';
+import EnhancedImageUploadSection from './wine-edit-form/EnhancedImageUploadSection';
 import FormActions from './wine-edit-form/FormActions';
 import { EditedWine } from './useWineCardState';
 
@@ -68,19 +69,10 @@ const WineEditForm = ({
         onStorageChange={(value) => handleEditField('storage', value)}
       />
       
-      <ImageUploadSection 
+      <EnhancedImageUploadSection 
         imageUrl={editedWine.image}
         fileInputRef={fileInputRef}
-        onImageUrlChange={(value) => handleEditField('image', value)}
-        onFileUploadClick={() => fileInputRef.current?.click()}
-      />
-      
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={handleFileUpload}
+        onImageChange={(value) => handleEditField('image', value)}
       />
       
       <FormActions 

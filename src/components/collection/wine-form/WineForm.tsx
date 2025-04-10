@@ -5,7 +5,7 @@ import GrapeSection from './GrapeSection';
 import YearRatingSection from './YearRatingSection';
 import CharacteristicsSection from './CharacteristicsSection';
 import DescriptionSection from '@/components/wine-card/wine-edit-form/DescriptionSection';
-import ImageUploadSection from './ImageUploadSection';
+import EnhancedImageUploadSection from './EnhancedImageUploadSection';
 import FormSubmitButtons from './FormSubmitButtons';
 
 interface WineFormProps {
@@ -57,11 +57,10 @@ const WineForm: React.FC<WineFormProps> = ({
         placeholder="Descrivi le caratteristiche del vino..."
       />
       
-      <ImageUploadSection 
+      <EnhancedImageUploadSection 
         wineData={wineData} 
         fileInputRef={fileInputRef} 
         handleChange={handleChange} 
-        handleFileUpload={handleFileUpload} 
       />
       
       <FormSubmitButtons 

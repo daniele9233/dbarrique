@@ -6,6 +6,9 @@ import { prepareWineData } from './utils/wineDataPreparation';
 import { setupUITimeout, performWineSubmission } from './utils/submissionHandlers';
 import { toast } from "@/hooks/use-toast";
 
+// Define max file size (10MB)
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
 export const useWineFormActions = (
   newWine: WineFormData,
   isSubmitting: boolean,
@@ -39,6 +42,19 @@ export const useWineFormActions = (
     const file = event.target.files?.[0];
     if (!file) return;
     
+    // Check file size
+    if (file.size > MAX_FILE_SIZE) {
+      toast({
+        title: "File troppo grande",
+        description: "L'immagine non deve superare i 10MB.",
+        variant: "destructive"
+      });
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
+    }
+    
     const reader = new FileReader();
     reader.onload = (e) => {
       if (e.target?.result) {
@@ -51,7 +67,7 @@ export const useWineFormActions = (
       }
     };
     reader.readAsDataURL(file);
-  }, [handleChange]);
+  }, [handleChange, fileInputRef]);
   
   const resetForm = useCallback(() => {
     setNewWine({

@@ -1,8 +1,12 @@
+
 import { useState, ChangeEvent } from 'react';
 import { Wine, WineType } from '@/data/models/Wine';
 import { toast } from "@/hooks/use-toast";
 import { updateWine } from "@/data/services/wineService";
 import { generateWineDescription } from './wineDescriptions';
+
+// Define max file size (10MB)
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 export interface EditedWine {
   name: string;
@@ -97,6 +101,16 @@ export const useWineCardState = (wine: Wine) => {
   const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    
+    // Check file size
+    if (file.size > MAX_FILE_SIZE) {
+      toast({
+        title: "File troppo grande",
+        description: "L'immagine non deve superare i 10MB.",
+        variant: "destructive"
+      });
+      return;
+    }
     
     const reader = new FileReader();
     reader.onload = (e) => {
