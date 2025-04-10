@@ -1,5 +1,5 @@
 
-import { RefObject } from "react";
+import { RefObject, useEffect } from "react";
 import ImageEditor from "@/components/common/ImageEditor";
 
 interface EnhancedImageUploadSectionProps {
@@ -13,6 +13,11 @@ const EnhancedImageUploadSection = ({
   fileInputRef, 
   onImageChange 
 }: EnhancedImageUploadSectionProps) => {
+  // Forza il rendering dell'editor quando l'immagine cambia
+  useEffect(() => {
+    console.log("Image URL changed in wine-card EnhancedImageUploadSection:", imageUrl);
+  }, [imageUrl]);
+
   return (
     <div className="space-y-2">
       <ImageEditor 

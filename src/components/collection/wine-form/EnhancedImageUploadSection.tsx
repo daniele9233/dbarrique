@@ -1,5 +1,5 @@
 
-import { RefObject, ChangeEvent } from "react";
+import { RefObject, useEffect } from "react";
 import { WineFormData } from "@/hooks/useWineForm";
 import ImageEditor from "@/components/common/ImageEditor";
 
@@ -15,8 +15,14 @@ const EnhancedImageUploadSection = ({
   handleChange
 }: EnhancedImageUploadSectionProps) => {
   const handleImageChange = (imageDataUrl: string) => {
+    console.log("Image changed in collection EnhancedImageUploadSection");
     handleChange('image', imageDataUrl);
   };
+  
+  // Forza il rendering dell'editor quando l'immagine cambia
+  useEffect(() => {
+    console.log("Wine data image changed:", wineData.image);
+  }, [wineData.image]);
   
   return (
     <div className="space-y-2">

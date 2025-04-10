@@ -27,6 +27,7 @@ const ImageEditor = ({
   const fileInputRef = externalFileInputRef || internalFileInputRef;
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   
   // Image transformation state
@@ -49,6 +50,7 @@ const ImageEditor = ({
     
     const img = new Image();
     img.onload = () => {
+      console.log("Image loaded:", img.width, img.height);
       imageRef.current = img;
       setImageLoaded(true);
       // Reset transformation when loading new image
@@ -56,18 +58,23 @@ const ImageEditor = ({
       setPositionX(0);
       setPositionY(0);
       setRotation(0);
-      renderImage();
+      
+      // Render after a short delay to ensure canvas is ready
+      setTimeout(() => renderImage(), 50);
     };
     img.src = imageUrl;
   }, [imageUrl]);
   
-  // Update container size based on parent element
+  // Update container size based on parent element and window resize
   useEffect(() => {
-    if (canvasRef.current) {
-      const parent = canvasRef.current.parentElement;
-      if (parent) {
+    const updateCanvasSize = () => {
+      if (canvasRef.current && containerRef.current) {
+        const parent = containerRef.current;
         const width = parent.clientWidth;
         const height = width / aspectRatio;
+        
+        console.log("Canvas size updated:", width, height);
+        
         setContainerWidth(width);
         setContainerHeight(height);
         
@@ -76,15 +83,36 @@ const ImageEditor = ({
         canvasRef.current.height = height;
         renderImage();
       }
+    };
+
+    // Initial setup
+    updateCanvasSize();
+    
+    // Add resize listener
+    window.addEventListener('resize', updateCanvasSize);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', updateCanvasSize);
+    };
+  }, [aspectRatio]);
+  
+  // Effect to re-render when image is loaded
+  useEffect(() => {
+    if (imageLoaded) {
+      renderImage();
     }
-  }, [aspectRatio, imageLoaded]);
+  }, [imageLoaded]);
   
   // Render image to canvas with current transformations
   const renderImage = () => {
     const canvas = canvasRef.current;
     const img = imageRef.current;
     
-    if (!canvas || !img || !imageLoaded) return;
+    if (!canvas || !img || !imageLoaded) {
+      console.log("Cannot render image - missing canvas, image, or image not loaded");
+      return;
+    }
     
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -118,6 +146,8 @@ const ImageEditor = ({
     
     // Restore context state
     ctx.restore();
+    
+    console.log("Image rendered with:", { scale, positionX, positionY, rotation });
   };
   
   // Effect to re-render image when transformations change
@@ -126,17 +156,51 @@ const ImageEditor = ({
   }, [scale, positionX, positionY, rotation, containerWidth, containerHeight]);
   
   // Movement handlers
-  const moveUp = () => setPositionY(prev => prev - 10);
-  const moveDown = () => setPositionY(prev => prev + 10);
-  const moveLeft = () => setPositionX(prev => prev - 10);
-  const moveRight = () => setPositionX(prev => prev + 10);
+  const moveUp = () => {
+    setPositionY(prev => prev - 10);
+    console.log("Moving up, new Y:", positionY - 10);
+  };
+  
+  const moveDown = () => {
+    setPositionY(prev => prev + 10);
+    console.log("Moving down, new Y:", positionY + 10);
+  };
+  
+  const moveLeft = () => {
+    setPositionX(prev => prev - 10);
+    console.log("Moving left, new X:", positionX - 10);
+  };
+  
+  const moveRight = () => {
+    setPositionX(prev => prev + 10);
+    console.log("Moving right, new X:", positionX + 10);
+  };
   
   // Zoom handlers
-  const zoomIn = () => setScale(prev => Math.min(prev + 0.1, 3));
-  const zoomOut = () => setScale(prev => Math.max(prev - 0.1, 0.5));
+  const zoomIn = () => {
+    setScale(prev => {
+      const newScale = Math.min(prev + 0.1, 3);
+      console.log("Zooming in, new scale:", newScale);
+      return newScale;
+    });
+  };
+  
+  const zoomOut = () => {
+    setScale(prev => {
+      const newScale = Math.max(prev - 0.1, 0.5);
+      console.log("Zooming out, new scale:", newScale);
+      return newScale;
+    });
+  };
   
   // Rotation handler
-  const rotateImage = () => setRotation(prev => (prev + 90) % 360);
+  const rotateImage = () => {
+    setRotation(prev => {
+      const newRotation = (prev + 90) % 360;
+      console.log("Rotating, new angle:", newRotation);
+      return newRotation;
+    });
+  };
   
   // File upload handler
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -156,6 +220,7 @@ const ImageEditor = ({
     const reader = new FileReader();
     reader.onload = (e) => {
       if (e.target?.result) {
+        console.log("File loaded, updating image");
         onImageChange(e.target.result as string);
       }
     };
@@ -164,9 +229,13 @@ const ImageEditor = ({
   
   // Save current canvas state as image
   const saveImage = () => {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current) {
+      console.log("Cannot save image - canvas not available");
+      return;
+    }
     
     const dataUrl = canvasRef.current.toDataURL('image/jpeg');
+    console.log("Saving image, size:", dataUrl.length);
     onImageChange(dataUrl);
     
     toast({
@@ -199,7 +268,10 @@ const ImageEditor = ({
         </div>
       </div>
       
-      <div className="bg-noir-dark rounded-lg overflow-hidden">
+      <div 
+        ref={containerRef}
+        className="bg-noir-dark rounded-lg overflow-hidden"
+      >
         <canvas 
           ref={canvasRef} 
           className="w-full h-full object-contain"
@@ -214,6 +286,7 @@ const ImageEditor = ({
               size="sm"
               className="bg-noir border-white/20 hover:bg-wine/20"
               onClick={zoomIn}
+              type="button"
             >
               <ZoomIn className="h-4 w-4 mr-1" />
               Zoom In
@@ -223,6 +296,7 @@ const ImageEditor = ({
               size="sm"
               className="bg-noir border-white/20 hover:bg-wine/20"
               onClick={zoomOut}
+              type="button"
             >
               <ZoomOut className="h-4 w-4 mr-1" />
               Zoom Out
@@ -232,6 +306,7 @@ const ImageEditor = ({
               size="sm"
               className="bg-noir border-white/20 hover:bg-wine/20"
               onClick={rotateImage}
+              type="button"
             >
               <RotateCw className="h-4 w-4 mr-1" />
               Ruota
@@ -245,6 +320,7 @@ const ImageEditor = ({
               size="sm"
               className="bg-noir border-white/20 hover:bg-wine/20"
               onClick={moveUp}
+              type="button"
             >
               <ArrowUp className="h-4 w-4" />
             </Button>
@@ -257,6 +333,7 @@ const ImageEditor = ({
               size="sm"
               className="bg-noir border-white/20 hover:bg-wine/20"
               onClick={moveLeft}
+              type="button"
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
@@ -265,6 +342,7 @@ const ImageEditor = ({
               size="sm"
               className="bg-wine text-white hover:bg-wine/80"
               onClick={saveImage}
+              type="button"
             >
               Applica
             </Button>
@@ -273,6 +351,7 @@ const ImageEditor = ({
               size="sm"
               className="bg-noir border-white/20 hover:bg-wine/20"
               onClick={moveRight}
+              type="button"
             >
               <ArrowRight className="h-4 w-4" />
             </Button>
@@ -285,6 +364,7 @@ const ImageEditor = ({
               size="sm"
               className="bg-noir border-white/20 hover:bg-wine/20"
               onClick={moveDown}
+              type="button"
             >
               <ArrowDown className="h-4 w-4" />
             </Button>
