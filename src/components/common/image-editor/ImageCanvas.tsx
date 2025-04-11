@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 
 interface ImageCanvasProps {
@@ -130,10 +129,16 @@ const ImageCanvas = ({
   };
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (resizeCorner) {
-      setResizing(true);
-      setInitialScale(scale);
-      setInitialMousePos({ x: e.clientX, y: e.clientY });
+    // Check if we clicked on one of the resize handles
+    const target = e.target as HTMLElement;
+    if (target.classList.contains('resize-handle')) {
+      const corner = target.dataset.corner;
+      if (corner) {
+        setResizeCorner(corner);
+        setResizing(true);
+        setInitialScale(scale);
+        setInitialMousePos({ x: e.clientX, y: e.clientY });
+      }
       e.preventDefault();
       return;
     }
@@ -162,12 +167,29 @@ const ImageCanvas = ({
       
       // Calculate distance moved (use the larger of deltaX or deltaY)
       const distance = Math.max(Math.abs(deltaX), Math.abs(deltaY));
-      const direction = resizeCorner.includes('right') || resizeCorner.includes('bottom') ? 1 : -1;
+      
+      // Determine direction based on which corner is being dragged
+      let direction = 1; // Default to scaling up
+      
+      if (resizeCorner.includes('top') || resizeCorner.includes('left')) {
+        // If dragging from top or left corners, invert direction
+        // Further from starting point = smaller
+        direction = -1;  
+      } else {
+        // If dragging from bottom or right corners
+        // Further from starting point = larger
+        direction = 1;
+      }
       
       // Adjust scale based on direction and distance moved
-      // Scale factor determines how sensitive the resize is
-      const scaleFactor = 0.005;
-      const newScale = Math.max(0.5, Math.min(3, initialScale + (direction * distance * scaleFactor)));
+      // Reduce the scale factor for more precise control
+      const scaleFactor = 0.003;
+      let newScale = initialScale + (direction * distance * scaleFactor);
+      
+      // Ensure scale stays within reasonable bounds
+      newScale = Math.max(0.5, Math.min(3, newScale));
+      
+      console.log(`Resizing: corner=${resizeCorner}, distance=${distance}, direction=${direction}, newScale=${newScale}`);
       
       onScaleChange(newScale);
     }
@@ -177,13 +199,6 @@ const ImageCanvas = ({
     setIsDragging(false);
     setResizing(false);
     setResizeCorner(null);
-  };
-  
-  const handleResizeStart = (corner: string) => (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setResizeCorner(corner);
-    setInitialScale(scale);
-    setInitialMousePos({ x: e.clientX, y: e.clientY });
   };
 
   // Ensure we stop dragging even if mouse leaves the element
@@ -200,6 +215,80 @@ const ImageCanvas = ({
     };
   }, []);
 
+  // Handle touchscreen events for mobile support
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      
+      // Check if we're touching a resize handle
+      const element = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (element?.classList.contains('resize-handle')) {
+        const corner = element.getAttribute('data-corner');
+        if (corner) {
+          setResizeCorner(corner);
+          setResizing(true);
+          setInitialScale(scale);
+          setInitialMousePos({ x: touch.clientX, y: touch.clientY });
+        }
+        e.preventDefault();
+        return;
+      }
+      
+      // Otherwise assume we're dragging the canvas
+      setIsDragging(true);
+      setDragStart({
+        x: touch.clientX - positionX,
+        y: touch.clientY - positionY
+      });
+      e.preventDefault();
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      
+      if (isDragging && onPositionChange) {
+        const newX = touch.clientX - dragStart.x;
+        const newY = touch.clientY - dragStart.y;
+        onPositionChange(newX, newY);
+      }
+      
+      if (resizing && resizeCorner && onScaleChange) {
+        // Calculate how much the touch has moved from initial position
+        const deltaX = touch.clientX - initialMousePos.x;
+        const deltaY = touch.clientY - initialMousePos.y;
+        
+        // Calculate distance moved
+        const distance = Math.max(Math.abs(deltaX), Math.abs(deltaY));
+        
+        // Determine direction based on which corner is being dragged
+        let direction = 1;
+        
+        if (resizeCorner.includes('top') || resizeCorner.includes('left')) {
+          direction = -1;
+        } else {
+          direction = 1;
+        }
+        
+        // Adjust scale based on direction and distance moved
+        const scaleFactor = 0.003;
+        let newScale = initialScale + (direction * distance * scaleFactor);
+        
+        // Ensure scale stays within reasonable bounds
+        newScale = Math.max(0.5, Math.min(3, newScale));
+        
+        onScaleChange(newScale);
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    setResizing(false);
+    setResizeCorner(null);
+  };
+
   return (
     <div 
       ref={containerRef}
@@ -208,6 +297,9 @@ const ImageCanvas = ({
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       <canvas 
         ref={canvasRef} 
@@ -216,23 +308,31 @@ const ImageCanvas = ({
       
       {imageUrl && (
         <>
-          {/* Resize handles - making them more obvious */}
+          {/* Resize handles with improved visibility and touchability */}
           <div 
-            className="absolute w-4 h-4 bg-wine rounded-full top-2 left-2 cursor-nwse-resize transform -translate-x-1/2 -translate-y-1/2 border-2 border-white"
-            onMouseDown={handleResizeStart('top-left')}
-          />
+            className="resize-handle absolute w-6 h-6 bg-wine rounded-full top-2 left-2 cursor-nwse-resize transform -translate-x-1/2 -translate-y-1/2 border-2 border-white flex items-center justify-center"
+            data-corner="top-left"
+          >
+            <div className="w-2 h-2 bg-white rounded-full"></div>
+          </div>
           <div 
-            className="absolute w-4 h-4 bg-wine rounded-full top-2 right-2 cursor-nesw-resize transform translate-x-1/2 -translate-y-1/2 border-2 border-white"
-            onMouseDown={handleResizeStart('top-right')}
-          />
+            className="resize-handle absolute w-6 h-6 bg-wine rounded-full top-2 right-2 cursor-nesw-resize transform translate-x-1/2 -translate-y-1/2 border-2 border-white flex items-center justify-center"
+            data-corner="top-right"
+          >
+            <div className="w-2 h-2 bg-white rounded-full"></div>
+          </div>
           <div 
-            className="absolute w-4 h-4 bg-wine rounded-full bottom-2 left-2 cursor-nesw-resize transform -translate-x-1/2 translate-y-1/2 border-2 border-white"
-            onMouseDown={handleResizeStart('bottom-left')}
-          />
+            className="resize-handle absolute w-6 h-6 bg-wine rounded-full bottom-2 left-2 cursor-nesw-resize transform -translate-x-1/2 translate-y-1/2 border-2 border-white flex items-center justify-center"
+            data-corner="bottom-left"
+          >
+            <div className="w-2 h-2 bg-white rounded-full"></div>
+          </div>
           <div 
-            className="absolute w-4 h-4 bg-wine rounded-full bottom-2 right-2 cursor-nwse-resize transform translate-x-1/2 translate-y-1/2 border-2 border-white"
-            onMouseDown={handleResizeStart('bottom-right')}
-          />
+            className="resize-handle absolute w-6 h-6 bg-wine rounded-full bottom-2 right-2 cursor-nwse-resize transform translate-x-1/2 translate-y-1/2 border-2 border-white flex items-center justify-center" 
+            data-corner="bottom-right"
+          >
+            <div className="w-2 h-2 bg-white rounded-full"></div>
+          </div>
           
           {/* Resize border */}
           <div className="absolute inset-0 border-2 border-wine pointer-events-none" />

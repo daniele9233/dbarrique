@@ -80,8 +80,9 @@ const ImageControls = ({
         <p className="text-center text-white/80 mb-2">Ridimensionamento manuale</p>
         <ul className="text-white/60 list-disc pl-5 space-y-1">
           <li>Trascina l'immagine per spostarla</li>
-          <li>Usa le maniglie agli angoli per ridimensionare</li>
-          <li>Usa i pulsanti sopra per zoom e rotazione</li>
+          <li>Usa i punti agli angoli per ridimensionare l'immagine</li>
+          <li>Trascina un angolo verso l'interno per rimpicciolire</li>
+          <li>Trascina un angolo verso l'esterno per ingrandire</li>
         </ul>
       </div>
     </div>
