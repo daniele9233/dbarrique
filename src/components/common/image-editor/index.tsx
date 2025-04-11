@@ -40,48 +40,42 @@ const ImageEditor = ({
   // Movement handlers
   const moveUp = () => {
     setPositionY(prev => prev - 10);
-    console.log("Moving up, new Y:", positionY - 10);
   };
   
   const moveDown = () => {
     setPositionY(prev => prev + 10);
-    console.log("Moving down, new Y:", positionY + 10);
   };
   
   const moveLeft = () => {
     setPositionX(prev => prev - 10);
-    console.log("Moving left, new X:", positionX - 10);
   };
   
   const moveRight = () => {
     setPositionX(prev => prev + 10);
-    console.log("Moving right, new X:", positionX + 10);
   };
   
   // Zoom handlers
   const zoomIn = () => {
-    setScale(prev => {
-      const newScale = Math.min(prev + 0.1, 3);
-      console.log("Zooming in, new scale:", newScale);
-      return newScale;
-    });
+    setScale(prev => Math.min(prev + 0.1, 3));
   };
   
   const zoomOut = () => {
-    setScale(prev => {
-      const newScale = Math.max(prev - 0.1, 0.5);
-      console.log("Zooming out, new scale:", newScale);
-      return newScale;
-    });
+    setScale(prev => Math.max(prev - 0.1, 0.5));
   };
   
   // Rotation handler
   const rotateImage = () => {
-    setRotation(prev => {
-      const newRotation = (prev + 90) % 360;
-      console.log("Rotating, new angle:", newRotation);
-      return newRotation;
-    });
+    setRotation(prev => (prev + 90) % 360);
+  };
+  
+  // Position and scale change handlers for manual manipulation
+  const handlePositionChange = (x: number, y: number) => {
+    setPositionX(x);
+    setPositionY(y);
+  };
+  
+  const handleScaleChange = (newScale: number) => {
+    setScale(newScale);
   };
   
   // Save current canvas state as image
@@ -117,6 +111,8 @@ const ImageEditor = ({
         rotation={rotation}
         aspectRatio={aspectRatio}
         onImageLoad={handleImageLoad}
+        onPositionChange={handlePositionChange}
+        onScaleChange={handleScaleChange}
       />
       
       {imageLoaded && (
