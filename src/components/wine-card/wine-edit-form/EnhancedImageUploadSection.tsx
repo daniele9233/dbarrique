@@ -1,6 +1,6 @@
 
 import { RefObject, useEffect } from "react";
-import ImageEditor from "@/components/common/ImageEditor";
+import ImageEditor from "@/components/common/image-editor";
 
 interface EnhancedImageUploadSectionProps {
   imageUrl: string;

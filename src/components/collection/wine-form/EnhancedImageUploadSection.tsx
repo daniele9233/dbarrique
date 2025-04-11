@@ -1,7 +1,7 @@
 
 import { RefObject, useEffect } from "react";
 import { WineFormData } from "@/hooks/useWineForm";
-import ImageEditor from "@/components/common/ImageEditor";
+import ImageEditor from "@/components/common/image-editor";
 
 interface EnhancedImageUploadSectionProps {
   wineData: WineFormData;
