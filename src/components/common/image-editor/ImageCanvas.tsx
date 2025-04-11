@@ -32,6 +32,8 @@ const ImageCanvas = ({
   const [resizing, setResizing] = useState(false);
   const [resizeCorner, setResizeCorner] = useState<string | null>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+  const [initialScale, setInitialScale] = useState(scale);
+  const [initialMousePos, setInitialMousePos] = useState({ x: 0, y: 0 });
   
   // Update container size based on parent element and window resize
   useEffect(() => {
@@ -130,6 +132,9 @@ const ImageCanvas = ({
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (resizeCorner) {
       setResizing(true);
+      setInitialScale(scale);
+      setInitialMousePos({ x: e.clientX, y: e.clientY });
+      e.preventDefault();
       return;
     }
     
@@ -139,37 +144,30 @@ const ImageCanvas = ({
         x: e.clientX - positionX,
         y: e.clientY - positionY
       });
+      e.preventDefault();
     }
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isDragging) {
+    if (isDragging && onPositionChange) {
       const newX = e.clientX - dragStart.x;
       const newY = e.clientY - dragStart.y;
-      
-      if (onPositionChange) {
-        onPositionChange(newX, newY);
-      }
+      onPositionChange(newX, newY);
     }
     
     if (resizing && resizeCorner && onScaleChange) {
-      // Calculate new scale based on resize direction
-      const container = containerRef.current;
-      if (!container) return;
+      // Calculate how much the mouse has moved from the initial position
+      const deltaX = e.clientX - initialMousePos.x;
+      const deltaY = e.clientY - initialMousePos.y;
       
-      const rect = container.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
+      // Calculate distance moved (use the larger of deltaX or deltaY)
+      const distance = Math.max(Math.abs(deltaX), Math.abs(deltaY));
+      const direction = resizeCorner.includes('right') || resizeCorner.includes('bottom') ? 1 : -1;
       
-      // Calculate distance from center to cursor
-      const distance = Math.sqrt(
-        Math.pow(e.clientX - centerX, 2) + 
-        Math.pow(e.clientY - centerY, 2)
-      );
-      
-      // Use distance to determine scale (normalized by container size)
-      const referenceSize = Math.min(rect.width, rect.height) / 2;
-      const newScale = Math.max(0.5, Math.min(3, distance / referenceSize));
+      // Adjust scale based on direction and distance moved
+      // Scale factor determines how sensitive the resize is
+      const scaleFactor = 0.005;
+      const newScale = Math.max(0.5, Math.min(3, initialScale + (direction * distance * scaleFactor)));
       
       onScaleChange(newScale);
     }
@@ -185,6 +183,8 @@ const ImageCanvas = ({
     e.stopPropagation();
     setResizeCorner(corner);
     setResizing(true);
+    setInitialScale(scale);
+    setInitialMousePos({ x: e.clientX, y: e.clientY });
   };
 
   // Ensure we stop dragging even if mouse leaves the element
@@ -219,24 +219,24 @@ const ImageCanvas = ({
         <>
           {/* Resize handles */}
           <div 
-            className="absolute w-3 h-3 bg-blue-400 rounded-full top-2 left-2 cursor-nwse-resize transform -translate-x-1/2 -translate-y-1/2"
+            className="absolute w-4 h-4 bg-wine rounded-full top-2 left-2 cursor-nwse-resize transform -translate-x-1/2 -translate-y-1/2 border-2 border-white"
             onMouseDown={handleResizeStart('top-left')}
           />
           <div 
-            className="absolute w-3 h-3 bg-blue-400 rounded-full top-2 right-2 cursor-nesw-resize transform translate-x-1/2 -translate-y-1/2"
+            className="absolute w-4 h-4 bg-wine rounded-full top-2 right-2 cursor-nesw-resize transform translate-x-1/2 -translate-y-1/2 border-2 border-white"
             onMouseDown={handleResizeStart('top-right')}
           />
           <div 
-            className="absolute w-3 h-3 bg-blue-400 rounded-full bottom-2 left-2 cursor-nesw-resize transform -translate-x-1/2 translate-y-1/2"
+            className="absolute w-4 h-4 bg-wine rounded-full bottom-2 left-2 cursor-nesw-resize transform -translate-x-1/2 translate-y-1/2 border-2 border-white"
             onMouseDown={handleResizeStart('bottom-left')}
           />
           <div 
-            className="absolute w-3 h-3 bg-blue-400 rounded-full bottom-2 right-2 cursor-nwse-resize transform translate-x-1/2 translate-y-1/2"
+            className="absolute w-4 h-4 bg-wine rounded-full bottom-2 right-2 cursor-nwse-resize transform translate-x-1/2 translate-y-1/2 border-2 border-white"
             onMouseDown={handleResizeStart('bottom-right')}
           />
           
           {/* Resize border */}
-          <div className="absolute inset-0 border-2 border-blue-400 pointer-events-none" />
+          <div className="absolute inset-0 border-2 border-wine pointer-events-none" />
         </>
       )}
     </div>
