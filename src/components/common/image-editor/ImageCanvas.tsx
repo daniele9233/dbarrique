@@ -182,7 +182,6 @@ const ImageCanvas = ({
   const handleResizeStart = (corner: string) => (e: React.MouseEvent) => {
     e.stopPropagation();
     setResizeCorner(corner);
-    setResizing(true);
     setInitialScale(scale);
     setInitialMousePos({ x: e.clientX, y: e.clientY });
   };
@@ -217,7 +216,7 @@ const ImageCanvas = ({
       
       {imageUrl && (
         <>
-          {/* Resize handles */}
+          {/* Resize handles - making them more obvious */}
           <div 
             className="absolute w-4 h-4 bg-wine rounded-full top-2 left-2 cursor-nwse-resize transform -translate-x-1/2 -translate-y-1/2 border-2 border-white"
             onMouseDown={handleResizeStart('top-left')}
