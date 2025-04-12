@@ -1,7 +1,8 @@
 
 import { Button } from "@/components/ui/button";
 import { 
-  RotateCw, ZoomIn, ZoomOut
+  RotateCw, ZoomIn, ZoomOut, 
+  ArrowUp, ArrowDown, ArrowLeft, ArrowRight 
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
@@ -23,6 +24,10 @@ const ImageControls = ({
   scale,
   imageLoaded,
   onScaleChange,
+  onMoveUp,
+  onMoveDown,
+  onMoveLeft,
+  onMoveRight,
   onZoomIn,
   onZoomOut,
   onRotate
@@ -61,6 +66,45 @@ const ImageControls = ({
         >
           <RotateCw className="h-4 w-4 mr-1" />
           Ruota
+        </Button>
+      </div>
+      
+      <div className="flex flex-wrap gap-2 justify-center">
+        <Button
+          variant="outline"
+          size="icon"
+          className="bg-noir border-white/20 hover:bg-wine/20"
+          onClick={onMoveUp}
+          type="button"
+        >
+          <ArrowUp className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          className="bg-noir border-white/20 hover:bg-wine/20"
+          onClick={onMoveDown}
+          type="button"
+        >
+          <ArrowDown className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          className="bg-noir border-white/20 hover:bg-wine/20"
+          onClick={onMoveLeft}
+          type="button"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          className="bg-noir border-white/20 hover:bg-wine/20"
+          onClick={onMoveRight}
+          type="button"
+        >
+          <ArrowRight className="h-4 w-4" />
         </Button>
       </div>
       
