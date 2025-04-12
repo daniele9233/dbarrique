@@ -77,6 +77,7 @@ const ImageCanvas = ({
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      style={{ touchAction: 'none' }} // Previene il comportamento di scroll/zoom predefinito
     >
       <ImageRenderer 
         imageUrl={imageUrl}

@@ -22,13 +22,15 @@ export const useImageInteractions = ({
   const [resizeCorner, setResizeCorner] = useState<string | null>(null);
   const [initialScale, setInitialScale] = useState(scale);
   const [initialMousePos, setInitialMousePos] = useState({ x: 0, y: 0 });
+  const dragTimeoutRef = useRef<number | null>(null);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     // Verifica se abbiamo cliccato su una delle maniglie di ridimensionamento
     const target = e.target as HTMLElement;
-    if (target.classList.contains('resize-handle') || target.parentElement?.classList.contains('resize-handle')) {
-      // Corretto per gestire anche il click sul div interno
-      const corner = target.dataset.corner || target.parentElement?.dataset.corner;
+    const resizeElement = target.closest('.resize-handle');
+    
+    if (resizeElement) {
+      const corner = resizeElement.getAttribute('data-corner');
       if (corner) {
         console.log(`Iniziato ridimensionamento dall'angolo: ${corner}`);
         setResizeCorner(corner);
@@ -40,7 +42,11 @@ export const useImageInteractions = ({
       return;
     }
     
-    if ((e.target as HTMLElement).tagName.toLowerCase() === 'canvas') {
+    // Inizia il trascinamento se non stiamo cliccando su un pulsante o altro elemento interattivo
+    if (target.tagName.toLowerCase() !== 'button' && 
+        !target.closest('button') && 
+        !target.classList.contains('resize-handle')) {
+      console.log('Iniziato trascinamento immagine con mouse');
       setIsDragging(true);
       setDragStart({
         x: e.clientX - positionX,
@@ -54,6 +60,7 @@ export const useImageInteractions = ({
     if (isDragging && onPositionChange) {
       const newX = e.clientX - dragStart.x;
       const newY = e.clientY - dragStart.y;
+      console.log(`Spostamento mouse: x=${newX}, y=${newY}`);
       onPositionChange(newX, newY);
     }
     
@@ -77,8 +84,7 @@ export const useImageInteractions = ({
       }
       
       // Regola la scala in base alla direzione e alla distanza percorsa
-      // Fattore di scala ridotto per un controllo più preciso
-      const scaleFactor = 0.006; // Aumentato per rendere più reattivo il ridimensionamento
+      const scaleFactor = 0.007; // Fattore leggermente aumentato per maggiore reattività
       let newScale = initialScale + (direction * distance * scaleFactor);
       
       // Assicura che la scala rimanga entro limiti ragionevoli
@@ -91,22 +97,25 @@ export const useImageInteractions = ({
   };
 
   const handleMouseUp = () => {
+    console.log('Mouse rilasciato');
     setIsDragging(false);
     setResizing(false);
     setResizeCorner(null);
   };
 
-  // Gestori eventi touch
+  // Gestori eventi touch migliorati
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     if (e.touches.length === 1) {
       const touch = e.touches[0];
       
-      // Controlla se stiamo toccando una maniglia di ridimensionamento
+      // Ottieni l'elemento sotto il touch point
       const element = document.elementFromPoint(touch.clientX, touch.clientY);
-      if (element?.classList.contains('resize-handle') || element?.parentElement?.classList.contains('resize-handle')) {
-        // Ottiene l'elemento corretto che contiene l'attributo data-corner
-        const resizeElement = element.classList.contains('resize-handle') ? element : element.parentElement;
-        const corner = resizeElement?.getAttribute('data-corner');
+      if (!element) return;
+      
+      // Controlla se stiamo toccando una maniglia di ridimensionamento
+      const resizeElement = element.closest('.resize-handle');
+      if (resizeElement) {
+        const corner = resizeElement.getAttribute('data-corner');
         if (corner) {
           console.log(`Iniziato ridimensionamento touch dall'angolo: ${corner}`);
           setResizeCorner(corner);
@@ -114,27 +123,38 @@ export const useImageInteractions = ({
           setInitialScale(scale);
           setInitialMousePos({ x: touch.clientX, y: touch.clientY });
         }
-        e.preventDefault();
         return;
       }
       
       // Altrimenti presupponiamo che stiamo trascinando il canvas
+      console.log('Iniziato trascinamento immagine con touch');
       setIsDragging(true);
       setDragStart({
         x: touch.clientX - positionX,
         y: touch.clientY - positionY
       });
-      e.preventDefault();
+      
+      // Piccolo ritardo per assicurarsi che sia un trascinamento intenzionale e non un semplice tap
+      if (dragTimeoutRef.current) clearTimeout(dragTimeoutRef.current);
+      dragTimeoutRef.current = window.setTimeout(() => {
+        console.log('Confermato trascinamento con touch dopo delay');
+      }, 100);
     }
   };
 
   const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    // Previeni lo scrolling della pagina durante il trascinamento
+    if (isDragging || resizing) {
+      e.preventDefault();
+    }
+    
     if (e.touches.length === 1) {
       const touch = e.touches[0];
       
       if (isDragging && onPositionChange) {
         const newX = touch.clientX - dragStart.x;
         const newY = touch.clientY - dragStart.y;
+        console.log(`Spostamento touch: x=${newX}, y=${newY}`);
         onPositionChange(newX, newY);
       }
       
@@ -156,7 +176,7 @@ export const useImageInteractions = ({
         }
         
         // Regola la scala in base alla direzione e alla distanza percorsa
-        const scaleFactor = 0.006; // Aumentato per maggiore reattività
+        const scaleFactor = 0.007; // Aumentato per maggiore reattività
         let newScale = initialScale + (direction * distance * scaleFactor);
         
         // Assicura che la scala rimanga entro limiti ragionevoli
@@ -169,6 +189,11 @@ export const useImageInteractions = ({
   };
 
   const handleTouchEnd = () => {
+    console.log('Touch terminato');
+    if (dragTimeoutRef.current) {
+      clearTimeout(dragTimeoutRef.current);
+      dragTimeoutRef.current = null;
+    }
     setIsDragging(false);
     setResizing(false);
     setResizeCorner(null);

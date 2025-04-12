@@ -88,7 +88,7 @@ const ImageRenderer = ({
   return (
     <canvas 
       ref={canvasRef} 
-      className="w-full h-full object-contain cursor-move"
+      className="w-full h-full object-contain cursor-move touch-manipulation"
     />
   );
 };
