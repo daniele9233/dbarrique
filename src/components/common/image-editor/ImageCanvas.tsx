@@ -32,13 +32,13 @@ const ImageCanvas = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   
-  // Set up canvas dimensions based on container and aspect ratio
+  // Imposta le dimensioni del canvas in base al container e all'aspect ratio
   const containerSize = useCanvasSize({ 
     containerRef, 
     canvasRef, 
     aspectRatio,
     onSizeChange: () => {
-      // Re-render image when canvas size changes
+      // Renderizza nuovamente l'immagine quando cambia la dimensione del canvas
       const canvas = canvasRef.current;
       if (canvas) {
         const event = new Event('resize');
@@ -47,7 +47,7 @@ const ImageCanvas = ({
     }
   });
   
-  // Handle image interactions (dragging and resizing)
+  // Gestisce le interazioni dell'immagine (trascinamento e ridimensionamento)
   const { 
     handleMouseDown, 
     handleMouseMove, 
@@ -63,13 +63,13 @@ const ImageCanvas = ({
     positionY
   });
   
-  // Add global mouse up handler
+  // Aggiunge il gestore globale per il mouse up
   useGlobalEvents(handleMouseUp);
 
   return (
     <div 
       ref={containerRef}
-      className="bg-noir-dark rounded-lg overflow-hidden relative"
+      className="bg-noir-dark rounded-lg overflow-hidden relative touch-manipulation"
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}

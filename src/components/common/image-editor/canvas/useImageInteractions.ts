@@ -1,3 +1,4 @@
+
 import { useState, useRef, RefObject } from 'react';
 
 interface UseImageInteractionsProps {
@@ -23,11 +24,13 @@ export const useImageInteractions = ({
   const [initialMousePos, setInitialMousePos] = useState({ x: 0, y: 0 });
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Check if we clicked on one of the resize handles
+    // Verifica se abbiamo cliccato su una delle maniglie di ridimensionamento
     const target = e.target as HTMLElement;
-    if (target.classList.contains('resize-handle')) {
-      const corner = target.dataset.corner;
+    if (target.classList.contains('resize-handle') || target.parentElement?.classList.contains('resize-handle')) {
+      // Corretto per gestire anche il click sul div interno
+      const corner = target.dataset.corner || target.parentElement?.dataset.corner;
       if (corner) {
+        console.log(`Iniziato ridimensionamento dall'angolo: ${corner}`);
         setResizeCorner(corner);
         setResizing(true);
         setInitialScale(scale);
@@ -55,35 +58,33 @@ export const useImageInteractions = ({
     }
     
     if (resizing && resizeCorner && onScaleChange) {
-      // Calculate how much the mouse has moved from the initial position
+      // Calcola quanto il mouse si è spostato dalla posizione iniziale
       const deltaX = e.clientX - initialMousePos.x;
       const deltaY = e.clientY - initialMousePos.y;
       
-      // Calculate distance moved (use the larger of deltaX or deltaY)
+      // Calcola la distanza spostata (usa il maggiore tra deltaX o deltaY)
       const distance = Math.max(Math.abs(deltaX), Math.abs(deltaY));
       
-      // Determine direction based on which corner is being dragged
-      let direction = 1; // Default to scaling up
+      // Determina la direzione in base all'angolo che viene trascinato
+      let direction = 1; // Predefinito per aumentare la scala
       
       if (resizeCorner.includes('top') || resizeCorner.includes('left')) {
-        // If dragging from top or left corners, invert direction
-        // Further from starting point = smaller
+        // Se si trascina dagli angoli superiore o sinistro, inverti la direzione
         direction = -1;  
       } else {
-        // If dragging from bottom or right corners
-        // Further from starting point = larger
+        // Se si trascina dagli angoli inferiore o destro
         direction = 1;
       }
       
-      // Adjust scale based on direction and distance moved
-      // Reduce the scale factor for more precise control
-      const scaleFactor = 0.003;
+      // Regola la scala in base alla direzione e alla distanza percorsa
+      // Fattore di scala ridotto per un controllo più preciso
+      const scaleFactor = 0.006; // Aumentato per rendere più reattivo il ridimensionamento
       let newScale = initialScale + (direction * distance * scaleFactor);
       
-      // Ensure scale stays within reasonable bounds
+      // Assicura che la scala rimanga entro limiti ragionevoli
       newScale = Math.max(0.5, Math.min(3, newScale));
       
-      console.log(`Resizing: corner=${resizeCorner}, distance=${distance}, direction=${direction}, newScale=${newScale}`);
+      console.log(`Ridimensionamento: angolo=${resizeCorner}, distanza=${distance}, direzione=${direction}, nuovaScala=${newScale}`);
       
       onScaleChange(newScale);
     }
@@ -95,16 +96,19 @@ export const useImageInteractions = ({
     setResizeCorner(null);
   };
 
-  // Touch event handlers
+  // Gestori eventi touch
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     if (e.touches.length === 1) {
       const touch = e.touches[0];
       
-      // Check if we're touching a resize handle
+      // Controlla se stiamo toccando una maniglia di ridimensionamento
       const element = document.elementFromPoint(touch.clientX, touch.clientY);
-      if (element?.classList.contains('resize-handle')) {
-        const corner = element.getAttribute('data-corner');
+      if (element?.classList.contains('resize-handle') || element?.parentElement?.classList.contains('resize-handle')) {
+        // Ottiene l'elemento corretto che contiene l'attributo data-corner
+        const resizeElement = element.classList.contains('resize-handle') ? element : element.parentElement;
+        const corner = resizeElement?.getAttribute('data-corner');
         if (corner) {
+          console.log(`Iniziato ridimensionamento touch dall'angolo: ${corner}`);
           setResizeCorner(corner);
           setResizing(true);
           setInitialScale(scale);
@@ -114,7 +118,7 @@ export const useImageInteractions = ({
         return;
       }
       
-      // Otherwise assume we're dragging the canvas
+      // Altrimenti presupponiamo che stiamo trascinando il canvas
       setIsDragging(true);
       setDragStart({
         x: touch.clientX - positionX,
@@ -135,14 +139,14 @@ export const useImageInteractions = ({
       }
       
       if (resizing && resizeCorner && onScaleChange) {
-        // Calculate how much the touch has moved from initial position
+        // Calcola quanto il touch si è spostato dalla posizione iniziale
         const deltaX = touch.clientX - initialMousePos.x;
         const deltaY = touch.clientY - initialMousePos.y;
         
-        // Calculate distance moved
+        // Calcola la distanza spostata
         const distance = Math.max(Math.abs(deltaX), Math.abs(deltaY));
         
-        // Determine direction based on which corner is being dragged
+        // Determina la direzione in base all'angolo che viene trascinato
         let direction = 1;
         
         if (resizeCorner.includes('top') || resizeCorner.includes('left')) {
@@ -151,13 +155,14 @@ export const useImageInteractions = ({
           direction = 1;
         }
         
-        // Adjust scale based on direction and distance moved
-        const scaleFactor = 0.003;
+        // Regola la scala in base alla direzione e alla distanza percorsa
+        const scaleFactor = 0.006; // Aumentato per maggiore reattività
         let newScale = initialScale + (direction * distance * scaleFactor);
         
-        // Ensure scale stays within reasonable bounds
+        // Assicura che la scala rimanga entro limiti ragionevoli
         newScale = Math.max(0.5, Math.min(3, newScale));
         
+        console.log(`Ridimensionamento touch: distanza=${distance}, nuovaScala=${newScale}`);
         onScaleChange(newScale);
       }
     }
