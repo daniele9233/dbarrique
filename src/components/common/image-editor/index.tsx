@@ -1,12 +1,12 @@
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import ImageCanvas from './ImageCanvas';
 import ImageControls from './ImageControls';
 import ImageUploader from './ImageUploader';
 
-interface ImageEditorProps {
+export interface ImageEditorProps {
   imageUrl: string;
   onImageChange: (imageDataUrl: string) => void;
   aspectRatio?: number;
@@ -38,35 +38,17 @@ const ImageEditor = ({
   };
   
   // Movement handlers
-  const moveUp = () => {
-    setPositionY(prev => prev - 10);
-  };
-  
-  const moveDown = () => {
-    setPositionY(prev => prev + 10);
-  };
-  
-  const moveLeft = () => {
-    setPositionX(prev => prev - 10);
-  };
-  
-  const moveRight = () => {
-    setPositionX(prev => prev + 10);
-  };
+  const moveUp = () => setPositionY(prev => prev - 10);
+  const moveDown = () => setPositionY(prev => prev + 10);
+  const moveLeft = () => setPositionX(prev => prev - 10);
+  const moveRight = () => setPositionX(prev => prev + 10);
   
   // Zoom handlers
-  const zoomIn = () => {
-    setScale(prev => Math.min(prev + 0.1, 3));
-  };
-  
-  const zoomOut = () => {
-    setScale(prev => Math.max(prev - 0.1, 0.5));
-  };
+  const zoomIn = () => setScale(prev => Math.min(prev + 0.1, 3));
+  const zoomOut = () => setScale(prev => Math.max(prev - 0.1, 0.5));
   
   // Rotation handler
-  const rotateImage = () => {
-    setRotation(prev => (prev + 90) % 360);
-  };
+  const rotateImage = () => setRotation(prev => (prev + 90) % 360);
   
   // Position and scale change handlers for manual manipulation
   const handlePositionChange = (x: number, y: number) => {
@@ -130,7 +112,6 @@ const ImageEditor = ({
             onRotate={rotateImage}
           />
           
-          {/* Save Button - Separate from other controls for prominence */}
           <Button 
             variant="outline" 
             size="sm"
