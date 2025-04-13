@@ -27,11 +27,11 @@ const ImageRenderer = ({
     
     const img = new Image();
     img.onload = () => {
-      console.log("Image loaded:", img.width, img.height);
+      console.log("Immagine caricata:", img.width, img.height);
       imageRef.current = img;
       onImageLoad(img);
       
-      // Render after a short delay to ensure canvas is ready
+      // Render dopo un breve ritardo per assicurarsi che il canvas sia pronto
       setTimeout(() => renderImage(), 50);
     };
     img.src = imageUrl;
@@ -89,6 +89,11 @@ const ImageRenderer = ({
     <canvas 
       ref={canvasRef} 
       className="w-full h-full object-contain cursor-move touch-manipulation"
+      style={{
+        touchAction: 'none', // Disabilita il comportamento predefinito del touch
+        WebkitUserSelect: 'none', // Impedisce la selezione del testo
+        userSelect: 'none'
+      }}
     />
   );
 };

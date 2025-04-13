@@ -47,6 +47,16 @@ const ImageEditor = ({
   const zoomIn = () => setScale(prev => Math.min(prev + 0.1, 3));
   const zoomOut = () => setScale(prev => Math.max(prev - 0.1, 0.5));
   
+  // Center handler
+  const centerImage = () => {
+    setPositionX(0);
+    setPositionY(0);
+    toast({
+      title: "Immagine centrata",
+      description: "L'immagine è stata riposizionata al centro"
+    });
+  };
+  
   // Rotation handler
   const rotateImage = () => setRotation(prev => (prev + 90) % 360);
   
@@ -64,12 +74,12 @@ const ImageEditor = ({
   const saveImage = () => {
     const canvas = document.querySelector('canvas');
     if (!canvas) {
-      console.log("Cannot save image - canvas not available");
+      console.log("Non è possibile salvare l'immagine - canvas non disponibile");
       return;
     }
     
     const dataUrl = canvas.toDataURL('image/jpeg');
-    console.log("Saving image, size:", dataUrl.length);
+    console.log("Salvataggio immagine, dimensione:", dataUrl.length);
     onImageChange(dataUrl);
     
     toast({
@@ -110,6 +120,7 @@ const ImageEditor = ({
             onZoomIn={zoomIn}
             onZoomOut={zoomOut}
             onRotate={rotateImage}
+            onCenter={centerImage}
           />
           
           <Button 

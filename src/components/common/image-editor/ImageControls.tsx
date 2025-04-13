@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { 
   RotateCw, ZoomIn, ZoomOut, 
-  ArrowUp, ArrowDown, ArrowLeft, ArrowRight 
+  Maximize2
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
@@ -18,6 +18,7 @@ interface ImageControlsProps {
   onZoomIn: () => void;
   onZoomOut: () => void;
   onRotate: () => void;
+  onCenter: () => void;
 }
 
 const ImageControls = ({
@@ -30,7 +31,8 @@ const ImageControls = ({
   onMoveRight,
   onZoomIn,
   onZoomOut,
-  onRotate
+  onRotate,
+  onCenter
 }: ImageControlsProps) => {
   if (!imageLoaded) return null;
 
@@ -67,44 +69,15 @@ const ImageControls = ({
           <RotateCw className="h-4 w-4 mr-1" />
           Ruota
         </Button>
-      </div>
-      
-      <div className="flex flex-wrap gap-2 justify-center">
-        <Button
-          variant="outline"
-          size="icon"
-          className="bg-noir border-white/20 hover:bg-wine/20"
-          onClick={onMoveUp}
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="bg-noir border-white/20 hover:bg-wine/20 flex-1"
+          onClick={onCenter}
           type="button"
         >
-          <ArrowUp className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          className="bg-noir border-white/20 hover:bg-wine/20"
-          onClick={onMoveDown}
-          type="button"
-        >
-          <ArrowDown className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          className="bg-noir border-white/20 hover:bg-wine/20"
-          onClick={onMoveLeft}
-          type="button"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          className="bg-noir border-white/20 hover:bg-wine/20"
-          onClick={onMoveRight}
-          type="button"
-        >
-          <ArrowRight className="h-4 w-4" />
+          <Maximize2 className="h-4 w-4 mr-1" />
+          Centra
         </Button>
       </div>
       
@@ -121,12 +94,12 @@ const ImageControls = ({
       </div>
       
       <div className="bg-noir-dark rounded p-3 text-sm">
-        <p className="text-center text-white/80 mb-2">Ridimensionamento manuale</p>
+        <p className="text-center text-white/80 mb-2">Suggerimenti per l'uso</p>
         <ul className="text-white/60 list-disc pl-5 space-y-1">
+          <li>Doppio tap/click per centrare l'immagine</li>
           <li>Trascina l'immagine per spostarla</li>
-          <li>Usa i punti agli angoli per ridimensionare l'immagine</li>
-          <li>Trascina un angolo verso l'interno per rimpicciolire</li>
-          <li>Trascina un angolo verso l'esterno per ingrandire</li>
+          <li>Usa il cursore in basso a destra per ridimensionare</li>
+          <li>Usa i comandi sopra per un controllo preciso</li>
         </ul>
       </div>
     </div>
