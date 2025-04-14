@@ -9,6 +9,12 @@ interface UseImageInteractionsProps {
   positionY: number;
 }
 
+// Define our own interface that matches React's Touch type
+interface TouchPoint {
+  clientX: number;
+  clientY: number;
+}
+
 export const useImageInteractions = ({
   onPositionChange,
   onScaleChange,
@@ -48,7 +54,7 @@ export const useImageInteractions = ({
   };
 
   // Calcola la distanza tra due punti (per il pinch zoom)
-  const getDistance = (touch1: Touch, touch2: Touch) => {
+  const getDistance = (touch1: TouchPoint, touch2: TouchPoint) => {
     const dx = touch1.clientX - touch2.clientX;
     const dy = touch1.clientY - touch2.clientY;
     return Math.sqrt(dx * dx + dy * dy);
@@ -130,8 +136,15 @@ export const useImageInteractions = ({
     
     // Gestisci il pinch zoom
     if (e.touches.length === 2) {
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
+      const touch1: TouchPoint = {
+        clientX: e.touches[0].clientX,
+        clientY: e.touches[0].clientY
+      };
+      
+      const touch2: TouchPoint = {
+        clientX: e.touches[1].clientX,
+        clientY: e.touches[1].clientY
+      };
       
       const distance = getDistance(touch1, touch2);
       setInitialDistance(distance);
@@ -174,8 +187,15 @@ export const useImageInteractions = ({
     
     // Gestisci il pinch zoom
     if (e.touches.length === 2 && initialDistance > 0) {
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
+      const touch1: TouchPoint = {
+        clientX: e.touches[0].clientX,
+        clientY: e.touches[0].clientY
+      };
+      
+      const touch2: TouchPoint = {
+        clientX: e.touches[1].clientX,
+        clientY: e.touches[1].clientY
+      };
       
       const currentDistance = getDistance(touch1, touch2);
       const scaleFactor = currentDistance / initialDistance;
