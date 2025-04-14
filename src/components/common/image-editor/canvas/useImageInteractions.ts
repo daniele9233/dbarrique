@@ -1,5 +1,5 @@
 
-import { useState, useRef, RefObject } from 'react';
+import { useState, useRef } from 'react';
 
 interface UseImageInteractionsProps {
   onPositionChange?: (x: number, y: number) => void;
@@ -48,10 +48,9 @@ export const useImageInteractions = ({
   };
 
   // Calcola la distanza tra due punti (per il pinch zoom)
-  const getDistance = (touches: TouchList) => {
-    if (touches.length < 2) return 0;
-    const dx = touches[0].clientX - touches[1].clientX;
-    const dy = touches[0].clientY - touches[1].clientY;
+  const getDistance = (touch1: Touch, touch2: Touch) => {
+    const dx = touch1.clientX - touch2.clientX;
+    const dy = touch1.clientY - touch2.clientY;
     return Math.sqrt(dx * dx + dy * dy);
   };
 
@@ -131,7 +130,10 @@ export const useImageInteractions = ({
     
     // Gestisci il pinch zoom
     if (e.touches.length === 2) {
-      const distance = getDistance(e.touches);
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      
+      const distance = getDistance(touch1, touch2);
       setInitialDistance(distance);
       setInitialScale(scale);
       setResizing(true);
@@ -172,7 +174,10 @@ export const useImageInteractions = ({
     
     // Gestisci il pinch zoom
     if (e.touches.length === 2 && initialDistance > 0) {
-      const currentDistance = getDistance(e.touches);
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      
+      const currentDistance = getDistance(touch1, touch2);
       const scaleFactor = currentDistance / initialDistance;
       const newScale = Math.max(0.5, Math.min(3, initialScale * scaleFactor));
       
