@@ -5,6 +5,7 @@ import ResizeHandles from './canvas/ResizeHandles';
 import { useCanvasSize } from './canvas/useCanvasSize';
 import { useImageInteractions } from './canvas/useImageInteractions';
 import { useGlobalEvents } from './canvas/useGlobalEvents';
+import { Maximize2 } from 'lucide-react';
 
 interface ImageCanvasProps {
   imageUrl: string;
@@ -39,11 +40,7 @@ const ImageCanvas = ({
     aspectRatio,
     onSizeChange: () => {
       // Renderizza nuovamente l'immagine quando cambia la dimensione del canvas
-      const canvas = canvasRef.current;
-      if (canvas) {
-        const event = new Event('resize');
-        window.dispatchEvent(event);
-      }
+      window.dispatchEvent(new Event('resize'));
     }
   });
   
@@ -78,7 +75,11 @@ const ImageCanvas = ({
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
-      style={{ touchAction: 'none' }} // Previene il comportamento di scroll/zoom predefinito
+      style={{ 
+        touchAction: 'none', // Previene il comportamento di scroll/zoom predefinito
+        WebkitUserSelect: 'none', // Impedisce la selezione del testo
+        userSelect: 'none'
+      }}
     >
       <ImageRenderer 
         imageUrl={imageUrl}
@@ -94,14 +95,12 @@ const ImageCanvas = ({
       {/* Pulsante per centrare l'immagine */}
       {imageUrl && (
         <button
-          className="absolute top-4 left-4 z-20 bg-wine/90 text-white rounded-full w-10 h-10 flex items-center justify-center border-2 border-white/50"
+          className="absolute top-4 left-4 z-20 bg-wine/90 text-white rounded-full w-10 h-10 flex items-center justify-center border-2 border-white/50 hover:bg-wine"
           onClick={centerImage}
           type="button"
           aria-label="Centra immagine"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 12H3M12 3v18M12 8l-4 4 4 4M8 12h8"/>
-          </svg>
+          <Maximize2 className="h-5 w-5" />
         </button>
       )}
     </div>

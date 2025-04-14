@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { 
   RotateCw, ZoomIn, ZoomOut, 
-  Maximize2
+  Maximize2, MoveHorizontal, MoveVertical
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
@@ -38,7 +38,7 @@ const ImageControls = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between gap-2">
+      <div className="flex justify-between gap-2 flex-wrap">
         <Button 
           variant="outline" 
           size="sm"
@@ -93,13 +93,66 @@ const ImageControls = ({
         />
       </div>
       
+      {/* Controlli di movimento */}
+      <div className="grid grid-cols-3 gap-2 max-w-[180px] mx-auto">
+        <div></div>
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="bg-noir border-white/20 hover:bg-wine/20 p-2"
+          onClick={onMoveUp}
+          type="button"
+        >
+          <MoveVertical className="h-4 w-4 rotate-180" />
+        </Button>
+        <div></div>
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="bg-noir border-white/20 hover:bg-wine/20 p-2"
+          onClick={onMoveLeft}
+          type="button"
+        >
+          <MoveHorizontal className="h-4 w-4 rotate-180" />
+        </Button>
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="bg-noir border-white/20 hover:bg-wine/20 p-2"
+          onClick={onCenter}
+          type="button"
+        >
+          <Maximize2 className="h-4 w-4" />
+        </Button>
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="bg-noir border-white/20 hover:bg-wine/20 p-2"
+          onClick={onMoveRight}
+          type="button"
+        >
+          <MoveHorizontal className="h-4 w-4" />
+        </Button>
+        <div></div>
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="bg-noir border-white/20 hover:bg-wine/20 p-2"
+          onClick={onMoveDown}
+          type="button"
+        >
+          <MoveVertical className="h-4 w-4" />
+        </Button>
+        <div></div>
+      </div>
+      
       <div className="bg-noir-dark rounded p-3 text-sm">
         <p className="text-center text-white/80 mb-2">Suggerimenti per l'uso</p>
         <ul className="text-white/60 list-disc pl-5 space-y-1">
           <li>Doppio tap/click per centrare l'immagine</li>
           <li>Trascina l'immagine per spostarla</li>
-          <li>Usa il cursore in basso a destra per ridimensionare</li>
-          <li>Usa i comandi sopra per un controllo preciso</li>
+          <li>Usa il controllo nell'angolo per ridimensionare</li>
+          <li>Usa due dita per pinch-to-zoom (su mobile)</li>
         </ul>
       </div>
     </div>

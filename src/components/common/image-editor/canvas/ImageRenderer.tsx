@@ -88,11 +88,12 @@ const ImageRenderer = ({
   return (
     <canvas 
       ref={canvasRef} 
-      className="w-full h-full object-contain cursor-move touch-manipulation"
+      className="w-full h-full object-contain cursor-move"
       style={{
         touchAction: 'none', // Disabilita il comportamento predefinito del touch
         WebkitUserSelect: 'none', // Impedisce la selezione del testo
-        userSelect: 'none'
+        userSelect: 'none',
+        display: 'block' // Rimuove spazi bianchi sotto il canvas
       }}
     />
   );

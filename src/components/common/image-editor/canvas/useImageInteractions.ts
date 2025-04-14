@@ -19,20 +19,23 @@ export const useImageInteractions = ({
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [resizing, setResizing] = useState(false);
-  const [resizeStartPoint, setResizeStartPoint] = useState({ x: 0, y: 0 });
+  const [resizeStartScale] = useState(scale);
+  const [initialDistance, setInitialDistance] = useState(0);
   const [initialScale, setInitialScale] = useState(scale);
   const lastTapRef = useRef<number>(0);
-  const dragTimeoutRef = useRef<number | null>(null);
-
-  // Center the image with double tap/click
+  
+  // Funzione per centrare l'immagine
   const centerImage = () => {
     console.log('Centrando l\'immagine');
     if (onPositionChange) {
       onPositionChange(0, 0);
     }
+    if (onScaleChange) {
+      onScaleChange(1);
+    }
   };
 
-  // Check if this is a double tap for centering
+  // Controlla se è un doppio tap per centrare l'immagine
   const checkDoubleTap = () => {
     const now = Date.now();
     const DOUBLE_TAP_DELAY = 300; // ms
@@ -44,53 +47,49 @@ export const useImageInteractions = ({
     return false;
   };
 
-  // Handle resizing with a simpler approach
-  const handleResize = (newScale: number) => {
-    console.log(`Applicando nuovo zoom: ${newScale}`);
-    if (onScaleChange) {
-      onScaleChange(Math.max(0.5, Math.min(3, newScale)));
-    }
+  // Calcola la distanza tra due punti (per il pinch zoom)
+  const getDistance = (touches: TouchList) => {
+    if (touches.length < 2) return 0;
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
   };
 
   // Mouse event handlers
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Previeni comportamenti di default del browser
+    e.preventDefault();
+    
     const target = e.target as HTMLElement;
     
-    // Handle resize controls
-    if (target.classList.contains('resize-control')) {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      const direction = target.dataset.direction;
-      console.log(`Iniziato ridimensionamento direzione: ${direction}`);
-      
+    // Gestisci il controllo di resize
+    if (target.closest('.resize-control')) {
+      console.log('Iniziato il ridimensionamento con il mouse');
       setResizing(true);
       setInitialScale(scale);
-      setResizeStartPoint({ x: e.clientX, y: e.clientY });
       return;
     }
     
-    // Check for double-click to center
+    // Controlla se è un doppio clic per centrare
     if (checkDoubleTap()) {
-      e.preventDefault();
       return;
     }
     
-    // Start dragging (if not clicking on a button or other control)
-    if (target.tagName.toLowerCase() !== 'button' && 
-        !target.closest('button') && 
-        !target.classList.contains('resize-control')) {
+    // Inizia il trascinamento
+    if (!target.closest('button')) {
       console.log('Iniziato spostamento immagine');
       setIsDragging(true);
       setDragStart({
         x: e.clientX - positionX,
         y: e.clientY - positionY
       });
-      e.preventDefault();
     }
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Previeni comportamenti di default
+    e.preventDefault();
+    
     if (isDragging && onPositionChange) {
       const newX = e.clientX - dragStart.x;
       const newY = e.clientY - dragStart.y;
@@ -99,11 +98,24 @@ export const useImageInteractions = ({
     }
     
     if (resizing && onScaleChange) {
-      const deltaY = resizeStartPoint.y - e.clientY;
-      // Usa deltaY per un controllo più intuitivo: su = zoom in, giù = zoom out
-      const scaleFactor = 0.01;
-      const newScale = initialScale + (deltaY * scaleFactor);
-      handleResize(newScale);
+      // Utilizziamo la distanza dal centro per determinare lo scale
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      
+      // Calcoliamo la distanza dal centro
+      const distanceX = e.clientX - rect.left - centerX;
+      const distanceY = e.clientY - rect.top - centerY;
+      const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+      
+      // Usiamo la distanza per calcolare il nuovo scale
+      // Maggiore è la distanza, maggiore sarà lo scale
+      const maxDistance = Math.max(rect.width, rect.height) / 2;
+      const scaleRatio = Math.max(0.2, Math.min(distance / maxDistance, 1.5));
+      const newScale = Math.max(0.5, Math.min(3, initialScale * scaleRatio));
+      
+      console.log(`Ridimensionamento: distance=${distance.toFixed(2)}, scale=${newScale.toFixed(2)}`);
+      onScaleChange(newScale);
     }
   };
 
@@ -112,46 +124,65 @@ export const useImageInteractions = ({
     setResizing(false);
   };
 
-  // Touch event handlers (improved)
+  // Touch event handlers
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (e.touches.length !== 1) return;
+    // Previeni comportamenti di default come lo zoom del browser
+    e.preventDefault();
+    
+    // Gestisci il pinch zoom
+    if (e.touches.length === 2) {
+      const distance = getDistance(e.touches);
+      setInitialDistance(distance);
+      setInitialScale(scale);
+      setResizing(true);
+      console.log(`Pinch zoom iniziato, distanza iniziale: ${distance.toFixed(2)}`);
+      return;
+    }
     
     const touch = e.touches[0];
     const target = document.elementFromPoint(touch.clientX, touch.clientY) as HTMLElement;
     
     if (!target) return;
     
-    // Previeni lo scrolling della pagina durante le interazioni con l'editor
-    e.preventDefault();
-    
-    // Handle resize controls
-    if (target.classList.contains('resize-control')) {
-      const direction = target.dataset.direction;
-      console.log(`Iniziato ridimensionamento touch direzione: ${direction}`);
-      
+    // Gestisci il controllo di resize
+    if (target.closest('.resize-control')) {
+      console.log('Iniziato il ridimensionamento con touch');
       setResizing(true);
       setInitialScale(scale);
-      setResizeStartPoint({ x: touch.clientX, y: touch.clientY });
       return;
     }
     
-    // Check for double-tap to center
+    // Controlla se è un doppio tap per centrare
     if (checkDoubleTap()) return;
     
-    // Start dragging
-    console.log('Iniziato spostamento immagine con touch');
-    setIsDragging(true);
-    setDragStart({
-      x: touch.clientX - positionX,
-      y: touch.clientY - positionY
-    });
+    // Inizia il trascinamento
+    if (!target.closest('button')) {
+      console.log('Iniziato spostamento immagine con touch');
+      setIsDragging(true);
+      setDragStart({
+        x: touch.clientX - positionX,
+        y: touch.clientY - positionY
+      });
+    }
   };
 
   const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (e.touches.length !== 1) return;
-    
-    // Previeni lo scrolling della pagina durante le interazioni
+    // Previeni comportamenti di default
     e.preventDefault();
+    
+    // Gestisci il pinch zoom
+    if (e.touches.length === 2 && initialDistance > 0) {
+      const currentDistance = getDistance(e.touches);
+      const scaleFactor = currentDistance / initialDistance;
+      const newScale = Math.max(0.5, Math.min(3, initialScale * scaleFactor));
+      
+      console.log(`Pinch zoom: factor=${scaleFactor.toFixed(2)}, scale=${newScale.toFixed(2)}`);
+      
+      if (onScaleChange) {
+        onScaleChange(newScale);
+      }
+      return;
+    }
     
     const touch = e.touches[0];
     
@@ -162,22 +193,34 @@ export const useImageInteractions = ({
       onPositionChange(newX, newY);
     }
     
-    if (resizing && onScaleChange) {
-      const deltaY = resizeStartPoint.y - touch.clientY;
-      // Usa deltaY per un controllo più intuitivo: su = zoom in, giù = zoom out
-      const scaleFactor = 0.01;
-      const newScale = initialScale + (deltaY * scaleFactor);
-      handleResize(newScale);
+    if (resizing && e.touches.length === 1 && onScaleChange) {
+      // Utilizziamo logica simile al mouse per il touch singolo
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      
+      const distanceX = touch.clientX - rect.left - centerX;
+      const distanceY = touch.clientY - rect.top - centerY;
+      const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+      
+      const maxDistance = Math.max(rect.width, rect.height) / 2;
+      const scaleRatio = Math.max(0.2, Math.min(distance / maxDistance, 1.5));
+      const newScale = Math.max(0.5, Math.min(3, initialScale * scaleRatio));
+      
+      console.log(`Ridimensionamento touch: distance=${distance.toFixed(2)}, scale=${newScale.toFixed(2)}`);
+      onScaleChange(newScale);
     }
   };
 
-  const handleTouchEnd = () => {
-    if (dragTimeoutRef.current) {
-      clearTimeout(dragTimeoutRef.current);
-      dragTimeoutRef.current = null;
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length < 2) {
+      setInitialDistance(0);
     }
-    setIsDragging(false);
-    setResizing(false);
+    
+    if (e.touches.length === 0) {
+      setIsDragging(false);
+      setResizing(false);
+    }
   };
 
   return {

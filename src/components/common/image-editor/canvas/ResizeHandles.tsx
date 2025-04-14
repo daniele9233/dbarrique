@@ -8,19 +8,24 @@ const ResizeHandles = ({ imageUrl }: ResizeHandlesProps) => {
   
   return (
     <>
-      {/* Controllo di zoom sempificato */}
+      {/* Controllo di zoom migliorato - più grande e visibile */}
       <div 
-        className="resize-control absolute w-12 h-12 bg-wine/80 rounded-full bottom-4 right-4 cursor-ns-resize transform translate-x-1/2 translate-y-1/2 border-2 border-white flex items-center justify-center touch-manipulation z-30"
-        data-direction="vertical"
+        className="resize-control absolute w-16 h-16 bg-wine/80 rounded-full bottom-6 right-6 cursor-se-resize transform translate-x-1/2 translate-y-1/2 border-2 border-white flex items-center justify-center touch-manipulation z-30"
+        data-direction="corner"
       >
-        <div className="w-6 h-1 bg-white rounded-full"></div>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <polyline points="9 21 3 21 3 15"></polyline>
+          <line x1="21" y1="3" x2="14" y2="10"></line>
+          <line x1="3" y1="21" x2="10" y2="14"></line>
+        </svg>
       </div>
       
       {/* Info box per istruzioni - mostrato solo su desktop */}
       <div className="absolute bottom-4 left-4 bg-noir/90 p-2 rounded text-xs text-white/80 max-w-xs hidden md:block">
         <p>• Doppio click/tap per centrare</p>
         <p>• Trascina per spostare</p>
-        <p>• Usa il controllo per ridimensionare</p>
+        <p>• Usa l'angolo per ridimensionare</p>
       </div>
       
       {/* Bordo di ridimensionamento */}
