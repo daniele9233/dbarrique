@@ -12,6 +12,7 @@ const ResizeHandles = ({ imageUrl }: ResizeHandlesProps) => {
       <div 
         className="resize-control absolute w-16 h-16 bg-wine/80 rounded-full bottom-6 right-6 cursor-se-resize transform translate-x-1/2 translate-y-1/2 border-2 border-white flex items-center justify-center touch-manipulation z-30"
         data-direction="corner"
+        style={{ touchAction: 'none' }}
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="15 3 21 3 21 9"></polyline>

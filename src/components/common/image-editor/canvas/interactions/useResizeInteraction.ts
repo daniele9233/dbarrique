@@ -14,6 +14,7 @@ export const useResizeInteraction = ({
   const [resizing, setResizing] = useState(false);
   const [initialScale, setInitialScale] = useState(scale);
   const [initialDistance, setInitialDistance] = useState(0);
+  const [initialPointerPosition, setInitialPointerPosition] = useState({ x: 0, y: 0 });
 
   const startResize = (target: HTMLElement | null) => {
     if (isResizeControl(target)) {
@@ -40,20 +41,22 @@ export const useResizeInteraction = ({
   ) => {
     if (!resizing || !onScaleChange) return false;
     
-    // Utilizziamo la distanza dal centro per determinare lo scale
+    // Get element dimensions and position
     const rect = element.getBoundingClientRect();
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
     
-    // Calcoliamo la distanza dal centro
-    const distanceX = clientX - rect.left - centerX;
-    const distanceY = clientY - rect.top - centerY;
+    // Calculate distance from center to pointer
+    const distanceX = clientX - centerX;
+    const distanceY = clientY - centerY;
     const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
     
-    // Usiamo la distanza per calcolare il nuovo scale
-    const maxDistance = Math.max(rect.width, rect.height) / 2;
-    const scaleRatio = Math.max(0.2, Math.min(distance / maxDistance, 1.5));
-    const newScale = Math.max(0.5, Math.min(3, initialScale * scaleRatio));
+    // Calculate diagonal of the element for scale reference
+    const diagonal = Math.sqrt(rect.width * rect.width + rect.height * rect.height) / 2;
+    
+    // Calculate scale factor based on distance relative to the diagonal
+    const scaleFactor = Math.max(0.2, Math.min(distance / diagonal * 1.5, 2));
+    const newScale = Math.max(0.5, Math.min(3, initialScale * scaleFactor));
     
     console.log(`Ridimensionamento: distance=${distance.toFixed(2)}, scale=${newScale.toFixed(2)}`);
     onScaleChange(newScale);
@@ -73,6 +76,9 @@ export const useResizeInteraction = ({
 
   const endResize = () => {
     const wasResizing = resizing;
+    if (wasResizing) {
+      console.log('Ridimensionamento terminato');
+    }
     setResizing(false);
     return wasResizing;
   };
