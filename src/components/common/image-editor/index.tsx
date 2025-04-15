@@ -19,7 +19,7 @@ const ImageEditor = ({
   aspectRatio = 1.5, 
   fileInputRef 
 }: ImageEditorProps) => {
-  // Image transformation state
+  // Stato delle trasformazioni dell'immagine
   const [scale, setScale] = useState(1);
   const [positionX, setPositionX] = useState(0);
   const [positionY, setPositionY] = useState(0);
@@ -29,48 +29,80 @@ const ImageEditor = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
   const handleImageLoad = (img: HTMLImageElement) => {
+    console.log("Immagine caricata in ImageEditor:", img.width, img.height);
     setImageLoaded(true);
-    // Reset transformation when loading new image
+    // Reset delle trasformazioni quando si carica una nuova immagine
     setScale(1);
     setPositionX(0);
     setPositionY(0);
     setRotation(0);
   };
   
-  // Movement handlers
-  const moveUp = () => setPositionY(prev => prev - 10);
-  const moveDown = () => setPositionY(prev => prev + 10);
-  const moveLeft = () => setPositionX(prev => prev - 10);
-  const moveRight = () => setPositionX(prev => prev + 10);
+  // Gestori di movimento
+  const moveUp = () => {
+    console.log("Movimento verso l'alto");
+    setPositionY(prev => prev - 20);
+  };
   
-  // Zoom handlers
-  const zoomIn = () => setScale(prev => Math.min(prev + 0.1, 3));
-  const zoomOut = () => setScale(prev => Math.max(prev - 0.1, 0.5));
+  const moveDown = () => {
+    console.log("Movimento verso il basso");
+    setPositionY(prev => prev + 20);
+  };
   
-  // Center handler
+  const moveLeft = () => {
+    console.log("Movimento verso sinistra");
+    setPositionX(prev => prev - 20);
+  };
+  
+  const moveRight = () => {
+    console.log("Movimento verso destra");
+    setPositionX(prev => prev + 20);
+  };
+  
+  // Gestori di zoom
+  const zoomIn = () => {
+    const newScale = Math.min(scale + 0.2, 3);
+    console.log(`Zoom in: ${newScale.toFixed(2)}`);
+    setScale(newScale);
+  };
+  
+  const zoomOut = () => {
+    const newScale = Math.max(scale - 0.2, 0.5);
+    console.log(`Zoom out: ${newScale.toFixed(2)}`);
+    setScale(newScale);
+  };
+  
+  // Gestore di centratura
   const centerImage = () => {
+    console.log("Centrando l'immagine");
     setPositionX(0);
     setPositionY(0);
+    setScale(1);
     toast({
       title: "Immagine centrata",
       description: "L'immagine è stata riposizionata al centro"
     });
   };
   
-  // Rotation handler
-  const rotateImage = () => setRotation(prev => (prev + 90) % 360);
+  // Gestore di rotazione
+  const rotateImage = () => {
+    const newRotation = (rotation + 90) % 360;
+    console.log(`Rotazione: ${newRotation}°`);
+    setRotation(newRotation);
+  };
   
-  // Position and scale change handlers for manual manipulation
+  // Gestori di cambiamento posizione e scala per manipolazione manuale
   const handlePositionChange = (x: number, y: number) => {
     setPositionX(x);
     setPositionY(y);
   };
   
   const handleScaleChange = (newScale: number) => {
+    console.log(`Cambio scala: ${newScale.toFixed(2)}`);
     setScale(newScale);
   };
   
-  // Save current canvas state as image
+  // Salva lo stato attuale del canvas come immagine
   const saveImage = () => {
     const canvas = document.querySelector('canvas');
     if (!canvas) {

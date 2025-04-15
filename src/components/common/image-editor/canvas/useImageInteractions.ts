@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useDragInteraction } from './interactions/useDragInteraction';
 import { useResizeInteraction } from './interactions/useResizeInteraction';
@@ -51,12 +52,14 @@ export const useImageInteractions = ({
     resetDistance
   } = useResizeInteraction({ onScaleChange, scale });
 
-  // Mouse event handlers
+  // Gestori di eventi mouse
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     // Previeni comportamenti di default del browser
     e.preventDefault();
     
     const target = e.target as HTMLElement;
+    
+    console.log('Mouse down su:', target.tagName, target.className);
     
     // Try to start resize
     if (startResize(target)) {
@@ -85,10 +88,12 @@ export const useImageInteractions = ({
     endResize();
   };
 
-  // Touch event handlers
+  // Gestori di eventi touch
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     // Previeni comportamenti di default come lo zoom del browser
     e.preventDefault();
+    
+    console.log('Touch start, tocchi:', e.touches.length);
     
     // Gestisci il pinch zoom
     if (e.touches.length === 2) {
@@ -111,6 +116,8 @@ export const useImageInteractions = ({
     const target = document.elementFromPoint(touch.clientX, touch.clientY) as HTMLElement;
     
     if (!target) return;
+    
+    console.log('Touch start su:', target.tagName, target.className);
     
     // Try to start resize
     if (startResize(target)) {
@@ -160,6 +167,8 @@ export const useImageInteractions = ({
   };
 
   const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    console.log('Touch end, tocchi rimanenti:', e.touches.length);
+    
     if (e.touches.length < 2) {
       resetDistance();
     }

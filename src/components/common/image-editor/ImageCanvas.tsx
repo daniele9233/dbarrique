@@ -78,7 +78,8 @@ const ImageCanvas = ({
       style={{ 
         touchAction: 'none', // Previene il comportamento di scroll/zoom predefinito
         WebkitUserSelect: 'none', // Impedisce la selezione del testo
-        userSelect: 'none'
+        userSelect: 'none',
+        minHeight: '200px' // Altezza minima per garantire che il canvas sia visibile
       }}
     >
       <ImageRenderer 

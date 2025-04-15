@@ -19,7 +19,7 @@ export const useDragInteraction = ({
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   const startDrag = (clientX: number, clientY: number, target: HTMLElement | null) => {
-    // Check if we should start dragging
+    // Verifica se dovremmo iniziare il trascinamento
     if (isResizeControl(target) || checkDoubleTap() || isButton(target)) {
       return false;
     }
@@ -39,6 +39,7 @@ export const useDragInteraction = ({
       const newY = clientY - dragStart.y;
       console.log(`Spostamento: x=${newX}, y=${newY}`);
       onPositionChange(newX, newY);
+      return true;
     }
     
     return isDragging;
@@ -46,6 +47,9 @@ export const useDragInteraction = ({
 
   const endDrag = () => {
     const wasDragging = isDragging;
+    if (wasDragging) {
+      console.log('Trascinamento terminato');
+    }
     setIsDragging(false);
     return wasDragging;
   };
