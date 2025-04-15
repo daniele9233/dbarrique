@@ -1,5 +1,5 @@
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import ImageCanvas from './ImageCanvas';
@@ -28,7 +28,7 @@ const ImageEditor = ({
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
-  const handleImageLoad = (img: HTMLImageElement) => {
+  const handleImageLoad = useCallback((img: HTMLImageElement) => {
     console.log("Immagine caricata in ImageEditor:", img.width, img.height);
     setImageLoaded(true);
     // Reset delle trasformazioni quando si carica una nuova immagine
@@ -36,44 +36,44 @@ const ImageEditor = ({
     setPositionX(0);
     setPositionY(0);
     setRotation(0);
-  };
+  }, []);
   
   // Gestori di movimento
-  const moveUp = () => {
+  const moveUp = useCallback(() => {
     console.log("Movimento verso l'alto");
     setPositionY(prev => prev - 20);
-  };
+  }, []);
   
-  const moveDown = () => {
+  const moveDown = useCallback(() => {
     console.log("Movimento verso il basso");
     setPositionY(prev => prev + 20);
-  };
+  }, []);
   
-  const moveLeft = () => {
+  const moveLeft = useCallback(() => {
     console.log("Movimento verso sinistra");
     setPositionX(prev => prev - 20);
-  };
+  }, []);
   
-  const moveRight = () => {
+  const moveRight = useCallback(() => {
     console.log("Movimento verso destra");
     setPositionX(prev => prev + 20);
-  };
+  }, []);
   
   // Gestori di zoom
-  const zoomIn = () => {
+  const zoomIn = useCallback(() => {
     const newScale = Math.min(scale + 0.2, 3);
     console.log(`Zoom in: ${newScale.toFixed(2)}`);
     setScale(newScale);
-  };
+  }, [scale]);
   
-  const zoomOut = () => {
+  const zoomOut = useCallback(() => {
     const newScale = Math.max(scale - 0.2, 0.5);
     console.log(`Zoom out: ${newScale.toFixed(2)}`);
     setScale(newScale);
-  };
+  }, [scale]);
   
   // Gestore di centratura
-  const centerImage = () => {
+  const centerImage = useCallback(() => {
     console.log("Centrando l'immagine");
     setPositionX(0);
     setPositionY(0);
@@ -82,28 +82,28 @@ const ImageEditor = ({
       title: "Immagine centrata",
       description: "L'immagine è stata riposizionata al centro"
     });
-  };
+  }, []);
   
   // Gestore di rotazione
-  const rotateImage = () => {
+  const rotateImage = useCallback(() => {
     const newRotation = (rotation + 90) % 360;
     console.log(`Rotazione: ${newRotation}°`);
     setRotation(newRotation);
-  };
+  }, [rotation]);
   
   // Gestori di cambiamento posizione e scala per manipolazione manuale
-  const handlePositionChange = (x: number, y: number) => {
+  const handlePositionChange = useCallback((x: number, y: number) => {
     setPositionX(x);
     setPositionY(y);
-  };
+  }, []);
   
-  const handleScaleChange = (newScale: number) => {
+  const handleScaleChange = useCallback((newScale: number) => {
     console.log(`Cambio scala: ${newScale.toFixed(2)}`);
     setScale(newScale);
-  };
+  }, []);
   
   // Salva lo stato attuale del canvas come immagine
-  const saveImage = () => {
+  const saveImage = useCallback(() => {
     const canvas = document.querySelector('canvas');
     if (!canvas) {
       console.log("Non è possibile salvare l'immagine - canvas non disponibile");
@@ -118,7 +118,16 @@ const ImageEditor = ({
       title: "Modifiche salvate",
       description: "Le modifiche all'immagine sono state applicate."
     });
-  };
+  }, [onImageChange]);
+  
+  // Reset quando cambia l'URL dell'immagine
+  useEffect(() => {
+    if (imageUrl) {
+      console.log("Nuova immagine caricata, URL:", imageUrl.substring(0, 50) + "...");
+    } else {
+      setImageLoaded(false);
+    }
+  }, [imageUrl]);
   
   return (
     <div className="space-y-4">

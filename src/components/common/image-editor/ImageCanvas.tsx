@@ -1,5 +1,5 @@
 
-import { useRef } from 'react';
+import { useRef, useCallback } from 'react';
 import ImageRenderer from './canvas/ImageRenderer';
 import ResizeHandles from './canvas/ResizeHandles';
 import { useCanvasSize } from './canvas/useCanvasSize';
@@ -63,6 +63,13 @@ const ImageCanvas = ({
     positionY
   });
   
+  // Gestore di centerImage migliorato
+  const handleCenterImage = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    centerImage();
+  }, [centerImage]);
+  
   // Aggiunge il gestore globale per il mouse up
   useGlobalEvents(handleMouseUp);
 
@@ -95,16 +102,18 @@ const ImageCanvas = ({
       
       <ResizeHandles imageUrl={imageUrl} />
       
-      {/* Pulsante per centrare l'immagine */}
+      {/* Pulsanti di zoom */}
       {imageUrl && (
-        <button
-          className="absolute top-4 left-4 z-20 bg-wine/90 text-white rounded-full w-10 h-10 flex items-center justify-center border-2 border-white/50 hover:bg-wine"
-          onClick={centerImage}
-          type="button"
-          aria-label="Centra immagine"
-        >
-          <Maximize2 className="h-5 w-5" />
-        </button>
+        <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
+          <button
+            className="bg-wine/90 text-white rounded-full w-10 h-10 flex items-center justify-center border-2 border-white/50 hover:bg-wine"
+            onClick={handleCenterImage}
+            type="button"
+            aria-label="Centra immagine"
+          >
+            <Maximize2 className="h-5 w-5" />
+          </button>
+        </div>
       )}
     </div>
   );

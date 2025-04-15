@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { isButton, isResizeControl } from '../utils/imageInteractionUtils';
 
 interface UseDragInteractionProps {
@@ -18,7 +18,7 @@ export const useDragInteraction = ({
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-  const startDrag = (clientX: number, clientY: number, target: HTMLElement | null) => {
+  const startDrag = useCallback((clientX: number, clientY: number, target: HTMLElement | null) => {
     // Verifica se dovremmo iniziare il trascinamento
     if (isResizeControl(target) || isButton(target)) {
       return false;
@@ -29,16 +29,16 @@ export const useDragInteraction = ({
       return false;
     }
     
-    console.log('Iniziato spostamento immagine');
+    console.log('Iniziato spostamento immagine', {clientX, clientY, positionX, positionY});
     setIsDragging(true);
     setDragStart({
       x: clientX - positionX,
       y: clientY - positionY
     });
     return true;
-  };
+  }, [checkDoubleTap, positionX, positionY]);
 
-  const handleDrag = (clientX: number, clientY: number) => {
+  const handleDrag = useCallback((clientX: number, clientY: number) => {
     if (isDragging && onPositionChange) {
       const newX = clientX - dragStart.x;
       const newY = clientY - dragStart.y;
@@ -48,16 +48,16 @@ export const useDragInteraction = ({
     }
     
     return isDragging;
-  };
+  }, [isDragging, onPositionChange, dragStart]);
 
-  const endDrag = () => {
+  const endDrag = useCallback(() => {
     const wasDragging = isDragging;
     if (wasDragging) {
       console.log('Trascinamento terminato');
     }
     setIsDragging(false);
     return wasDragging;
-  };
+  }, [isDragging]);
 
   return {
     isDragging,

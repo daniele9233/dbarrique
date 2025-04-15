@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { isResizeControl } from '../utils/imageInteractionUtils';
 
 interface UseResizeInteractionProps {
@@ -16,7 +16,7 @@ export const useResizeInteraction = ({
   const [initialDistance, setInitialDistance] = useState(0);
   const [initialPointerPosition, setInitialPointerPosition] = useState({ x: 0, y: 0 });
 
-  const startResize = (target: HTMLElement | null) => {
+  const startResize = useCallback((target: HTMLElement | null) => {
     if (isResizeControl(target)) {
       console.log('Iniziato il ridimensionamento con il mouse');
       setResizing(true);
@@ -24,17 +24,17 @@ export const useResizeInteraction = ({
       return true;
     }
     return false;
-  };
+  }, [scale]);
 
-  const startPinchResize = (distance: number) => {
+  const startPinchResize = useCallback((distance: number) => {
     console.log(`Pinch zoom iniziato, distanza iniziale: ${distance.toFixed(2)}`);
     setInitialDistance(distance);
     setInitialScale(scale);
     setResizing(true);
     return true;
-  };
+  }, [scale]);
 
-  const handleMouseResize = (
+  const handleMouseResize = useCallback((
     clientX: number, 
     clientY: number, 
     element: HTMLElement
@@ -51,8 +51,8 @@ export const useResizeInteraction = ({
     const distanceY = clientY - centerY;
     const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
     
-    // Fattore di scala più semplice e diretto
-    const scaleFactor = Math.max(0.5, Math.min(3, distance / 100));
+    // Fattore di scala più efficace
+    const scaleFactor = distance / 150;
     
     console.log(`Ridimensionamento: distance=${distance.toFixed(2)}, scaleFactor=${scaleFactor.toFixed(2)}`);
     
@@ -65,9 +65,9 @@ export const useResizeInteraction = ({
     console.log(`Nuova scala: ${clampedScale.toFixed(2)}`);
     onScaleChange(clampedScale);
     return true;
-  };
+  }, [resizing, onScaleChange, initialScale]);
 
-  const handlePinchResize = (distance: number) => {
+  const handlePinchResize = useCallback((distance: number) => {
     if (!resizing || !onScaleChange || initialDistance <= 0) return false;
     
     const scaleFactor = distance / initialDistance;
@@ -76,35 +76,35 @@ export const useResizeInteraction = ({
     console.log(`Pinch zoom: factor=${scaleFactor.toFixed(2)}, scale=${newScale.toFixed(2)}`);
     onScaleChange(newScale);
     return true;
-  };
+  }, [resizing, onScaleChange, initialDistance, initialScale]);
   
   // Funzioni specifiche per lo zoom in/out tramite pulsanti
-  const zoomIn = () => {
+  const zoomIn = useCallback(() => {
     if (!onScaleChange) return;
     const newScale = Math.min(scale + 0.2, 3);
     console.log(`Zoom in: ${newScale.toFixed(2)}`);
     onScaleChange(newScale);
-  };
+  }, [scale, onScaleChange]);
   
-  const zoomOut = () => {
+  const zoomOut = useCallback(() => {
     if (!onScaleChange) return;
     const newScale = Math.max(scale - 0.2, 0.5);
     console.log(`Zoom out: ${newScale.toFixed(2)}`);
     onScaleChange(newScale);
-  };
+  }, [scale, onScaleChange]);
 
-  const endResize = () => {
+  const endResize = useCallback(() => {
     const wasResizing = resizing;
     if (wasResizing) {
       console.log('Ridimensionamento terminato');
     }
     setResizing(false);
     return wasResizing;
-  };
+  }, [resizing]);
 
-  const resetDistance = () => {
+  const resetDistance = useCallback(() => {
     setInitialDistance(0);
-  };
+  }, []);
 
   return {
     resizing,
