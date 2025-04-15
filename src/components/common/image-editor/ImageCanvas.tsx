@@ -52,7 +52,9 @@ const ImageCanvas = ({
     handleTouchStart, 
     handleTouchMove, 
     handleTouchEnd,
-    centerImage
+    centerImage,
+    zoomIn,
+    zoomOut
   } = useImageInteractions({
     onPositionChange,
     onScaleChange,

@@ -27,10 +27,10 @@ export const useResizeInteraction = ({
   };
 
   const startPinchResize = (distance: number) => {
+    console.log(`Pinch zoom iniziato, distanza iniziale: ${distance.toFixed(2)}`);
     setInitialDistance(distance);
     setInitialScale(scale);
     setResizing(true);
-    console.log(`Pinch zoom iniziato, distanza iniziale: ${distance.toFixed(2)}`);
     return true;
   };
 
@@ -51,15 +51,19 @@ export const useResizeInteraction = ({
     const distanceY = clientY - centerY;
     const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
     
-    // Calculate diagonal of the element for scale reference
-    const diagonal = Math.sqrt(rect.width * rect.width + rect.height * rect.height) / 2;
+    // Fattore di scala più semplice e diretto
+    const scaleFactor = Math.max(0.5, Math.min(3, distance / 100));
     
-    // Calculate scale factor based on distance relative to the diagonal
-    const scaleFactor = Math.max(0.2, Math.min(distance / diagonal * 1.5, 2));
-    const newScale = Math.max(0.5, Math.min(3, initialScale * scaleFactor));
+    console.log(`Ridimensionamento: distance=${distance.toFixed(2)}, scaleFactor=${scaleFactor.toFixed(2)}`);
     
-    console.log(`Ridimensionamento: distance=${distance.toFixed(2)}, scale=${newScale.toFixed(2)}`);
-    onScaleChange(newScale);
+    // Applica la scala considerando la scala iniziale
+    const newScale = initialScale * scaleFactor;
+    
+    // Limita la scala tra 0.5 e 3
+    const clampedScale = Math.max(0.5, Math.min(3, newScale));
+    
+    console.log(`Nuova scala: ${clampedScale.toFixed(2)}`);
+    onScaleChange(clampedScale);
     return true;
   };
 
@@ -72,6 +76,21 @@ export const useResizeInteraction = ({
     console.log(`Pinch zoom: factor=${scaleFactor.toFixed(2)}, scale=${newScale.toFixed(2)}`);
     onScaleChange(newScale);
     return true;
+  };
+  
+  // Funzioni specifiche per lo zoom in/out tramite pulsanti
+  const zoomIn = () => {
+    if (!onScaleChange) return;
+    const newScale = Math.min(scale + 0.2, 3);
+    console.log(`Zoom in: ${newScale.toFixed(2)}`);
+    onScaleChange(newScale);
+  };
+  
+  const zoomOut = () => {
+    if (!onScaleChange) return;
+    const newScale = Math.max(scale - 0.2, 0.5);
+    console.log(`Zoom out: ${newScale.toFixed(2)}`);
+    onScaleChange(newScale);
   };
 
   const endResize = () => {
@@ -93,6 +112,8 @@ export const useResizeInteraction = ({
     startPinchResize,
     handleMouseResize,
     handlePinchResize,
+    zoomIn,
+    zoomOut,
     endResize,
     resetDistance
   };

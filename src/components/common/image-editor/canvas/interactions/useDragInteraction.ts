@@ -20,7 +20,12 @@ export const useDragInteraction = ({
 
   const startDrag = (clientX: number, clientY: number, target: HTMLElement | null) => {
     // Verifica se dovremmo iniziare il trascinamento
-    if (isResizeControl(target) || checkDoubleTap() || isButton(target)) {
+    if (isResizeControl(target) || isButton(target)) {
+      return false;
+    }
+    
+    // Verifica per doppio tap (questo previene l'inizio del trascinamento se è doppio tap)
+    if (checkDoubleTap()) {
       return false;
     }
     

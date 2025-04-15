@@ -47,7 +47,9 @@ export const useImageInteractions = ({
     startResize, 
     startPinchResize, 
     handleMouseResize, 
-    handlePinchResize, 
+    handlePinchResize,
+    zoomIn,
+    zoomOut,
     endResize,
     resetDistance
   } = useResizeInteraction({ onScaleChange, scale });
@@ -187,5 +189,7 @@ export const useImageInteractions = ({
     handleTouchMove,
     handleTouchEnd,
     centerImage,
+    zoomIn,
+    zoomOut,
   };
 };
