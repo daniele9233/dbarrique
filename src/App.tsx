@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Collection from "./pages/Collection";
 import Dashboard from "./pages/Dashboard";
 import WNetwork from "./pages/WNetwork";
+import WineBot from "./pages/WineBot";
 import NotFound from "./pages/NotFound";
 import "./styles/custom-scrollbar.css";
 
@@ -51,6 +52,7 @@ const App = () => {
             <Route path="/collection" element={<Collection />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/wnetwork" element={<WNetwork />} />
+            <Route path="/winebot" element={<WineBot />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
