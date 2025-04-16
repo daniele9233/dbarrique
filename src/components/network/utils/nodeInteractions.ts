@@ -14,23 +14,7 @@ export function setupNodeInteractions(
     .on("mouseover", (event, d) => {
       d3.select(event.currentTarget)
         .attr("stroke-width", 2)
-        .attr("stroke-opacity", 1)
-        .transition()
-        .duration(500)
-        .attr("r", d.radius * 1.1)
-        .transition()
-        .duration(500)
-        .attr("r", d.radius)
-        .on("end", function repeat() {
-          d3.select(this)
-            .transition()
-            .duration(500)
-            .attr("r", d.radius * 1.1)
-            .transition()
-            .duration(500)
-            .attr("r", d.radius)
-            .on("end", repeat);
-        });
+        .attr("stroke-opacity", 1);
         
       const tooltip = d3.select(tooltipRef.current);
       tooltip
@@ -47,9 +31,7 @@ export function setupNodeInteractions(
     .on("mouseout", (event, d) => {
       d3.select(event.currentTarget)
         .attr("stroke-width", 1)
-        .attr("stroke-opacity", 0.3)
-        .interrupt() // Stop all transitions
-        .attr("r", d.radius);
+        .attr("stroke-opacity", 0.3);
         
       d3.select(tooltipRef.current)
         .style("display", "none");

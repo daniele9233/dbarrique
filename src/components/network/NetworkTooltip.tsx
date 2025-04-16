@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { SimulationNode } from './types';
-import { X } from 'lucide-react';
 
 interface NetworkTooltipProps {
   selectedNode: SimulationNode | null;
@@ -11,32 +10,26 @@ const NetworkTooltip: React.FC<NetworkTooltipProps> = ({ selectedNode }) => {
   if (!selectedNode) return null;
 
   return (
-    <div className="absolute right-4 bottom-4 p-4 bg-noir-dark/80 backdrop-blur-md rounded-lg border border-white/10 shadow-lg max-w-xs w-full animate-fade-in">
-      <div className="flex items-start justify-between">
-        <div className="flex items-start gap-3 flex-1">
-          <div className="w-16 h-16 flex-shrink-0 rounded-md overflow-hidden">
-            <img 
-              src={selectedNode.image} 
-              alt={selectedNode.name} 
-              className="w-full h-full object-cover hover:scale-110 transition-transform duration-300" 
-            />
-          </div>
-          <div>
-            <h3 className="font-serif text-wine text-lg font-medium">{selectedNode.name}</h3>
-            <p className="text-white/80 text-sm">{selectedNode.grape}, {selectedNode.year}</p>
-            <p className="text-white/70 text-xs">{selectedNode.region}</p>
-            <div className="mt-2 flex items-center">
-              <span className="text-white/60 text-xs mr-1">Rating:</span>
-              <div className="flex">
-                {Array.from({ length: 10 }).map((_, i) => (
-                  <span 
-                    key={i} 
-                    className={`text-xs ${i < selectedNode.rating ? 'text-wine' : 'text-white/30'}`}
-                  >
-                    ★
-                  </span>
-                ))}
-              </div>
+    <div className="absolute right-4 bottom-4 p-4 bg-noir-dark/80 backdrop-blur-md rounded-lg border border-white/10 shadow-lg max-w-xs w-full">
+      <div className="flex items-start gap-3">
+        <div className="w-16 h-16 flex-shrink-0 rounded-md overflow-hidden">
+          <img src={selectedNode.image} alt={selectedNode.name} className="w-full h-full object-cover" />
+        </div>
+        <div>
+          <h3 className="font-serif text-wine text-lg font-medium">{selectedNode.name}</h3>
+          <p className="text-white/80 text-sm">{selectedNode.grape}, {selectedNode.year}</p>
+          <p className="text-white/70 text-xs">{selectedNode.region}</p>
+          <div className="mt-2 flex items-center">
+            <span className="text-white/60 text-xs mr-1">Rating:</span>
+            <div className="flex">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <span 
+                  key={i} 
+                  className={`text-xs ${i < selectedNode.rating ? 'text-wine' : 'text-white/30'}`}
+                >
+                  ★
+                </span>
+              ))}
             </div>
           </div>
         </div>
