@@ -9,6 +9,7 @@ import { generateWineDescription } from './wineDescriptions';
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 export interface EditedWine {
+  id: string; // Adding the missing id property
   name: string;
   region: string;
   winery: string;
@@ -38,6 +39,7 @@ export const useWineCardState = (wine: Wine) => {
   
   const [editedWine, setEditedWine] = useState<EditedWine>({
     ...wine,
+    id: id, // Explicitly setting the id
     winery: wine.winery || "",
     grapes: grapes || (grape !== "Blend" ? [grape] : []),
     description: wine.description || wineDescriptions.description,
